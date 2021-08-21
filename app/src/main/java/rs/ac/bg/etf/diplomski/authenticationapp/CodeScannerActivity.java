@@ -6,11 +6,12 @@ import android.os.Bundle;
 
 import dagger.hilt.android.AndroidEntryPoint;
 
-public class MainActivity extends AppCompatActivity {
+@AndroidEntryPoint
+public class CodeScannerActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_code_scanner);
     }
 }
