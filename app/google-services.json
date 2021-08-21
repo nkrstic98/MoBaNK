@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "813099956289",
+    "project_id": "authenticationapp2021",
+    "storage_bucket": "authenticationapp2021.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:813099956289:android:5fba64ceb24e37f61d2ec0",
+        "android_client_info": {
+          "package_name": "rs.ac.bg.etf.diplomski.authenticationapp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "813099956289-ahafp5dl3snsrpuv7f2ec3l8b8ept861.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "rs.ac.bg.etf.diplomski.authenticationapp",
+            "certificate_hash": "47ecc2e7d3f2e3d318a3c4633382dd849ce9686c"
+          }
+        },
+        {
+          "client_id": "813099956289-d96uri39i16jg2mot98s203u3kcq5cuh.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCN_nNt5i9dC8oyz8NBt-EF1XHCNajQ_O4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "813099956289-d96uri39i16jg2mot98s203u3kcq5cuh.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
