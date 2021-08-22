@@ -1,14 +1,22 @@
 package rs.ac.bg.etf.diplomski.authenticationapp;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
-
 import android.Manifest;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+import androidx.fragment.app.Fragment;
+import androidx.navigation.NavController;
+import androidx.navigation.Navigation;
+
 import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Toast;
 
 import com.budiyev.android.codescanner.AutoFocusMode;
@@ -23,21 +31,22 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.List;
+import java.util.NavigableMap;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicBoolean;
 
-import dagger.hilt.android.AndroidEntryPoint;
-import rs.ac.bg.etf.diplomski.authenticationapp.databinding.ActivityCodeScannerBinding;
+import rs.ac.bg.etf.diplomski.authenticationapp.databinding.FragmentCodeScannerBinding;
 
-@AndroidEntryPoint
-public class CodeScannerActivity extends AppCompatActivity {
+public class CodeScannerFragment extends Fragment {
 
     private static final int CAMERA_REQUEST_CODE = 101;
 
     private static final String PHONE_VERIFICATION_SIS_KEY = "phone-verification-sis-key";
     private static final String PHONE_VERIFICATION_SIS_NUMBER = "phone-verification-sis-number";
 
-    private ActivityCodeScannerBinding binding;
+    private FragmentCodeScannerBinding binding;
+    private RegisterActivity registerActivity;
+    private NavController navController;
+
     private FirebaseAuth firebaseAuth;
     private FirebaseFirestore firebaseFirestore;
     private CodeScanner codeScanner;
@@ -45,56 +54,52 @@ public class CodeScannerActivity extends AppCompatActivity {
     private boolean phone_verification_in_progress = false;
     private String phone_number = "";
 
+    public CodeScannerFragment() {
+        // Required empty public constructor
+    }
+
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        binding = ActivityCodeScannerBinding.inflate(getLayoutInflater());
-        setContentView(binding.getRoot());
+        registerActivity = (RegisterActivity) requireActivity();
 
         firebaseAuth = FirebaseAuth.getInstance();
         firebaseFirestore = FirebaseFirestore.getInstance();
+    }
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+
+        binding = FragmentCodeScannerBinding.inflate(inflater, container, false);
 
         setupCameraPermissions();
         initCodeScanner();
+
+        return binding.getRoot();
     }
 
     @Override
-    protected void onStart() {
-        super.onStart();
-        if(phone_verification_in_progress && phone_number != "") {
-            verifyPhoneNumber(phone_number);
-        }
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        navController = Navigation.findNavController(view);
     }
 
     @Override
-    protected void onResume() {
-        super.onResume();
-        codeScanner.startPreview();
-    }
-
-    @Override
-    protected void onPause() {
+    public void onPause() {
         super.onPause();
         codeScanner.releaseResources();
     }
 
     @Override
-    protected void onSaveInstanceState(@NonNull Bundle outState) {
-        super.onSaveInstanceState(outState);
-        outState.putBoolean(PHONE_VERIFICATION_SIS_KEY, phone_verification_in_progress);
-        outState.putString(PHONE_VERIFICATION_SIS_NUMBER, phone_number);
-    }
-
-    @Override
-    protected void onRestoreInstanceState(@NonNull Bundle savedInstanceState) {
-        super.onRestoreInstanceState(savedInstanceState);
-        phone_verification_in_progress = savedInstanceState.getBoolean(PHONE_VERIFICATION_SIS_KEY);
-        phone_number = savedInstanceState.getString(PHONE_VERIFICATION_SIS_NUMBER, "");
+    public void onResume() {
+        super.onResume();
+        codeScanner.startPreview();
     }
 
     private void initCodeScanner() {
-        codeScanner = new CodeScanner(this, binding.scannerView);
+        codeScanner = new CodeScanner(registerActivity, binding.scannerView);
 
         codeScanner.setCamera(CodeScanner.CAMERA_BACK);
         codeScanner.setFormats(CodeScanner.ALL_FORMATS);
@@ -110,14 +115,14 @@ public class CodeScannerActivity extends AppCompatActivity {
                 verifyUserKey(scanned_data[0], scanned_data[1], scanned_data[2]);
             }
             catch (Exception e) {
-                runOnUiThread(() -> {
-                    Toast.makeText(this, "Invalid QR Code. Please try again", Toast.LENGTH_SHORT).show();
+                registerActivity.runOnUiThread(() -> {
+                    Toast.makeText(registerActivity, "Invalid QR Code. Please try again", Toast.LENGTH_SHORT).show();
                 });
             }
         });
 
         codeScanner.setErrorCallback(error -> {
-            runOnUiThread(() -> {
+            registerActivity.runOnUiThread(() -> {
                 Log.e("scanner-error", "Camera initialization error" + error.getMessage());
             });
         });
@@ -138,12 +143,12 @@ public class CodeScannerActivity extends AppCompatActivity {
                         verifyPhoneNumber(phoneNumber);
                     }
                     else {
-                        Toast.makeText(this, "Invalid QR code! Use different code, or contact QR Code provider.", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(registerActivity, "Invalid QR code! Use different code, or contact QR Code provider.", Toast.LENGTH_SHORT).show();
                     }
                 })
                 .addOnFailureListener(e -> {
                     Log.e("firebase-tag", e.getMessage());
-                    Toast.makeText(this, "Something went wrong. Please try again later!", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(registerActivity, "Something went wrong. Please try again later!", Toast.LENGTH_SHORT).show();
                 });
     }
 
@@ -155,7 +160,7 @@ public class CodeScannerActivity extends AppCompatActivity {
                         .newBuilder(firebaseAuth)
                         .setPhoneNumber(phoneNumber)
                         .setTimeout(60L, TimeUnit.SECONDS)
-                        .setActivity(this)
+                        .setActivity(registerActivity)
                         .setCallbacks(new PhoneAuthProvider.OnVerificationStateChangedCallbacks() {
                             @Override
                             public void onVerificationCompleted(@NonNull PhoneAuthCredential phoneAuthCredential) {
@@ -187,13 +192,13 @@ public class CodeScannerActivity extends AppCompatActivity {
     }
 
     private void setupCameraPermissions() {
-        if(ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
+        if(ContextCompat.checkSelfPermission(registerActivity, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
             makePermissionRequest();
         }
     }
 
     private void makePermissionRequest() {
-        ActivityCompat.requestPermissions(this, new String[]{ Manifest.permission.CAMERA }, CAMERA_REQUEST_CODE);
+        ActivityCompat.requestPermissions(registerActivity, new String[]{ Manifest.permission.CAMERA }, CAMERA_REQUEST_CODE);
     }
 
     @Override
@@ -201,7 +206,7 @@ public class CodeScannerActivity extends AppCompatActivity {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         if (requestCode == CAMERA_REQUEST_CODE) {
             if (grantResults.length == 0 || grantResults[0] != PackageManager.PERMISSION_GRANTED) {
-                Toast.makeText(this, "You need camera permission to be able to use this app", Toast.LENGTH_SHORT).show();
+                Toast.makeText(registerActivity, "You need camera permission to be able to use this app", Toast.LENGTH_SHORT).show();
             }
         }
     }
