@@ -9,12 +9,20 @@ import android.Manifest;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.provider.ContactsContract;
 import android.util.Log;
 import android.widget.Toast;
 
 import com.budiyev.android.codescanner.AutoFocusMode;
 import com.budiyev.android.codescanner.CodeScanner;
 import com.budiyev.android.codescanner.ScanMode;
+import com.google.firebase.FirebaseException;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.PhoneAuthCredential;
+import com.google.firebase.auth.PhoneAuthOptions;
+import com.google.firebase.auth.PhoneAuthProvider;
+
+import java.util.concurrent.TimeUnit;
 
 import dagger.hilt.android.AndroidEntryPoint;
 import rs.ac.bg.etf.diplomski.authenticationapp.databinding.ActivityCodeScannerBinding;
@@ -24,15 +32,24 @@ public class CodeScannerActivity extends AppCompatActivity {
 
     private static final int CAMERA_REQUEST_CODE = 101;
 
-    ActivityCodeScannerBinding binding;
+    private static final String PHONE_VERIFICATION_SIS_KEY = "phone-verification-sis-key";
+    private static final String PHONE_VERIFICATION_SIS_NUMBER = "phone-verification-sis-number";
 
+    private ActivityCodeScannerBinding binding;
+    private FirebaseAuth firebaseAuth;
     private CodeScanner codeScanner;
+
+    private boolean phone_verification_in_progress = false;
+    private String phone_number = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         binding = ActivityCodeScannerBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
+
+        firebaseAuth = FirebaseAuth.getInstance();
 
         setupCameraPermissions();
         initCodeScanner();
@@ -49,12 +66,14 @@ public class CodeScannerActivity extends AppCompatActivity {
         codeScanner.setFlashEnabled(false);
 
         codeScanner.setDecodeCallback(result -> {
-            runOnUiThread(() -> {
-//                String[] scanned_data = result.getText().split("@");
-//                binding.textViewKey.setText(scanned_data[0]);
-//                binding.textViewPhone.setText(scanned_data[1]);
-                binding.textViewKey.setText(result.getText());
-            });
+            try {
+                String[] scanned_data = result.getText().split("@");
+
+                verifyPhoneNumber(scanned_data[1]);
+            }
+            catch (Exception e) {
+                Toast.makeText(this, "Invalid QR Code. Please try again", Toast.LENGTH_SHORT);
+            }
         });
 
         codeScanner.setErrorCallback(error -> {
@@ -69,6 +88,14 @@ public class CodeScannerActivity extends AppCompatActivity {
     }
 
     @Override
+    protected void onStart() {
+        super.onStart();
+        if(phone_verification_in_progress && phone_number != "") {
+            //verifyPhoneNumber(phone_number);
+        }
+    }
+
+    @Override
     protected void onResume() {
         super.onResume();
         codeScanner.startPreview();
@@ -78,6 +105,61 @@ public class CodeScannerActivity extends AppCompatActivity {
     protected void onPause() {
         super.onPause();
         codeScanner.releaseResources();
+    }
+
+    @Override
+    protected void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putBoolean(PHONE_VERIFICATION_SIS_KEY, phone_verification_in_progress);
+        outState.putString(PHONE_VERIFICATION_SIS_NUMBER, phone_number);
+    }
+
+    @Override
+    protected void onRestoreInstanceState(@NonNull Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+        phone_verification_in_progress = savedInstanceState.getBoolean(PHONE_VERIFICATION_SIS_KEY);
+        phone_number = savedInstanceState.getString(PHONE_VERIFICATION_SIS_NUMBER, "");
+    }
+
+    private void verifyPhoneNumber(String phoneNumber) {
+        this.phone_number = phoneNumber;
+
+        PhoneAuthOptions phoneAuthOptions =
+                PhoneAuthOptions
+                        .newBuilder(firebaseAuth)
+                        .setPhoneNumber(phoneNumber)
+                        .setTimeout(60L, TimeUnit.SECONDS)
+                        .setActivity(this)
+                        .setCallbacks(new PhoneAuthProvider.OnVerificationStateChangedCallbacks() {
+                            @Override
+                            public void onVerificationCompleted(@NonNull PhoneAuthCredential phoneAuthCredential) {
+                                Log.d("verification-tag", "onVerificationCompleted: " + phoneAuthCredential);
+                            }
+
+                            @Override
+                            public void onVerificationFailed(@NonNull FirebaseException e) {
+                                Log.e("verification-tag", "onVerificationFailed: " + e.getMessage());
+                            }
+
+                            @Override
+                            public void onCodeSent(@NonNull String verificationId, @NonNull PhoneAuthProvider.ForceResendingToken forceResendingToken) {
+                                super.onCodeSent(verificationId, forceResendingToken);
+
+                            }
+
+                            @Override
+                            public void onCodeAutoRetrievalTimeOut(@NonNull String s) {
+                                super.onCodeAutoRetrievalTimeOut(s);
+                                Log.d("verification-tag", "onCodeAutoRetrievalTimeOut: " + s);
+                            }
+
+
+                        })
+                        .build();
+
+        PhoneAuthProvider.verifyPhoneNumber(phoneAuthOptions);
+
+        phone_verification_in_progress = true;
     }
 
     private void setupCameraPermissions() {

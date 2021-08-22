@@ -9,33 +9,11 @@
     <com.budiyev.android.codescanner.CodeScannerView
         android:id="@+id/scanner_view"
         android:layout_width="match_parent"
-        android:layout_height="400dp"
+        android:layout_height="match_parent"
         app:autoFocusButtonColor="@android:color/white"
         app:autoFocusButtonVisible="true"
         app:flashButtonColor="@android:color/white"
         app:flashButtonVisible="true"
         app:maskColor="#52000000" />
-
-    <TextView
-        android:id="@+id/text_view_key"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/scanner_view"
-        android:layout_centerHorizontal="true"
-        android:layout_margin="20dp"
-        android:text="User Unique Key..."
-        android:textColor="@android:color/black"
-        />
-
-    <TextView
-        android:id="@+id/text_view_phone"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/text_view_key"
-        android:layout_centerHorizontal="true"
-        android:text="User phone number..."
-        android:textColor="@android:color/black"
-        />
-
 
 </RelativeLayout>
