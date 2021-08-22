@@ -72,6 +72,7 @@ dependencies {
     implementation platform('com.google.firebase:firebase-bom:28.4.0')
     implementation 'com.google.firebase:firebase-analytics'
     implementation 'com.google.firebase:firebase-auth'
+    implementation 'com.google.firebase:firebase-firestore'
 
     //Code scanner dependency
     implementation 'com.budiyev.android:code-scanner:2.1.0'
