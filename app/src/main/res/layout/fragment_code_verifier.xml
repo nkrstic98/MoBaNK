@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    tools:context=".CodeVerifierFragment">
+    tools:context=".account_setup.CodeVerifierFragment">
 
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/sms_verifier_label"
@@ -25,7 +25,9 @@
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/sms_verifier"
             android:layout_width="match_parent"
-            android:layout_height="match_parent" />
+            android:layout_height="match_parent"
+            android:inputType="number"
+            />
     </com.google.android.material.textfield.TextInputLayout>
 
     <Button

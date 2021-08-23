@@ -1,4 +1,4 @@
-package rs.ac.bg.etf.diplomski.authenticationapp;
+package rs.ac.bg.etf.diplomski.authenticationapp.account_setup;
 
 import android.os.Bundle;
 
@@ -14,7 +14,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
-import com.google.common.base.MoreObjects;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.UserProfileChangeRequest;
@@ -23,6 +22,8 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import rs.ac.bg.etf.diplomski.authenticationapp.account_setup.UserRegisterFragmentArgs;
+import rs.ac.bg.etf.diplomski.authenticationapp.account_setup.UserRegisterFragmentDirections;
 import rs.ac.bg.etf.diplomski.authenticationapp.databinding.FragmentUserRegisterBinding;
 import rs.ac.bg.etf.diplomski.authenticationapp.models.User;
 

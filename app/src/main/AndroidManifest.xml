@@ -14,7 +14,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.AuthenticationApp">
 
-        <activity android:name=".RegisterActivity">
+        <activity android:name=".account_setup.RegisterActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

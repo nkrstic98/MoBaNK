@@ -1,7 +1,6 @@
-package rs.ac.bg.etf.diplomski.authenticationapp;
+package rs.ac.bg.etf.diplomski.authenticationapp.account_setup;
 
 import android.Manifest;
-import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 
@@ -31,9 +30,9 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.List;
-import java.util.NavigableMap;
 import java.util.concurrent.TimeUnit;
 
+import rs.ac.bg.etf.diplomski.authenticationapp.account_setup.CodeScannerFragmentDirections;
 import rs.ac.bg.etf.diplomski.authenticationapp.databinding.FragmentCodeScannerBinding;
 
 public class CodeScannerFragment extends Fragment {
@@ -185,7 +184,7 @@ public class CodeScannerFragment extends Fragment {
                         .build();
 
         PhoneAuthProvider.verifyPhoneNumber(phoneAuthOptions);
-        
+
     }
 
     private void setupCameraPermissions() {

@@ -5,7 +5,6 @@ import android.content.SharedPreferences;
 import android.os.Build;
 import android.security.keystore.KeyGenParameterSpec;
 import android.security.keystore.KeyProperties;
-import android.telecom.Call;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -36,6 +35,8 @@ import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.KeyGenerator;
 import javax.crypto.NoSuchPaddingException;
 import javax.crypto.SecretKey;
+
+import rs.ac.bg.etf.diplomski.authenticationapp.account_setup.RegisterActivity;
 
 public class BiometricAuthenticator {
 
@@ -154,7 +155,7 @@ public class BiometricAuthenticator {
     }
 
     @RequiresApi(api = Build.VERSION_CODES.M)
-    protected void generateSecretKey(boolean require_authentication) {
+    public void generateSecretKey(boolean require_authentication) {
         try {
             KeyGenParameterSpec keyGenParameterSpec = new KeyGenParameterSpec.Builder(
                         BiometricAuthenticator.KEY_NAME,
@@ -178,7 +179,7 @@ public class BiometricAuthenticator {
         }
     }
 
-    protected SecretKey getSecretKey() {
+    public SecretKey getSecretKey() {
         try {
             KeyStore keyStore = KeyStore.getInstance("AndroidKeyStore");
             keyStore.load(null);
@@ -202,7 +203,7 @@ public class BiometricAuthenticator {
         }
     }
 
-    protected Cipher getCypher() {
+    public Cipher getCypher() {
         try {
             return Cipher.getInstance(KeyProperties.KEY_ALGORITHM_AES + "/"
                     + KeyProperties.BLOCK_MODE_CBC + "/"

@@ -6,7 +6,6 @@ import android.os.Build;
 import android.os.Bundle;
 
 import androidx.annotation.RequiresApi;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
 import androidx.lifecycle.MutableLiveData;
@@ -22,17 +21,14 @@ import android.widget.Toast;
 import com.davidmiguel.numberkeyboard.NumberKeyboardListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 
-import java.nio.charset.Charset;
 import java.security.InvalidKeyException;
-import java.util.Date;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
-import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.SecretKey;
 
+import rs.ac.bg.etf.diplomski.authenticationapp.account_setup.RegisterActivity;
 import rs.ac.bg.etf.diplomski.authenticationapp.databinding.FragmentKeyboardBinding;
 
 public class KeyboardFragment extends Fragment {
