@@ -6,9 +6,13 @@ import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.biometric.BiometricManager;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.MutableLiveData;
+import androidx.navigation.NavController;
+import androidx.navigation.Navigation;
 
 import android.provider.Settings;
 import android.util.Log;
@@ -42,9 +46,7 @@ public class PinRegisterFragment extends Fragment {
 
     private RegisterActivity registerActivity;
     private FragmentPinRegisterBinding binding;
-
-    private FirebaseAuth firebaseAuth;
-    private FirebaseFirestore firebaseFirestore;
+    private NavController navController;
 
     private BiometricAuthenticator biometricAuthenticator;
 
@@ -64,10 +66,7 @@ public class PinRegisterFragment extends Fragment {
 
         documentId.setValue(PinRegisterFragmentArgs.fromBundle(requireArguments()).getDocumentId());
 
-        biometricAuthenticator = new BiometricAuthenticator(registerActivity, documentId.getValue());
-
-        firebaseAuth = FirebaseAuth.getInstance();
-        firebaseFirestore = FirebaseFirestore.getInstance();
+        biometricAuthenticator = new BiometricAuthenticator(registerActivity, new PinRegisterCallback());
     }
 
     @Override
@@ -152,37 +151,12 @@ public class PinRegisterFragment extends Fragment {
                             biometricAuthenticator.authenticate(cipher);
                         }
                         else {
-                            Date date = new Date();
-                            long time = date.getTime();
-
-                            editor.putLong(BiometricAuthenticator.SHARED_PREFERENCES_KEY_PARAMETER, time);
-                            editor.commit();
-
-                            String key = documentId.getValue() + "_" + time;
-
-                            byte[] crypto = cipher.doFinal(
-                                    key.getBytes(Charset.defaultCharset())
-                            );
-
-                            firebaseFirestore
-                                    .collection("users")
-                                    .document(documentId.getValue())
-                                    .update("secret_key", crypto.toString())
-                                    .addOnSuccessListener(registerActivity, aVoid1 -> {
-                                        Toast.makeText(registerActivity, "Success!", Toast.LENGTH_SHORT).show();
-
-                                        //prebaci na logovanje
-                                        //ugasi aktivnost
-                                    })
-                                    .addOnFailureListener(registerActivity, e -> {
-                                        Toast.makeText(registerActivity, e.getMessage(), Toast.LENGTH_SHORT).show();
-                                    });
+                            PinRegisterFragmentDirections.ActionPinRegisterFragmentToKeyboardFragment action =
+                                    PinRegisterFragmentDirections.actionPinRegisterFragmentToKeyboardFragment(documentId.getValue());
+                            action.setDocumentId(documentId.getValue());
+                            navController.navigate(action);
                         }
                     } catch (InvalidKeyException e) {
-                        e.printStackTrace();
-                    } catch (BadPaddingException e) {
-                        e.printStackTrace();
-                    } catch (IllegalBlockSizeException e) {
                         e.printStackTrace();
                     }
                 }
@@ -190,5 +164,28 @@ public class PinRegisterFragment extends Fragment {
         });
 
         return  binding.getRoot();
+    }
+
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        navController = Navigation.findNavController(view);
+        biometricAuthenticator.registerNavController(navController);
+    }
+
+    public class PinRegisterCallback implements BiometricAuthenticator.Callback {
+
+        @Override
+        public void invoke() {
+            PinRegisterFragmentDirections.ActionPinRegisterFragmentToKeyboardFragment action =
+                    PinRegisterFragmentDirections.actionPinRegisterFragmentToKeyboardFragment(documentId.getValue());
+            action.setDocumentId(documentId.getValue());
+            navController.navigate(action);
+        }
+
+        @Override
+        public void encrypt(Cipher cipher) {
+            biometricAuthenticator.encrypt(cipher, documentId.getValue());
+        }
     }
 }

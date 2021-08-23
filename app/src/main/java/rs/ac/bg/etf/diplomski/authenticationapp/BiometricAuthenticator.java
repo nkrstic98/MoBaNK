@@ -5,6 +5,7 @@ import android.content.SharedPreferences;
 import android.os.Build;
 import android.security.keystore.KeyGenParameterSpec;
 import android.security.keystore.KeyProperties;
+import android.telecom.Call;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -13,6 +14,7 @@ import androidx.biometric.BiometricManager;
 import androidx.biometric.BiometricPrompt;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.FragmentActivity;
+import androidx.navigation.NavController;
 
 import com.google.firebase.firestore.FirebaseFirestore;
 
@@ -36,6 +38,12 @@ import javax.crypto.NoSuchPaddingException;
 import javax.crypto.SecretKey;
 
 public class BiometricAuthenticator {
+
+    public interface  Callback {
+        void invoke();
+        void encrypt(Cipher cipher);
+    }
+
     public static final String SHARED_PREFERENCES_BIOMETRY = "shared-preferences-authentication-data";
     public static final String SHARED_PREFERENCES_BIOMETRY_PARAMETER = "shared-preferences-biometry-parameter";
     public static final String SHARED_PREFERENCES_PIN_CODE_PARAMETER = "shared-preferences-pin-code-parameter";
@@ -43,62 +51,41 @@ public class BiometricAuthenticator {
 
     protected static final String KEY_NAME = "android-device-info-key";
 
+    private Context context;
+    private NavController navController;
+
     private Executor executor;
     private BiometricPrompt biometricPrompt;
     private BiometricPrompt.PromptInfo promptInfo;
 
-    public BiometricAuthenticator(Context context, String data) {
+    public BiometricAuthenticator(Context context, Callback callback) {
         executor = ContextCompat.getMainExecutor(context);
+
+        this.context = context;
 
         biometricPrompt = new BiometricPrompt((FragmentActivity) context, executor, new BiometricPrompt.AuthenticationCallback() {
             @Override
             public void onAuthenticationError(int errorCode, @NonNull CharSequence errString) {
                 super.onAuthenticationError(errorCode, errString);
-                Toast.makeText(context,
-                        "Authentication error: " + errString, Toast.LENGTH_SHORT)
-                        .show();
+
+                if(context instanceof RegisterActivity) {
+                    callback.invoke();
+                }
+                else {
+
+                }
             }
 
             @Override
             public void onAuthenticationSucceeded(@NonNull BiometricPrompt.AuthenticationResult result) {
                 super.onAuthenticationSucceeded(result);
 
-                try {
-                    Date date = new Date();
-                    long time = date.getTime();
-
-                    SharedPreferences sharedPreferences = context.getSharedPreferences(BiometricAuthenticator.SHARED_PREFERENCES_KEY_PARAMETER, Context.MODE_PRIVATE);
-                    SharedPreferences.Editor editor = sharedPreferences.edit();
-                    editor.putLong(BiometricAuthenticator.SHARED_PREFERENCES_BIOMETRY_PARAMETER, time);
-                    editor.commit();
-
-                    String key = data + "_" + time;
-
-                    byte[] crypto = result.getCryptoObject().getCipher().doFinal(
-                            key.getBytes(Charset.defaultCharset())
-                    );
-
-                    FirebaseFirestore firebaseFirestore = FirebaseFirestore.getInstance();
-                    firebaseFirestore
-                            .collection("users")
-                            .document(data)
-                            .update("secret_key", crypto.toString())
-                            .addOnSuccessListener((FragmentActivity) context, aVoid1 -> {
-                                Toast.makeText(context, "Success!", Toast.LENGTH_SHORT).show();
-
-                                //prebaci me na logovanje
-                                //ugasi ovu aktivnosts
-                            })
-                            .addOnFailureListener((FragmentActivity) context, e -> {
-                                Toast.makeText(context, e.getMessage(), Toast.LENGTH_SHORT).show();
-                            });
-
-                } catch (BadPaddingException e) {
-                    e.printStackTrace();
-                } catch (IllegalBlockSizeException e) {
-                    e.printStackTrace();
+                if(context instanceof RegisterActivity) {
+                    callback.encrypt(result.getCryptoObject().getCipher());
                 }
+                else {
 
+                }
 
                 Toast.makeText(context,
                         "Authentication succeeded!", Toast.LENGTH_SHORT).show();
@@ -120,8 +107,50 @@ public class BiometricAuthenticator {
                 .build();
     }
 
+    public void registerNavController(NavController navController) {
+        this.navController = navController;
+    }
+
     public void authenticate(Cipher cipher) {
         biometricPrompt.authenticate(promptInfo, new BiometricPrompt.CryptoObject(cipher));
+    }
+
+    public void encrypt(Cipher cipher, String data) {
+        try {
+            Date date = new Date();
+            long time = date.getTime();
+
+            SharedPreferences sharedPreferences = context.getSharedPreferences(BiometricAuthenticator.SHARED_PREFERENCES_KEY_PARAMETER, Context.MODE_PRIVATE);
+            SharedPreferences.Editor editor = sharedPreferences.edit();
+            editor.putLong(BiometricAuthenticator.SHARED_PREFERENCES_BIOMETRY_PARAMETER, time);
+            editor.commit();
+
+            String key = data + "_" + time;
+
+            byte[] crypto = cipher.doFinal(
+                    key.getBytes(Charset.defaultCharset())
+            );
+
+            FirebaseFirestore firebaseFirestore = FirebaseFirestore.getInstance();
+            firebaseFirestore
+                    .collection("users")
+                    .document(data)
+                    .update("secret_key", crypto.toString())
+                    .addOnSuccessListener((FragmentActivity) context, aVoid1 -> {
+                        Toast.makeText(context, "Authentication succeeded!", Toast.LENGTH_SHORT).show();
+
+                        //prebaci me na logovanje
+                        //ugasi ovu aktivnosts
+                    })
+                    .addOnFailureListener((FragmentActivity) context, e -> {
+                        Toast.makeText(context, e.getMessage(), Toast.LENGTH_SHORT).show();
+                    });
+
+        } catch (BadPaddingException e) {
+            e.printStackTrace();
+        } catch (IllegalBlockSizeException e) {
+            e.printStackTrace();
+        }
     }
 
     @RequiresApi(api = Build.VERSION_CODES.M)

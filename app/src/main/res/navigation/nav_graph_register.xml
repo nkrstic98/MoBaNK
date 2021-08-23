@@ -48,5 +48,17 @@
         <argument
             android:name="documentId"
             app:argType="string" />
+        <action
+            android:id="@+id/action_pinRegisterFragment_to_keyboardFragment"
+            app:destination="@id/keyboardFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/keyboardFragment"
+        android:name="rs.ac.bg.etf.diplomski.authenticationapp.KeyboardFragment"
+        android:label="fragment_keyboard"
+        tools:layout="@layout/fragment_keyboard" >
+        <argument
+            android:name="documentId"
+            app:argType="string" />
     </fragment>
 </navigation>

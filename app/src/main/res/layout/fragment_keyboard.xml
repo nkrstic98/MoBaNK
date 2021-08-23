@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:keyboard="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    tools:context=".KeyboardFragment">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="50dp"
+        android:layout_gravity="center"
+        android:layout_marginTop="20dp"
+        android:gravity="center"
+        android:text="Enter PIN Code"
+        android:textSize="30sp" />
+
+    <TextView
+        android:id="@+id/pin_code"
+        android:layout_width="wrap_content"
+        android:layout_height="50dp"
+        android:layout_gravity="center"
+        android:layout_marginTop="80dp"
+        android:gravity="center"
+        android:textSize="40sp" />
+
+    <com.davidmiguel.numberkeyboard.NumberKeyboard
+        android:id="@+id/numberKeyboard"
+        android:layout_width="match_parent"
+        android:layout_height="300dp"
+        android:layout_marginTop="20dp"
+        android:layout_marginLeft="75dp"
+        android:layout_marginRight="75dp"
+        keyboard:numberkeyboard_keyWidth="60dp"
+        keyboard:numberkeyboard_keyHeight="60dp"
+        keyboard:numberkeyboard_keyboardType="integer"
+        />
+
+    <Button
+        android:id="@+id/button_submit"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:text="SUBMIT"
+        android:layout_marginTop="20dp"
+        />
+
+</LinearLayout>
