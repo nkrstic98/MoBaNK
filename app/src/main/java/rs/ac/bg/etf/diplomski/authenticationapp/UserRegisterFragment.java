@@ -128,8 +128,7 @@ public class UserRegisterFragment extends Fragment {
                                                                     .collection("users")
                                                                     .document(documentId.getValue())
                                                                     .update(
-                                                                            "email", email,
-                                                                            "password", password
+                                                                            "email", email
                                                                     )
                                                                     .addOnSuccessListener(registerActivity, aVoid1 -> {
                                                                         Toast.makeText(registerActivity, "Registration successful", Toast.LENGTH_SHORT).show();

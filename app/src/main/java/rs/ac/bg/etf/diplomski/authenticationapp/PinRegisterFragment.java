@@ -1,13 +1,17 @@
 package rs.ac.bg.etf.diplomski.authenticationapp;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
 
+import androidx.biometric.BiometricManager;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.MutableLiveData;
 
+import android.provider.Settings;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -28,6 +32,9 @@ import javax.crypto.SecretKey;
 
 import rs.ac.bg.etf.diplomski.authenticationapp.databinding.FragmentPinRegisterBinding;
 import rs.ac.bg.etf.diplomski.authenticationapp.databinding.FragmentUserRegisterBinding;
+
+import static androidx.biometric.BiometricManager.Authenticators.BIOMETRIC_STRONG;
+import static androidx.biometric.BiometricManager.Authenticators.DEVICE_CREDENTIAL;
 
 public class PinRegisterFragment extends Fragment {
 
@@ -95,7 +102,27 @@ public class PinRegisterFragment extends Fragment {
         });
 
         binding.biometryAuth.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            biometry_used.setValue(isChecked);
+            BiometricManager biometricManager = BiometricManager.from(registerActivity);
+            switch (biometricManager.canAuthenticate(BIOMETRIC_STRONG | DEVICE_CREDENTIAL)) {
+                case BiometricManager.BIOMETRIC_SUCCESS:
+                    biometry_used.setValue(isChecked);
+                    if(isChecked) {
+                        Toast.makeText(registerActivity, "Biometry enabled.", Toast.LENGTH_SHORT).show();
+                    }
+                    else {
+                        Toast.makeText(registerActivity, "Biometry disabled.", Toast.LENGTH_SHORT).show();
+                    }
+                    break;
+                case BiometricManager.BIOMETRIC_ERROR_NO_HARDWARE:
+                    Toast.makeText(registerActivity, "No biometric features available on this device.", Toast.LENGTH_SHORT).show();
+                    biometry_used.setValue(false);
+                    break;
+                case BiometricManager.BIOMETRIC_ERROR_HW_UNAVAILABLE:
+                    Toast.makeText(registerActivity, "Biometric features are currently unavailable.", Toast.LENGTH_SHORT).show();
+                    biometry_used.setValue(false);
+                    binding.biometryAuth.setChecked(false);
+                    break;
+            }
         });
 
         binding.buttonSubmit.setOnClickListener(v -> {
