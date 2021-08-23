@@ -76,4 +76,7 @@ dependencies {
 
     //Code scanner dependency
     implementation 'com.budiyev.android:code-scanner:2.1.0'
+
+    //Custom PIN input keyboard
+    implementation 'com.github.davidmigloz:number-keyboard:3.0.0'
 }

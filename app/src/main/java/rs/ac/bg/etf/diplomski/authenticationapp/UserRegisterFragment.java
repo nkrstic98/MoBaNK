@@ -126,6 +126,11 @@ public class UserRegisterFragment extends Fragment {
                                                 )
                                                 .addOnSuccessListener(registerActivity, aVoid1 -> {
                                                     Toast.makeText(registerActivity, "Registration successful", Toast.LENGTH_SHORT).show();
+
+                                                    UserRegisterFragmentDirections.ActionUserRegisterFragmentToPinRegisterFragment action =
+                                                            UserRegisterFragmentDirections.actionUserRegisterFragmentToPinRegisterFragment(documentId.getValue());
+                                                    action.setDocumentId(documentId.getValue());
+                                                    navController.navigate(action);
                                                 })
                                                 .addOnFailureListener(registerActivity, e -> {
                                                     Toast.makeText(registerActivity, e.getMessage(), Toast.LENGTH_SHORT).show();

@@ -36,5 +36,17 @@
         tools:layout="@layout/fragment_user_register" >
         <argument android:name="documentId"
             app:argType="string" />
+        <action
+            android:id="@+id/action_userRegisterFragment_to_pinRegisterFragment"
+            app:destination="@id/pinRegisterFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/pinRegisterFragment"
+        android:name="rs.ac.bg.etf.diplomski.authenticationapp.PinRegisterFragment"
+        android:label="fragment_pin_register"
+        tools:layout="@layout/fragment_pin_register" >
+        <argument
+            android:name="documentId"
+            app:argType="string" />
     </fragment>
 </navigation>

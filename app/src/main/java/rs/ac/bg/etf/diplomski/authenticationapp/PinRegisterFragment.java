@@ -1,64 +1,93 @@
 package rs.ac.bg.etf.diplomski.authenticationapp;
 
+import android.content.Intent;
 import android.os.Bundle;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.MutableLiveData;
+import androidx.navigation.NavController;
+import androidx.navigation.Navigation;
 
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-/**
- * A simple {@link Fragment} subclass.
- * Use the {@link PinRegisterFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
+import com.davidmiguel.numberkeyboard.NumberKeyboardListener;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.FirebaseFirestore;
+
+import rs.ac.bg.etf.diplomski.authenticationapp.databinding.FragmentPinRegisterBinding;
+import rs.ac.bg.etf.diplomski.authenticationapp.databinding.FragmentUserRegisterBinding;
+
 public class PinRegisterFragment extends Fragment {
 
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
+    private static final int MAX_CHARS = 4;
 
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
+    private RegisterActivity registerActivity;
+    private FragmentPinRegisterBinding binding;
+    private NavController navController;
+
+    private FirebaseAuth firebaseAuth;
+    private FirebaseFirestore firebaseFirestore;
+
+    private MutableLiveData<String> documentId = new MutableLiveData<>();
+
+    private String pin_code = "";
 
     public PinRegisterFragment() {
         // Required empty public constructor
     }
 
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment PinRegisterFragment.
-     */
-    // TODO: Rename and change types and number of parameters
-    public static PinRegisterFragment newInstance(String param1, String param2) {
-        PinRegisterFragment fragment = new PinRegisterFragment();
-        Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
-        fragment.setArguments(args);
-        return fragment;
-    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
-        }
+
+        registerActivity = (RegisterActivity) requireActivity();
+
+        firebaseAuth = FirebaseAuth.getInstance();
+        firebaseFirestore = FirebaseFirestore.getInstance();
+
+        documentId.setValue(PinRegisterFragmentArgs.fromBundle(requireArguments()).getDocumentId());
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_pin_register, container, false);
+
+        binding = FragmentPinRegisterBinding.inflate(inflater, container, false);
+
+        binding.numberKeyboard.setListener(new NumberKeyboardListener() {
+            @Override
+            public void onNumberClicked(int i) {
+                if(pin_code.length() < MAX_CHARS) {
+                    pin_code = pin_code.concat(Integer.toString(i));
+                    binding.pinCode.setText(binding.pinCode.getText().toString() + "*");
+                }
+            }
+
+            @Override
+            public void onLeftAuxButtonClicked() {
+
+            }
+
+            @Override
+            public void onRightAuxButtonClicked() {
+                if(pin_code.length() > 0) {
+                    pin_code = pin_code.substring(0, pin_code.length() - 1);
+                    binding.pinCode.setText(binding.pinCode.getText().toString().substring(0, pin_code.length()));
+                }
+            }
+        });
+
+        return  binding.getRoot();
+    }
+
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        navController = Navigation.findNavController(view);
     }
 }
