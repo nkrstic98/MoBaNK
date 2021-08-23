@@ -20,6 +20,9 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.UserProfileChangeRequest;
 import com.google.firebase.firestore.FirebaseFirestore;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import rs.ac.bg.etf.diplomski.authenticationapp.databinding.FragmentUserRegisterBinding;
 import rs.ac.bg.etf.diplomski.authenticationapp.models.User;
 
@@ -87,9 +90,10 @@ public class UserRegisterFragment extends Fragment {
         binding.buttonRegister.setOnClickListener(v -> {
             String email = binding.email.getText().toString();
             String password = binding.password.getText().toString();
+            String confirm_password = binding.passwordConfirm.getText().toString();
 
-            if(email.equals("") && password.equals("")) {
-                Toast.makeText(registerActivity, "Please enter email and password!", Toast.LENGTH_SHORT).show();
+            if(email.equals("") && password.equals("") && confirm_password.equals("")) {
+                Toast.makeText(registerActivity, "Please enter required data", Toast.LENGTH_SHORT).show();
                 binding.emailLabel.getEditText().requestFocus();
                 return;
             }
@@ -102,6 +106,41 @@ public class UserRegisterFragment extends Fragment {
 
             if(password.equals("")) {
                 Toast.makeText(registerActivity, "Password is required!", Toast.LENGTH_SHORT).show();
+                binding.passwordLabel.getEditText().requestFocus();
+                return;
+            }
+
+            if(confirm_password.equals("")) {
+                Toast.makeText(registerActivity, "Confirm password is required!", Toast.LENGTH_SHORT).show();
+                binding.passwordConfirmLabel.getEditText().requestFocus();
+                return;
+            }
+
+            if(!password.equals(confirm_password)) {
+                Toast.makeText(registerActivity, "Password and confirm password do not match!", Toast.LENGTH_SHORT).show();
+                binding.password.setText("");
+                binding.passwordConfirm.setText("");
+                binding.passwordLabel.getEditText().requestFocus();
+                return;
+            }
+
+            Pattern pattern = Pattern.compile("^" +
+                    "(?=.*[0-9])" +         //at least 1 digit
+                    "(?=.*[a-z])" +         //at least 1 lower case letter
+                    "(?=.*[A-Z])" +         //at least 1 upper case letter
+                    "(?=\\S+$)" +           //no white spaces
+                    ".{3,}" +               //at least 4 characters
+                    "$");
+            Matcher matcher = pattern.matcher(password);
+
+            if(!matcher.matches()) {
+                Toast.makeText(registerActivity,
+                        "Password must contain at least 1 lowercase, 1 uppercase letter, and 1 digit, must not contain whitespaces, and must be at least 6 characters long",
+                        Toast.LENGTH_LONG
+                ).show();
+
+                binding.password.setText("");
+                binding.passwordConfirm.setText("");
                 binding.passwordLabel.getEditText().requestFocus();
                 return;
             }
