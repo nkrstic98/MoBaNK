@@ -8,14 +8,21 @@
     tools:context=".PinRegisterFragment">
 
     <TextView
-        android:id="@+id/amount"
         android:layout_width="wrap_content"
-        android:layout_height="50dp"
+        android:layout_height="wrap_content"
         android:layout_marginTop="50dp"
         android:layout_marginLeft="20dp"
         android:layout_marginRight="20dp"
-        android:text="One more step: Enter PIN Code"
+        android:text="One more step"
         android:textSize="20dp" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp"
+        android:text="Add second layer of authentification to your account (PIN Code and/or Fingerprint)"
+        android:textSize="15dp" />
 
     <TextView
         android:id="@+id/pin_code"
@@ -29,14 +36,30 @@
     <com.davidmiguel.numberkeyboard.NumberKeyboard
         android:id="@+id/numberKeyboard"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="300dp"
         android:layout_marginTop="20dp"
-        android:layout_marginBottom="200dp"
         android:layout_marginLeft="75dp"
         android:layout_marginRight="75dp"
         keyboard:numberkeyboard_keyWidth="60dp"
         keyboard:numberkeyboard_keyHeight="60dp"
         keyboard:numberkeyboard_keyboardType="integer"
+        />
+
+    <com.google.android.material.switchmaterial.SwitchMaterial
+        android:id="@+id/biometry_auth"
+        android:layout_width="252dp"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="20dp"
+        android:layout_marginTop="30dp"
+        android:text="Authenticate using Fingerprint" />
+
+    <Button
+        android:id="@+id/button_submit"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:text="Submit"
+        android:layout_marginTop="20dp"
         />
 
 </LinearLayout>

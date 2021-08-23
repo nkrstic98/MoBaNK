@@ -1,18 +1,16 @@
 package rs.ac.bg.etf.diplomski.authenticationapp;
 
-import android.content.Intent;
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.MutableLiveData;
-import androidx.navigation.NavController;
-import androidx.navigation.Navigation;
 
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import com.davidmiguel.numberkeyboard.NumberKeyboardListener;
 import com.google.firebase.auth.FirebaseAuth;
@@ -27,13 +25,14 @@ public class PinRegisterFragment extends Fragment {
 
     private RegisterActivity registerActivity;
     private FragmentPinRegisterBinding binding;
-    private NavController navController;
 
     private FirebaseAuth firebaseAuth;
     private FirebaseFirestore firebaseFirestore;
 
-    private MutableLiveData<String> documentId = new MutableLiveData<>();
+    private BiometricAuthenticator biometricAuthenticator;
 
+    private MutableLiveData<String> documentId = new MutableLiveData<>();
+    private MutableLiveData<Boolean> biometry_used = new MutableLiveData<>(false);
     private String pin_code = "";
 
     public PinRegisterFragment() {
@@ -47,6 +46,8 @@ public class PinRegisterFragment extends Fragment {
 
         registerActivity = (RegisterActivity) requireActivity();
 
+        biometricAuthenticator = new BiometricAuthenticator(registerActivity);
+
         firebaseAuth = FirebaseAuth.getInstance();
         firebaseFirestore = FirebaseFirestore.getInstance();
 
@@ -58,6 +59,8 @@ public class PinRegisterFragment extends Fragment {
                              Bundle savedInstanceState) {
 
         binding = FragmentPinRegisterBinding.inflate(inflater, container, false);
+
+        binding.biometryAuth.setChecked(biometry_used.getValue());
 
         binding.numberKeyboard.setListener(new NumberKeyboardListener() {
             @Override
@@ -82,12 +85,29 @@ public class PinRegisterFragment extends Fragment {
             }
         });
 
-        return  binding.getRoot();
-    }
+        binding.biometryAuth.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            biometry_used.setValue(isChecked);
 
-    @Override
-    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
-        navController = Navigation.findNavController(view);
+            if(isChecked) {
+                biometricAuthenticator.authenticate();
+            }
+        });
+
+        binding.buttonSubmit.setOnClickListener(v -> {
+            if(pin_code.equals("") || pin_code.length() < MAX_CHARS) {
+                Toast.makeText(registerActivity, "You must enter 4 digit PIN code in order to continue", Toast.LENGTH_SHORT).show();
+                pin_code = "";
+                binding.pinCode.setText("");
+            }
+            else {
+                SharedPreferences sharedPreferences = registerActivity.getSharedPreferences(BiometricAuthenticator.SHARED_PREFERENCES_BIOMETRY, Context.MODE_PRIVATE);
+                SharedPreferences.Editor editor = sharedPreferences.edit();
+                editor.putBoolean(BiometricAuthenticator.SHARED_PREFERENCES_BIOMETRY_PARAMETER, biometry_used.getValue());
+                editor.putString(BiometricAuthenticator.SHARED_PREFERENCES_PIN_CODE_PARAMETER, pin_code);
+                editor.commit();
+            }
+        });
+
+        return  binding.getRoot();
     }
 }
