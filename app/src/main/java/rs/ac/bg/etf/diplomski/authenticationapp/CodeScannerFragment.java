@@ -40,9 +40,6 @@ public class CodeScannerFragment extends Fragment {
 
     private static final int CAMERA_REQUEST_CODE = 101;
 
-    private static final String PHONE_VERIFICATION_SIS_KEY = "phone-verification-sis-key";
-    private static final String PHONE_VERIFICATION_SIS_NUMBER = "phone-verification-sis-number";
-
     private FragmentCodeScannerBinding binding;
     private RegisterActivity registerActivity;
     private NavController navController;
@@ -50,9 +47,6 @@ public class CodeScannerFragment extends Fragment {
     private FirebaseAuth firebaseAuth;
     private FirebaseFirestore firebaseFirestore;
     private CodeScanner codeScanner;
-
-    private boolean phone_verification_in_progress = false;
-    private String phone_number = "";
 
     public CodeScannerFragment() {
         // Required empty public constructor
@@ -140,7 +134,8 @@ public class CodeScannerFragment extends Fragment {
                 .addOnSuccessListener(command -> {
                     List<DocumentSnapshot> documentSnapshotList = command.getDocuments();
                     if(documentSnapshotList.size() != 0 && documentSnapshotList.get(0).getId().equals(key)) {
-                        verifyPhoneNumber(phoneNumber);
+                        Toast.makeText(registerActivity, "QR Code successfully read! Wait for SMS code to proceed.", Toast.LENGTH_SHORT).show();
+                        verifyPhoneNumber(phoneNumber, id);
                     }
                     else {
                         Toast.makeText(registerActivity, "Invalid QR code! Use different code, or contact QR Code provider.", Toast.LENGTH_SHORT).show();
@@ -152,8 +147,7 @@ public class CodeScannerFragment extends Fragment {
                 });
     }
 
-    private void verifyPhoneNumber(String phoneNumber) {
-        this.phone_number = phoneNumber;
+    private void verifyPhoneNumber(String phoneNumber, String id) {
 
         PhoneAuthOptions phoneAuthOptions =
                 PhoneAuthOptions
@@ -175,7 +169,11 @@ public class CodeScannerFragment extends Fragment {
                             @Override
                             public void onCodeSent(@NonNull String verificationId, @NonNull PhoneAuthProvider.ForceResendingToken forceResendingToken) {
                                 super.onCodeSent(verificationId, forceResendingToken);
-
+                                CodeScannerFragmentDirections.ActionCodeScannerFragmentToCodeVerifierFragment action =
+                                        CodeScannerFragmentDirections.actionCodeScannerFragmentToCodeVerifierFragment(verificationId, id);
+                                action.setUserId(id);
+                                action.setVerificationId(verificationId);
+                                navController.navigate(action);
                             }
 
                             @Override
@@ -187,8 +185,7 @@ public class CodeScannerFragment extends Fragment {
                         .build();
 
         PhoneAuthProvider.verifyPhoneNumber(phoneAuthOptions);
-
-        phone_verification_in_progress = true;
+        
     }
 
     private void setupCameraPermissions() {

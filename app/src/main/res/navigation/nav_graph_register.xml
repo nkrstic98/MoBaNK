@@ -9,5 +9,21 @@
         android:id="@+id/codeScannerFragment"
         android:name="rs.ac.bg.etf.diplomski.authenticationapp.CodeScannerFragment"
         android:label="fragment_code_scanner"
-        tools:layout="@layout/fragment_code_scanner" />
+        tools:layout="@layout/fragment_code_scanner" >
+        <action
+            android:id="@+id/action_codeScannerFragment_to_codeVerifierFragment"
+            app:destination="@id/codeVerifierFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/codeVerifierFragment"
+        android:name="rs.ac.bg.etf.diplomski.authenticationapp.CodeVerifierFragment"
+        android:label="fragment_code_verifier"
+        tools:layout="@layout/fragment_code_verifier" >
+        <argument
+            android:name="verificationId"
+            app:argType="string" />
+        <argument
+            android:name="userId"
+            app:argType="string" />
+    </fragment>
 </navigation>
