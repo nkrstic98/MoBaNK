@@ -135,7 +135,7 @@ public class CodeScannerFragment extends Fragment {
                     List<DocumentSnapshot> documentSnapshotList = command.getDocuments();
                     if(documentSnapshotList.size() != 0 && documentSnapshotList.get(0).getId().equals(key)) {
                         Toast.makeText(registerActivity, "QR Code successfully read! Wait for SMS code to proceed.", Toast.LENGTH_SHORT).show();
-                        verifyPhoneNumber(phoneNumber, id);
+                        verifyPhoneNumber(phoneNumber, id, key);
                     }
                     else {
                         Toast.makeText(registerActivity, "Invalid QR code! Use different code, or contact QR Code provider.", Toast.LENGTH_SHORT).show();
@@ -147,7 +147,7 @@ public class CodeScannerFragment extends Fragment {
                 });
     }
 
-    private void verifyPhoneNumber(String phoneNumber, String id) {
+    private void verifyPhoneNumber(String phoneNumber, String id, String documentId) {
 
         PhoneAuthOptions phoneAuthOptions =
                 PhoneAuthOptions
@@ -170,9 +170,9 @@ public class CodeScannerFragment extends Fragment {
                             public void onCodeSent(@NonNull String verificationId, @NonNull PhoneAuthProvider.ForceResendingToken forceResendingToken) {
                                 super.onCodeSent(verificationId, forceResendingToken);
                                 CodeScannerFragmentDirections.ActionCodeScannerFragmentToCodeVerifierFragment action =
-                                        CodeScannerFragmentDirections.actionCodeScannerFragmentToCodeVerifierFragment(verificationId, id);
-                                action.setUserId(id);
+                                        CodeScannerFragmentDirections.actionCodeScannerFragmentToCodeVerifierFragment(verificationId, documentId);
                                 action.setVerificationId(verificationId);
+                                action.setDocumentId(documentId);
                                 navController.navigate(action);
                             }
 

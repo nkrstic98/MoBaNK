@@ -31,7 +31,7 @@ public class CodeVerifierFragment extends Fragment {
     private FirebaseFirestore firebaseFirestore;
 
     private MutableLiveData<String> verificationId = new MutableLiveData<>();
-    private MutableLiveData<String> userId = new MutableLiveData<>();
+    private MutableLiveData<String> documentId = new MutableLiveData<>();
 
     public CodeVerifierFragment() {
         // Required empty public constructor
@@ -45,6 +45,9 @@ public class CodeVerifierFragment extends Fragment {
 
         firebaseAuth = FirebaseAuth.getInstance();
         firebaseFirestore = FirebaseFirestore.getInstance();
+
+        verificationId.setValue(CodeVerifierFragmentArgs.fromBundle(requireArguments()).getVerificationId());
+        documentId.setValue(CodeVerifierFragmentArgs.fromBundle(requireArguments()).getDocumentId());
     }
 
     @Override
@@ -53,9 +56,6 @@ public class CodeVerifierFragment extends Fragment {
 
         binding = FragmentCodeVerifierBinding.inflate(inflater, container, false);
 
-        verificationId.setValue(CodeVerifierFragmentArgs.fromBundle(requireArguments()).getVerificationId());
-        userId.setValue(CodeVerifierFragmentArgs.fromBundle(requireArguments()).getUserId());
-
         binding.buttonSubmit.setOnClickListener(v -> {
             String smsCode = binding.smsVerifier.getText().toString();
             if(smsCode.equals("")) {
@@ -63,7 +63,6 @@ public class CodeVerifierFragment extends Fragment {
                 binding.smsVerifierLabel.getEditText().requestFocus();
             }
             else {
-                Toast.makeText(registerActivity, smsCode, Toast.LENGTH_SHORT).show();
                 registerUser(smsCode);
             }
         });
@@ -78,12 +77,18 @@ public class CodeVerifierFragment extends Fragment {
     }
 
     private void registerUser(String smsCode) {
-        firebaseAuth.signInWithCredential(PhoneAuthProvider.getCredential(verificationId.getValue(), "123456"))
+        firebaseAuth.signInWithCredential(PhoneAuthProvider.getCredential(verificationId.getValue(), smsCode))
                 .addOnCompleteListener(registerActivity, task -> {
                     if(task.isSuccessful()) {
                         Toast.makeText(registerActivity, "Valid SMS code!", Toast.LENGTH_SHORT).show();
 
-
+                        firebaseAuth.getCurrentUser().delete()
+                                .addOnCompleteListener(registerActivity, task1 -> {
+                                    CodeVerifierFragmentDirections.ActionCodeVerifierFragmentToUserRegisterFragment action =
+                                            CodeVerifierFragmentDirections.actionCodeVerifierFragmentToUserRegisterFragment(documentId.getValue());
+                                    action.setDocumentId(documentId.getValue());
+                                    navController.navigate(action);
+                                });
                     }
                     else {
                         Toast.makeText(registerActivity, "Wrong SMS verification code!", Toast.LENGTH_SHORT).show();
