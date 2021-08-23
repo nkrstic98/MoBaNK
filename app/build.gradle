@@ -79,4 +79,7 @@ dependencies {
 
     //Custom PIN input keyboard
     implementation 'com.github.davidmigloz:number-keyboard:3.0.0'
+
+    //Biometric dependency
+    implementation "androidx.biometric:biometric:1.2.0-alpha03"
 }
