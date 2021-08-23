@@ -106,43 +106,56 @@ public class UserRegisterFragment extends Fragment {
                 return;
             }
 
-            firebaseAuth.createUserWithEmailAndPassword(email, password)
-                    .addOnSuccessListener(registerActivity, authResult -> {
-                        FirebaseUser currentUser = firebaseAuth.getCurrentUser();
+            firebaseFirestore
+                    .collection("users")
+                    .document(documentId.getValue())
+                    .get()
+                    .addOnCompleteListener(registerActivity, task -> {
+                        if(task.isSuccessful()) {
+                            if(task.getResult().get("email") == null) {
+                                firebaseAuth.createUserWithEmailAndPassword(email, password)
+                                        .addOnSuccessListener(registerActivity, authResult -> {
+                                            FirebaseUser currentUser = firebaseAuth.getCurrentUser();
 
-                        if(currentUser != null) {
-                            UserProfileChangeRequest request = new UserProfileChangeRequest.Builder()
-                                    .setDisplayName(this.firstname + " " + this.lastname)
-                                    .build();
+                                            if(currentUser != null) {
+                                                UserProfileChangeRequest request = new UserProfileChangeRequest.Builder()
+                                                        .setDisplayName(this.firstname + " " + this.lastname)
+                                                        .build();
 
-                            currentUser.updateProfile(request)
-                                    .addOnSuccessListener(registerActivity, aVoid -> {
-                                        firebaseFirestore
-                                                .collection("users")
-                                                .document(documentId.getValue())
-                                                .update(
-                                                        "email", email,
-                                                        "password", password
-                                                )
-                                                .addOnSuccessListener(registerActivity, aVoid1 -> {
-                                                    Toast.makeText(registerActivity, "Registration successful", Toast.LENGTH_SHORT).show();
+                                                currentUser.updateProfile(request)
+                                                        .addOnSuccessListener(registerActivity, aVoid -> {
+                                                            firebaseFirestore
+                                                                    .collection("users")
+                                                                    .document(documentId.getValue())
+                                                                    .update(
+                                                                            "email", email,
+                                                                            "password", password
+                                                                    )
+                                                                    .addOnSuccessListener(registerActivity, aVoid1 -> {
+                                                                        Toast.makeText(registerActivity, "Registration successful", Toast.LENGTH_SHORT).show();
 
-                                                    UserRegisterFragmentDirections.ActionUserRegisterFragmentToPinRegisterFragment action =
-                                                            UserRegisterFragmentDirections.actionUserRegisterFragmentToPinRegisterFragment(documentId.getValue());
-                                                    action.setDocumentId(documentId.getValue());
-                                                    navController.navigate(action);
-                                                })
-                                                .addOnFailureListener(registerActivity, e -> {
-                                                    Toast.makeText(registerActivity, e.getMessage(), Toast.LENGTH_SHORT).show();
-                                                });
-                                    })
-                                    .addOnFailureListener(registerActivity, e -> {
-                                        Toast.makeText(registerActivity, e.getMessage(), Toast.LENGTH_SHORT).show();
-                                    });
+                                                                        UserRegisterFragmentDirections.ActionUserRegisterFragmentToPinRegisterFragment action =
+                                                                                UserRegisterFragmentDirections.actionUserRegisterFragmentToPinRegisterFragment(documentId.getValue());
+                                                                        action.setDocumentId(documentId.getValue());
+                                                                        navController.navigate(action);
+                                                                    })
+                                                                    .addOnFailureListener(registerActivity, e -> {
+                                                                        Toast.makeText(registerActivity, e.getMessage(), Toast.LENGTH_SHORT).show();
+                                                                    });
+                                                        })
+                                                        .addOnFailureListener(registerActivity, e -> {
+                                                            Toast.makeText(registerActivity, e.getMessage(), Toast.LENGTH_SHORT).show();
+                                                        });
+                                            }
+                                        })
+                                        .addOnFailureListener(registerActivity, e -> {
+                                            Toast.makeText(registerActivity, e.getMessage(), Toast.LENGTH_SHORT).show();
+                                        });
+                            }
+                            else {
+                                Toast.makeText(registerActivity, "Error: This user is already registered!", Toast.LENGTH_SHORT).show();
+                            }
                         }
-                    })
-                    .addOnFailureListener(registerActivity, e -> {
-                        Toast.makeText(registerActivity, e.getMessage(), Toast.LENGTH_SHORT).show();
                     });
         });
 
