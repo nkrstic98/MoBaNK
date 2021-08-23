@@ -2,6 +2,7 @@ package rs.ac.bg.etf.diplomski.authenticationapp;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.os.Build;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
@@ -15,6 +16,15 @@ import android.widget.Toast;
 import com.davidmiguel.numberkeyboard.NumberKeyboardListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
+
+import java.nio.charset.Charset;
+import java.security.InvalidKeyException;
+import java.util.Date;
+
+import javax.crypto.BadPaddingException;
+import javax.crypto.Cipher;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.SecretKey;
 
 import rs.ac.bg.etf.diplomski.authenticationapp.databinding.FragmentPinRegisterBinding;
 import rs.ac.bg.etf.diplomski.authenticationapp.databinding.FragmentUserRegisterBinding;
@@ -39,19 +49,18 @@ public class PinRegisterFragment extends Fragment {
         // Required empty public constructor
     }
 
-
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         registerActivity = (RegisterActivity) requireActivity();
 
-        biometricAuthenticator = new BiometricAuthenticator(registerActivity);
+        documentId.setValue(PinRegisterFragmentArgs.fromBundle(requireArguments()).getDocumentId());
+
+        biometricAuthenticator = new BiometricAuthenticator(registerActivity, documentId.getValue());
 
         firebaseAuth = FirebaseAuth.getInstance();
         firebaseFirestore = FirebaseFirestore.getInstance();
-
-        documentId.setValue(PinRegisterFragmentArgs.fromBundle(requireArguments()).getDocumentId());
     }
 
     @Override
@@ -87,10 +96,6 @@ public class PinRegisterFragment extends Fragment {
 
         binding.biometryAuth.setOnCheckedChangeListener((buttonView, isChecked) -> {
             biometry_used.setValue(isChecked);
-
-            if(isChecked) {
-                biometricAuthenticator.authenticate();
-            }
         });
 
         binding.buttonSubmit.setOnClickListener(v -> {
@@ -100,11 +105,60 @@ public class PinRegisterFragment extends Fragment {
                 binding.pinCode.setText("");
             }
             else {
+
                 SharedPreferences sharedPreferences = registerActivity.getSharedPreferences(BiometricAuthenticator.SHARED_PREFERENCES_BIOMETRY, Context.MODE_PRIVATE);
                 SharedPreferences.Editor editor = sharedPreferences.edit();
                 editor.putBoolean(BiometricAuthenticator.SHARED_PREFERENCES_BIOMETRY_PARAMETER, biometry_used.getValue());
                 editor.putString(BiometricAuthenticator.SHARED_PREFERENCES_PIN_CODE_PARAMETER, pin_code);
                 editor.commit();
+
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+
+                    biometricAuthenticator.generateSecretKey(biometry_used.getValue());
+                    Cipher cipher = biometricAuthenticator.getCypher();
+                    SecretKey secretKey = biometricAuthenticator.getSecretKey();
+
+                    try {
+                        cipher.init(Cipher.ENCRYPT_MODE, secretKey);
+
+                        if(biometry_used.getValue()) {
+                            biometricAuthenticator.authenticate(cipher);
+                        }
+                        else {
+                            Date date = new Date();
+                            long time = date.getTime();
+
+                            editor.putLong(BiometricAuthenticator.SHARED_PREFERENCES_KEY_PARAMETER, time);
+                            editor.commit();
+
+                            String key = documentId.getValue() + "_" + time;
+
+                            byte[] crypto = cipher.doFinal(
+                                    key.getBytes(Charset.defaultCharset())
+                            );
+
+                            firebaseFirestore
+                                    .collection("users")
+                                    .document(documentId.getValue())
+                                    .update("secret_key", crypto.toString())
+                                    .addOnSuccessListener(registerActivity, aVoid1 -> {
+                                        Toast.makeText(registerActivity, "Success!", Toast.LENGTH_SHORT).show();
+
+                                        //prebaci na logovanje
+                                        //ugasi aktivnost
+                                    })
+                                    .addOnFailureListener(registerActivity, e -> {
+                                        Toast.makeText(registerActivity, e.getMessage(), Toast.LENGTH_SHORT).show();
+                                    });
+                        }
+                    } catch (InvalidKeyException e) {
+                        e.printStackTrace();
+                    } catch (BadPaddingException e) {
+                        e.printStackTrace();
+                    } catch (IllegalBlockSizeException e) {
+                        e.printStackTrace();
+                    }
+                }
             }
         });
 
