@@ -73,6 +73,8 @@ public class BiometricAuthenticator {
     }
 
     public void encrypt(String data) {
+        Toast.makeText(context, "Registration successful!", Toast.LENGTH_SHORT).show();
+
         Intent intent = new Intent(context, LoginActivity.class);
         context.startActivity(intent);
         ((Activity) context).finish();

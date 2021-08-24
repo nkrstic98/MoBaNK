@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import rs.ac.bg.etf.diplomski.authenticationapp.databinding.ActivityLoginBinding;
@@ -58,9 +59,16 @@ public class LoginActivity extends AppCompatActivity {
         firebaseAuth.signInWithEmailAndPassword(email, password)
                 .addOnCompleteListener(this, task -> {
                     if(task.isSuccessful()) {
-                        Intent intent = new Intent(this, MainActivity.class);
-                        startActivity(intent);
-                        finish();
+                        FirebaseUser user = firebaseAuth.getCurrentUser();
+
+                        if(user.isEmailVerified()) {
+                            Intent intent = new Intent(this, MainActivity.class);
+                            startActivity(intent);
+                            finish();
+                        }
+                        else {
+                            Toast.makeText(this, "Verify email address to activate account!", Toast.LENGTH_SHORT).show();
+                        }
 
 //                        FirebaseUser user = firebaseAuth.getCurrentUser();
 //

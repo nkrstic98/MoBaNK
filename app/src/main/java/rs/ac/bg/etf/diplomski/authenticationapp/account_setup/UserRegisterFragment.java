@@ -158,33 +158,43 @@ public class UserRegisterFragment extends Fragment {
                                             FirebaseUser currentUser = firebaseAuth.getCurrentUser();
 
                                             if(currentUser != null) {
-                                                UserProfileChangeRequest request = new UserProfileChangeRequest.Builder()
-                                                        .setDisplayName(this.firstname + " " + this.lastname)
-                                                        .build();
 
-                                                currentUser.updateProfile(request)
+                                                currentUser.sendEmailVerification()
                                                         .addOnSuccessListener(registerActivity, aVoid -> {
-                                                            firebaseFirestore
-                                                                    .collection("users")
-                                                                    .document(documentId.getValue())
-                                                                    .update(
-                                                                            "email", email
-                                                                    )
-                                                                    .addOnSuccessListener(registerActivity, aVoid1 -> {
-                                                                        Toast.makeText(registerActivity, "Registration successful", Toast.LENGTH_SHORT).show();
+                                                            Toast.makeText(registerActivity, "Verification email sent!", Toast.LENGTH_SHORT).show();
 
-                                                                        UserRegisterFragmentDirections.ActionUserRegisterFragmentToPinRegisterFragment action =
-                                                                                UserRegisterFragmentDirections.actionUserRegisterFragmentToPinRegisterFragment(documentId.getValue());
-                                                                        action.setDocumentId(documentId.getValue());
-                                                                        navController.navigate(action);
+                                                            UserProfileChangeRequest request = new UserProfileChangeRequest.Builder()
+                                                                    .setDisplayName(this.firstname + " " + this.lastname)
+                                                                    .build();
+
+                                                            currentUser.updateProfile(request)
+                                                                    .addOnSuccessListener(registerActivity, aVoid1 -> {
+                                                                        firebaseFirestore
+                                                                                .collection("users")
+                                                                                .document(documentId.getValue())
+                                                                                .update(
+                                                                                        "email", email
+                                                                                )
+                                                                                .addOnSuccessListener(registerActivity, aVoid2 -> {
+                                                                                    UserRegisterFragmentDirections.ActionUserRegisterFragmentToPinRegisterFragment action =
+                                                                                            UserRegisterFragmentDirections.actionUserRegisterFragmentToPinRegisterFragment(documentId.getValue());
+                                                                                    action.setDocumentId(documentId.getValue());
+                                                                                    navController.navigate(action);
+                                                                                })
+                                                                                .addOnFailureListener(registerActivity, e -> {
+                                                                                    Toast.makeText(registerActivity, e.getMessage(), Toast.LENGTH_SHORT).show();
+                                                                                });
                                                                     })
                                                                     .addOnFailureListener(registerActivity, e -> {
-                                                                        Toast.makeText(registerActivity, e.getMessage(), Toast.LENGTH_SHORT).show();
+                                                                        Toast.makeText(registerActivity, "Registration failed. Try again!", Toast.LENGTH_SHORT).show();
+                                                                        currentUser.delete();
                                                                     });
                                                         })
                                                         .addOnFailureListener(registerActivity, e -> {
-                                                            Toast.makeText(registerActivity, e.getMessage(), Toast.LENGTH_SHORT).show();
+                                                            Toast.makeText(registerActivity, "Registration failed. Try again!", Toast.LENGTH_SHORT).show();
+                                                            currentUser.delete();
                                                         });
+
                                             }
                                         })
                                         .addOnFailureListener(registerActivity, e -> {
