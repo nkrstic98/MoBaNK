@@ -7,6 +7,7 @@ public class User {
     private String email = "";
     private String phone = "";
     private String gender = "";
+    private String secret_key = "";
 
     public User() {
 
@@ -67,5 +68,13 @@ public class User {
 
     public void setGender(String gender) {
         this.gender = gender;
+    }
+
+    public String getSecret_key() {
+        return secret_key;
+    }
+
+    public void setSecret_key(String secret_key) {
+        this.secret_key = secret_key;
     }
 }
