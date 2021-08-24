@@ -44,6 +44,7 @@ public class PinRegisterFragment extends Fragment {
     private BiometricAuthenticator biometricAuthenticator;
 
     private MutableLiveData<String> documentId = new MutableLiveData<>();
+
     private MutableLiveData<Boolean> biometry_used = new MutableLiveData<>(false);
     private String pin_code = "";
 
@@ -131,27 +132,14 @@ public class PinRegisterFragment extends Fragment {
                 editor.putString(BiometricAuthenticator.SHARED_PREFERENCES_PIN_CODE_PARAMETER, pin_code);
                 editor.commit();
 
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-
-                    biometricAuthenticator.generateSecretKey(biometry_used.getValue());
-                    Cipher cipher = biometricAuthenticator.getCypher();
-                    SecretKey secretKey = biometricAuthenticator.getSecretKey();
-
-                    try {
-                        cipher.init(Cipher.ENCRYPT_MODE, secretKey);
-
-                        if(biometry_used.getValue()) {
-                            biometricAuthenticator.authenticate(cipher);
-                        }
-                        else {
-                            PinRegisterFragmentDirections.ActionPinRegisterFragmentToKeyboardFragment action =
-                                    PinRegisterFragmentDirections.actionPinRegisterFragmentToKeyboardFragment(documentId.getValue());
-                            action.setDocumentId(documentId.getValue());
-                            navController.navigate(action);
-                        }
-                    } catch (InvalidKeyException e) {
-                        e.printStackTrace();
-                    }
+                if(biometry_used.getValue()) {
+                    biometricAuthenticator.authenticate();
+                }
+                else {
+                    PinRegisterFragmentDirections.ActionPinRegisterFragmentToKeyboardFragment action =
+                            PinRegisterFragmentDirections.actionPinRegisterFragmentToKeyboardFragment(documentId.getValue());
+                    action.setDocumentId(documentId.getValue());
+                    navController.navigate(action);
                 }
             }
         });
@@ -163,7 +151,6 @@ public class PinRegisterFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         navController = Navigation.findNavController(view);
-        biometricAuthenticator.registerNavController(navController);
     }
 
     public class PinRegisterCallback implements BiometricAuthenticator.Callback {
@@ -177,8 +164,8 @@ public class PinRegisterFragment extends Fragment {
         }
 
         @Override
-        public void encrypt(Cipher cipher) {
-            biometricAuthenticator.encrypt(cipher, documentId.getValue());
+        public void encrypt() {
+            biometricAuthenticator.encrypt(documentId.getValue());
         }
     }
 }

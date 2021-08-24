@@ -143,18 +143,7 @@ public class KeyboardFragment extends Fragment {
             else {
                 if(activity instanceof RegisterActivity) {
                     BiometricAuthenticator biometricAuthenticator = new BiometricAuthenticator(activity, null);
-
-                    biometricAuthenticator.generateSecretKey(false);
-                    Cipher cipher = biometricAuthenticator.getCypher();
-                    SecretKey secretKey = biometricAuthenticator.getSecretKey();
-
-                    try {
-                        cipher.init(Cipher.ENCRYPT_MODE, secretKey);
-
-                        biometricAuthenticator.encrypt(cipher, documentId.getValue());
-                    } catch (InvalidKeyException e) {
-                        e.printStackTrace();
-                    }
+                    biometricAuthenticator.encrypt(documentId.getValue());
                 }
                 else {
 

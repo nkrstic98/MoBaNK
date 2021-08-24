@@ -30,13 +30,5 @@ public class RegisterActivity extends AppCompatActivity {
 //        editor.clear();
 //        editor.commit();
 
-        long date = sharedPreferences.getLong(BiometricAuthenticator.SHARED_PREFERENCES_KEY_PARAMETER, -1);
-
-        if(date != -1) {
-            Intent intent = new Intent(this, LoginActivity.class);
-            intent.putExtra(LoginActivity.SECRET_KEY_PARAMETER, date);
-            startActivity(intent);
-            this.finish();
-        }
     }
 }

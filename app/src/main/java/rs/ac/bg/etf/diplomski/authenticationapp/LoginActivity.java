@@ -48,7 +48,6 @@ public class LoginActivity extends AppCompatActivity {
         });
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.M)
     private void login() {
         String email = binding.email.getText().toString();
         String password = binding.password.getText().toString();
@@ -87,9 +86,7 @@ public class LoginActivity extends AppCompatActivity {
 
                                     String secret_key = queryDocumentSnapshots.getDocuments().get(0).toObject(User.class).getSecret_key();
 
-                                    String documentId = queryDocumentSnapshots.getDocuments().get(0).getId();
-
-                                    if(verifyAccount(secret_key, documentId)) {
+                                    if(verifyAccount(secret_key)) {
                                         Toast.makeText(this, "Something went wrong. Please try again!", Toast.LENGTH_SHORT).show();
                                     }
                                     else {
@@ -112,42 +109,7 @@ public class LoginActivity extends AppCompatActivity {
                 });
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.M)
-    private boolean verifyAccount(String secret_key, String documentId) {
-        long date = getIntent().getLongExtra(SECRET_KEY_PARAMETER, -1);
-
-        if(date == -1) {
-            return false;
-        }
-
-        BiometricAuthenticator biometricAuthenticator = new BiometricAuthenticator(this, null);
-
-        biometricAuthenticator.generateSecretKey(false);
-        Cipher cipher = biometricAuthenticator.getCypher();
-        SecretKey secretKey = biometricAuthenticator.getSecretKey();
-
-        secretKey.getEncoded();
-
-        SharedPreferences sharedPreferences = getSharedPreferences(BiometricAuthenticator.SHARED_PREFERENCES_BIOMETRY, MODE_PRIVATE);
-
-        try {
-            String iv = sharedPreferences.getString(BiometricAuthenticator.SHARED_PREFERENCES_IV, "");
-            byte[] iv_bytes = getBytes(iv);
-
-            cipher.init(Cipher.ENCRYPT_MODE, secretKey);
-
-            byte[] decrypted_data = cipher.doFinal((documentId + "_" + date).getBytes(Charset.defaultCharset()));
-
-            String decrypted_string = decrypted_data.toString();
-            Toast.makeText(this, decrypted_string, Toast.LENGTH_SHORT).show();
-
-        } catch (InvalidKeyException e) {
-            e.printStackTrace();
-        } catch (BadPaddingException e) {
-            e.printStackTrace();
-        } catch (IllegalBlockSizeException e) {
-            e.printStackTrace();
-        }
+    private boolean verifyAccount(String secret_key) {
 
         return false;
     }
