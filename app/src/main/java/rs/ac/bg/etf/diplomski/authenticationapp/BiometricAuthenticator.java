@@ -1,46 +1,16 @@
 package rs.ac.bg.etf.diplomski.authenticationapp;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
-import android.os.Build;
-import android.security.keystore.KeyGenParameterSpec;
-import android.security.keystore.KeyProperties;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.RequiresApi;
 import androidx.biometric.BiometricManager;
 import androidx.biometric.BiometricPrompt;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.FragmentActivity;
-import androidx.navigation.NavController;
-
-import com.google.firebase.firestore.FirebaseFirestore;
-
-import java.io.IOException;
-import java.nio.charset.Charset;
-import java.security.InvalidAlgorithmParameterException;
-import java.security.KeyStore;
-import java.security.KeyStoreException;
-import java.security.NoSuchAlgorithmException;
-import java.security.NoSuchProviderException;
-import java.security.UnrecoverableKeyException;
-import java.security.cert.CertificateException;
-import java.security.spec.InvalidParameterSpecException;
-import java.util.Arrays;
-import java.util.Date;
 import java.util.concurrent.Executor;
-
-import javax.crypto.BadPaddingException;
-import javax.crypto.Cipher;
-import javax.crypto.IllegalBlockSizeException;
-import javax.crypto.KeyGenerator;
-import javax.crypto.NoSuchPaddingException;
-import javax.crypto.SecretKey;
-import javax.crypto.spec.IvParameterSpec;
-
-import rs.ac.bg.etf.diplomski.authenticationapp.account_setup.RegisterActivity;
 
 public class BiometricAuthenticator {
 
@@ -53,12 +23,6 @@ public class BiometricAuthenticator {
 
     public static final String SHARED_PREFERENCES_BIOMETRY_PARAMETER = "shared-preferences-biometry-parameter";
     public static final String SHARED_PREFERENCES_PIN_CODE_PARAMETER = "shared-preferences-pin-code-parameter";
-
-    public static final String SHARED_PREFERENCES_KEY = "shared-preferences-key-parameter";
-    public static final String SHARED_PREFERENCES_IV = "shared-preferences-iv";
-    public static final String SHARED_PREFERENCES_SALT = "shared-preferences-secret-key";
-
-    protected static final String KEY_NAME = "android-device-info-key";
 
     private Context context;
 
@@ -109,6 +73,61 @@ public class BiometricAuthenticator {
     }
 
     public void encrypt(String data) {
+        Intent intent = new Intent(context, LoginActivity.class);
+        context.startActivity(intent);
+        ((Activity) context).finish();
 
+//        FirebaseFirestore firebaseFirestore = FirebaseFirestore.getInstance();
+//
+//        //SECRET
+//        String message = "This is a secret created by Niky for aditional security of users and their data";
+//        String secret = shuffle(message);
+//        //SALT
+//        String salt = shuffle(secret);
+//        //KEY
+//        String key = shuffle(data + (new Date()).getTime());
+//        //IV
+//        Random rd = new Random();
+//        byte[] iv = new byte[16];
+//        rd.nextBytes(iv);
+//
+//        Encryption encryption = Encryption.getDefault(key, salt, iv);
+//
+//        String encrypted = encryption.encryptOrNull(secret);
+//
+//        Log.d("my-log", encrypted);
+//        //Log.d("my-log", decrypted);
+//
+//        SharedPreferences sharedPreferences = context.getSharedPreferences(SHARED_PREFERENCES_BIOMETRY, Context.MODE_PRIVATE);
+//        sharedPreferences.edit()
+//                .putString(SHARED_PREFERENCES_SECRET, secret)
+//                .apply();
+//
+//        firebaseFirestore
+//                .collection("users")
+//                .document(data)
+//                .update("security_message", encrypted)
+//                .addOnSuccessListener((Activity) context, aVoid -> {
+//                    Intent intent = new Intent(context, LoginActivity.class);
+//                    context.startActivity(intent);
+//                    ((Activity) context).finish();
+//                })
+//                .addOnFailureListener((Activity) context, e -> {
+//                    Toast.makeText(context, "Something went wrong. Please try again!", Toast.LENGTH_SHORT).show();
+//                });
     }
+
+//    private String shuffle(String input){
+//        List<Character> characters = new ArrayList<Character>();
+//        for(char c:input.toCharArray()){
+//            characters.add(c);
+//        }
+//        StringBuilder output = new StringBuilder(input.length());
+//        while(characters.size()!=0){
+//            int randPicker = (int)(Math.random()*characters.size());
+//            output.append(characters.remove(randPicker));
+//        }
+//
+//        return output.toString();
+//    }
 }

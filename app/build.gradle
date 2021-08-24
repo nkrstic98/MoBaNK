@@ -82,4 +82,10 @@ dependencies {
 
     //Biometric dependency
     implementation "androidx.biometric:biometric:1.2.0-alpha03"
+
+    //Encryption library included
+    implementation 'com.github.simbiose:Encryption:2.0.1'
+
+    //Gson dependency
+    implementation 'com.google.code.gson:gson:2.8.8'
 }

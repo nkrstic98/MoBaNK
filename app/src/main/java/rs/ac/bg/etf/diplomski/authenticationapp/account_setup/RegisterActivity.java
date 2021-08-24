@@ -26,9 +26,12 @@ public class RegisterActivity extends AppCompatActivity {
         setContentView(binding.getRoot());
 
         sharedPreferences = this.getSharedPreferences(BiometricAuthenticator.SHARED_PREFERENCES_BIOMETRY, MODE_PRIVATE);
-//        SharedPreferences.Editor editor = sharedPreferences.edit();
-//        editor.clear();
-//        editor.commit();
 
+
+        if(sharedPreferences.getAll() != null) {
+            Intent intent = new Intent(this, LoginActivity.class);
+            startActivity(intent);
+            this.finish();
+        }
     }
 }
