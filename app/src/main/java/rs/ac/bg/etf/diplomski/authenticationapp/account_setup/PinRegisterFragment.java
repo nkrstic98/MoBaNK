@@ -20,9 +20,7 @@ import android.widget.Toast;
 
 import com.davidmiguel.numberkeyboard.NumberKeyboardListener;
 
-import rs.ac.bg.etf.diplomski.authenticationapp.LoginActivity;
-import rs.ac.bg.etf.diplomski.authenticationapp.account_setup.PinRegisterFragmentArgs;
-import rs.ac.bg.etf.diplomski.authenticationapp.account_setup.PinRegisterFragmentDirections;
+import rs.ac.bg.etf.diplomski.authenticationapp.account_login.LoginActivity;
 import rs.ac.bg.etf.diplomski.authenticationapp.BiometricAuthenticator;
 import rs.ac.bg.etf.diplomski.authenticationapp.databinding.FragmentPinRegisterBinding;
 

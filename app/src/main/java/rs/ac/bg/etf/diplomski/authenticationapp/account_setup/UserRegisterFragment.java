@@ -182,6 +182,7 @@ public class UserRegisterFragment extends Fragment {
                                                                                             .getSharedPreferences(BiometricAuthenticator.SHARED_PREFERENCES_ACCOUNT, Context.MODE_PRIVATE)
                                                                                             .edit()
                                                                                             .putString(BiometricAuthenticator.SHARED_PREFERENCES_EMAIL_PARAMETER, email)
+                                                                                            .putString(BiometricAuthenticator.SHARED_PREFERENCES_USER_INFO, firstname + " " + lastname)
                                                                                             .apply();
 
                                                                                     UserRegisterFragmentDirections.ActionUserRegisterFragmentToPinRegisterFragment action =

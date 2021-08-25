@@ -6,10 +6,8 @@ import android.content.Intent;
 import android.os.Bundle;
 
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.firestore.FirebaseFirestore;
 
-import dagger.hilt.android.AndroidEntryPoint;
+import rs.ac.bg.etf.diplomski.authenticationapp.account_login.LoginActivity;
 
 public class MainActivity extends AppCompatActivity {
 

@@ -22,13 +22,10 @@ import android.widget.Toast;
 import com.davidmiguel.numberkeyboard.NumberKeyboardListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 
-import java.security.InvalidKeyException;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import javax.crypto.Cipher;
-import javax.crypto.SecretKey;
-
+import rs.ac.bg.etf.diplomski.authenticationapp.account_login.LoginActivity;
 import rs.ac.bg.etf.diplomski.authenticationapp.account_setup.RegisterActivity;
 import rs.ac.bg.etf.diplomski.authenticationapp.databinding.FragmentKeyboardBinding;
 

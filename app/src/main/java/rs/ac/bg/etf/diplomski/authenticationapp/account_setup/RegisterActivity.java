@@ -8,7 +8,7 @@ import android.os.Bundle;
 
 import dagger.hilt.android.AndroidEntryPoint;
 import rs.ac.bg.etf.diplomski.authenticationapp.BiometricAuthenticator;
-import rs.ac.bg.etf.diplomski.authenticationapp.LoginActivity;
+import rs.ac.bg.etf.diplomski.authenticationapp.account_login.LoginActivity;
 import rs.ac.bg.etf.diplomski.authenticationapp.databinding.ActivityRegisterBinding;
 
 @AndroidEntryPoint
@@ -27,7 +27,7 @@ public class RegisterActivity extends AppCompatActivity {
 
         sharedPreferences = this.getSharedPreferences(BiometricAuthenticator.SHARED_PREFERENCES_ACCOUNT, MODE_PRIVATE);
 
-        if(sharedPreferences.contains(BiometricAuthenticator.SHARED_PREFERENCES_PIN_CODE_PARAMETER)) {
+        if(sharedPreferences.contains(BiometricAuthenticator.SHARED_PREFERENCES_EMAIL_PARAMETER)) {
             Intent intent = new Intent(this, LoginActivity.class);
             startActivity(intent);
             this.finish();
