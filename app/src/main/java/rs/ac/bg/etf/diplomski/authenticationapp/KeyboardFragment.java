@@ -26,6 +26,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import rs.ac.bg.etf.diplomski.authenticationapp.app_login.LoginActivity;
+import rs.ac.bg.etf.diplomski.authenticationapp.app_setup.PinRegisterFragment;
 import rs.ac.bg.etf.diplomski.authenticationapp.app_setup.RegisterActivity;
 import rs.ac.bg.etf.diplomski.authenticationapp.databinding.FragmentKeyboardBinding;
 
@@ -42,6 +43,8 @@ public class KeyboardFragment extends Fragment {
     private MutableLiveData<Integer> time_to_wait = new MutableLiveData<>(30);
     private String pin_code = "";
 
+    SharedPreferences registerSP;
+
     private final Timer timer = new Timer();
 
     public KeyboardFragment() {
@@ -53,6 +56,8 @@ public class KeyboardFragment extends Fragment {
         super.onCreate(savedInstanceState);
 
         activity = requireActivity();
+
+        registerSP = activity.getSharedPreferences(PinRegisterFragment.SHARED_PREFERENCES_REGISTER, Context.MODE_PRIVATE);
     }
 
     @RequiresApi(api = Build.VERSION_CODES.M)
@@ -91,7 +96,8 @@ public class KeyboardFragment extends Fragment {
         });
 
         binding.buttonSubmit.setOnClickListener(v -> {
-            String sp_pin = KeyboardFragmentArgs.fromBundle(getArguments()).getPinCode();
+
+            String sp_pin = registerSP.getString(PinRegisterFragment.SHARED_PREFERENCES_REGISTER_PIN, "");
 
             if(!pin_code.equals(sp_pin)) {
                 if(num_tries.getValue() < MAX_TRIES) {
@@ -129,8 +135,9 @@ public class KeyboardFragment extends Fragment {
             }
             else {
                 if(activity instanceof RegisterActivity) {
-                    String pin = KeyboardFragmentArgs.fromBundle(getArguments()).getPinCode();
-                    boolean biometry = KeyboardFragmentArgs.fromBundle(getArguments()).getBiometry();
+                    registerSP = activity.getSharedPreferences(PinRegisterFragment.SHARED_PREFERENCES_REGISTER, Context.MODE_PRIVATE);
+                    String pin = registerSP.getString(PinRegisterFragment.SHARED_PREFERENCES_REGISTER_PIN, "");
+                    boolean biometry = registerSP.getBoolean(PinRegisterFragment.SHARED_PREFERENCES_REGISTER_BIOMETRY, false);
 
                     SharedPreferences sharedPreferences = activity.getSharedPreferences(BiometricAuthenticator.SHARED_PREFERENCES_ACCOUNT, Context.MODE_PRIVATE);
                     sharedPreferences
@@ -138,6 +145,8 @@ public class KeyboardFragment extends Fragment {
                             .putBoolean(BiometricAuthenticator.SHARED_PREFERENCES_BIOMETRY_PARAMETER, biometry)
                             .putString(BiometricAuthenticator.SHARED_PREFERENCES_PIN_CODE_PARAMETER, pin)
                             .apply();
+
+                    registerSP.edit().clear().apply();
 
                     Toast.makeText(activity, "Registration successful!", Toast.LENGTH_SHORT).show();
 
