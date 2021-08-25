@@ -1,4 +1,4 @@
-package rs.ac.bg.etf.diplomski.authenticationapp.app_setup;
+package rs.ac.bg.etf.diplomski.authenticationapp.app_second_factor_register;
 
 import android.content.Context;
 import android.content.Intent;
@@ -20,10 +20,13 @@ import android.view.ViewGroup;
 import android.widget.Toast;
 
 import com.davidmiguel.numberkeyboard.NumberKeyboardListener;
+import com.google.firebase.auth.FirebaseAuth;
 
-import rs.ac.bg.etf.diplomski.authenticationapp.KeyboardFragmentDirections;
 import rs.ac.bg.etf.diplomski.authenticationapp.app_login.LoginActivity;
 import rs.ac.bg.etf.diplomski.authenticationapp.BiometricAuthenticator;
+import rs.ac.bg.etf.diplomski.authenticationapp.app_main.HomeFragmentDirections;
+import rs.ac.bg.etf.diplomski.authenticationapp.app_main.MainActivity;
+import rs.ac.bg.etf.diplomski.authenticationapp.app_user_register.RegisterActivity;
 import rs.ac.bg.etf.diplomski.authenticationapp.databinding.FragmentPinRegisterBinding;
 
 import static androidx.biometric.BiometricManager.Authenticators.BIOMETRIC_STRONG;
@@ -35,10 +38,9 @@ public class PinRegisterFragment extends Fragment {
     public static final String SHARED_PREFERENCES_REGISTER_PIN = "shared-preferences-register-pin";
     public static final String SHARED_PREFERENCES_REGISTER_BIOMETRY = "shared-preferences-register-biometry";
 
-
     private static final int MAX_CHARS = 6;
 
-    private FragmentActivity activity;
+    private PinRegisterActivity pinRegisterActivity;
     private FragmentPinRegisterBinding binding;
     private NavController navController;
 
@@ -54,9 +56,9 @@ public class PinRegisterFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        activity = (FragmentActivity) requireActivity();
+        pinRegisterActivity = (PinRegisterActivity) requireActivity();
 
-        biometricAuthenticator = new BiometricAuthenticator(activity, new PinRegisterCallback());
+        biometricAuthenticator = new BiometricAuthenticator(pinRegisterActivity, new PinRegisterCallback());
     }
 
     @Override
@@ -91,23 +93,23 @@ public class PinRegisterFragment extends Fragment {
         });
 
         binding.biometryAuth.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            BiometricManager biometricManager = BiometricManager.from(activity);
+            BiometricManager biometricManager = BiometricManager.from(pinRegisterActivity);
             switch (biometricManager.canAuthenticate(BIOMETRIC_STRONG | DEVICE_CREDENTIAL)) {
                 case BiometricManager.BIOMETRIC_SUCCESS:
                     biometry_used.setValue(isChecked);
                     if(isChecked) {
-                        Toast.makeText(activity, "Biometry enabled.", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(pinRegisterActivity, "Biometry enabled.", Toast.LENGTH_SHORT).show();
                     }
                     else {
-                        Toast.makeText(activity, "Biometry disabled.", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(pinRegisterActivity, "Biometry disabled.", Toast.LENGTH_SHORT).show();
                     }
                     break;
                 case BiometricManager.BIOMETRIC_ERROR_NO_HARDWARE:
-                    Toast.makeText(activity, "No biometric features available on this device.", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(pinRegisterActivity, "No biometric features available on this device.", Toast.LENGTH_SHORT).show();
                     biometry_used.setValue(false);
                     break;
                 case BiometricManager.BIOMETRIC_ERROR_HW_UNAVAILABLE:
-                    Toast.makeText(activity, "Biometric features are currently unavailable.", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(pinRegisterActivity, "Biometric features are currently unavailable.", Toast.LENGTH_SHORT).show();
                     biometry_used.setValue(false);
                     binding.biometryAuth.setChecked(false);
                     break;
@@ -116,7 +118,7 @@ public class PinRegisterFragment extends Fragment {
 
         binding.buttonSubmit.setOnClickListener(v -> {
             if(pin_code.equals("") || pin_code.length() < MAX_CHARS) {
-                Toast.makeText(activity, "You must enter " + MAX_CHARS + " digit PIN code in order to continue", Toast.LENGTH_SHORT).show();
+                Toast.makeText(pinRegisterActivity, "You must enter " + MAX_CHARS + " digit PIN code in order to continue", Toast.LENGTH_SHORT).show();
                 pin_code = "";
                 binding.pinCode.setText("");
             }
@@ -125,7 +127,7 @@ public class PinRegisterFragment extends Fragment {
                     biometricAuthenticator.authenticate();
                 }
                 else {
-                    activity
+                    pinRegisterActivity
                             .getSharedPreferences(PinRegisterFragment.SHARED_PREFERENCES_REGISTER, Context.MODE_PRIVATE)
                             .edit()
                             .putString(PinRegisterFragment.SHARED_PREFERENCES_REGISTER_PIN, pin_code)
@@ -133,7 +135,7 @@ public class PinRegisterFragment extends Fragment {
                             .commit();
 
                     navController.navigate(
-                            PinRegisterFragmentDirections.actionPinRegisterFragmentMainToNavGraphPin()
+                            PinRegisterFragmentDirections.actionPinRegisterFragmentToNavGraphPin()
                     );
                 }
             }
@@ -152,7 +154,7 @@ public class PinRegisterFragment extends Fragment {
 
         @Override
         public void failure() {
-            activity
+            pinRegisterActivity
                     .getSharedPreferences(PinRegisterFragment.SHARED_PREFERENCES_REGISTER, Context.MODE_PRIVATE)
                     .edit()
                     .putString(PinRegisterFragment.SHARED_PREFERENCES_REGISTER_PIN, pin_code)
@@ -160,23 +162,29 @@ public class PinRegisterFragment extends Fragment {
                     .commit();
 
             navController.navigate(
-                    PinRegisterFragmentDirections.actionPinRegisterFragmentMainToNavGraphPin()
+                    PinRegisterFragmentDirections.actionPinRegisterFragmentToNavGraphPin()
             );
         }
 
         @Override
         public void success() {
-            SharedPreferences sharedPreferences = activity.getSharedPreferences(BiometricAuthenticator.SHARED_PREFERENCES_ACCOUNT, Context.MODE_PRIVATE);
+            SharedPreferences sharedPreferences = pinRegisterActivity.getSharedPreferences(BiometricAuthenticator.SHARED_PREFERENCES_ACCOUNT, Context.MODE_PRIVATE);
             SharedPreferences.Editor editor = sharedPreferences.edit();
             editor.putBoolean(BiometricAuthenticator.SHARED_PREFERENCES_BIOMETRY_PARAMETER, biometry_used.getValue());
             editor.putString(BiometricAuthenticator.SHARED_PREFERENCES_PIN_CODE_PARAMETER, pin_code);
             editor.apply();
 
-            Toast.makeText(activity, "Success!", Toast.LENGTH_SHORT).show();
-
-            Intent intent = new Intent(activity, LoginActivity.class);
-            activity.startActivity(intent);
-            activity.finish();
+            if(FirebaseAuth.getInstance().getCurrentUser().isEmailVerified()) {
+                Intent intent = new Intent(pinRegisterActivity, MainActivity.class);
+                intent.putExtra(MainActivity.REGISTRATION_COMPLETED, true);
+                pinRegisterActivity.startActivity(intent);
+                pinRegisterActivity.finish();
+            }
+            else {
+                Intent intent = new Intent(pinRegisterActivity, LoginActivity.class);
+                pinRegisterActivity.startActivity(intent);
+                pinRegisterActivity.finish();
+            }
         }
     }
 }

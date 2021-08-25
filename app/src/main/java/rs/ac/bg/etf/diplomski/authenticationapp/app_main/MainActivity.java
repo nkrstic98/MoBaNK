@@ -1,7 +1,6 @@
 package rs.ac.bg.etf.diplomski.authenticationapp.app_main;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.navigation.NavController;
 import androidx.navigation.fragment.NavHostFragment;
@@ -9,20 +8,21 @@ import androidx.navigation.fragment.NavHostFragment;
 import android.content.Intent;
 import android.os.Bundle;
 
-import com.google.android.material.button.MaterialButton;
 import com.google.firebase.auth.FirebaseAuth;
 
 import rs.ac.bg.etf.diplomski.authenticationapp.BiometricAuthenticator;
-import rs.ac.bg.etf.diplomski.authenticationapp.KeyboardFragmentDirections;
 import rs.ac.bg.etf.diplomski.authenticationapp.R;
 import rs.ac.bg.etf.diplomski.authenticationapp.app_login.LoginActivity;
-import rs.ac.bg.etf.diplomski.authenticationapp.app_setup.PinRegisterFragment;
-import rs.ac.bg.etf.diplomski.authenticationapp.app_setup.PinRegisterFragmentDirections;
+import rs.ac.bg.etf.diplomski.authenticationapp.app_second_factor_register.PinRegisterActivity;
 import rs.ac.bg.etf.diplomski.authenticationapp.databinding.ActivityMainBinding;
 
 public class MainActivity extends AppCompatActivity {
 
+    public static final String REGISTRATION_COMPLETED = "registration-completed";
+
     private ActivityMainBinding binding;
+
+    private boolean finish_registration = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -30,21 +30,18 @@ public class MainActivity extends AppCompatActivity {
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
-        FragmentManager fragmentManager = getSupportFragmentManager();
-        NavHostFragment navHostFragment = (NavHostFragment) fragmentManager.findFragmentById(R.id.main_host_fragment);
-        NavController navController = navHostFragment.getNavController();
-
         boolean registered_fully = getSharedPreferences(BiometricAuthenticator.SHARED_PREFERENCES_ACCOUNT, MODE_PRIVATE)
                 .contains(BiometricAuthenticator.SHARED_PREFERENCES_PIN_CODE_PARAMETER);
 
         if(!registered_fully) {
-            navController.navigate(
-                    HomeFragmentDirections.actionHomeFragmentPop()
-            );
-
-            navController.navigate(
-                    HomeFragmentDirections.actionGlobalPinRegisterFragmentMain()
-            );
+            finish_registration = true;
+            Intent intent = new Intent(this, PinRegisterActivity.class);
+            intent.putExtra(PinRegisterActivity.REGISTRATION_INVOKED, false);
+            startActivity(intent);
+            finish();
+        }
+        else {
+            finish_registration = getIntent().getBooleanExtra(REGISTRATION_COMPLETED, false);
         }
     }
 
@@ -52,12 +49,6 @@ public class MainActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         returnToLogin();
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-        logout();
     }
 
     @Override
@@ -73,7 +64,9 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void logout() {
-        FirebaseAuth.getInstance().signOut();
+        if(!finish_registration) {
+            FirebaseAuth.getInstance().signOut();
+        }
     }
 
     private void returnToLogin() {

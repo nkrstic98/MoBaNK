@@ -20,14 +20,15 @@ import android.view.ViewGroup;
 import android.widget.Toast;
 
 import com.davidmiguel.numberkeyboard.NumberKeyboardListener;
-import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.auth.FirebaseAuth;
 
 import java.util.Timer;
 import java.util.TimerTask;
 
 import rs.ac.bg.etf.diplomski.authenticationapp.app_login.LoginActivity;
-import rs.ac.bg.etf.diplomski.authenticationapp.app_setup.PinRegisterFragment;
-import rs.ac.bg.etf.diplomski.authenticationapp.app_setup.RegisterActivity;
+import rs.ac.bg.etf.diplomski.authenticationapp.app_main.MainActivity;
+import rs.ac.bg.etf.diplomski.authenticationapp.app_second_factor_register.PinRegisterActivity;
+import rs.ac.bg.etf.diplomski.authenticationapp.app_second_factor_register.PinRegisterFragment;
 import rs.ac.bg.etf.diplomski.authenticationapp.databinding.FragmentKeyboardBinding;
 
 public class KeyboardFragment extends Fragment {
@@ -136,16 +137,23 @@ public class KeyboardFragment extends Fragment {
                 }
             }
             else {
-                if(activity instanceof RegisterActivity) {
+                if(activity instanceof PinRegisterActivity) {
                    finishRegistration();
+
+                   if(FirebaseAuth.getInstance().getCurrentUser().isEmailVerified()) {
+                       Intent intent = new Intent(activity, MainActivity.class);
+                       intent.putExtra(MainActivity.REGISTRATION_COMPLETED, true);
+                       activity.startActivity(intent);
+                       activity.finish();
+                   }
+                   else {
+                       Intent intent = new Intent(activity, LoginActivity.class);
+                       activity.startActivity(intent);
+                       activity.finish();
+                   }
                 }
                 else {
-                    if(!registerSP.contains(BiometricAuthenticator.SHARED_PREFERENCES_PIN_CODE_PARAMETER)) {
-                        finishRegistration();
-                    }
-                    else {
-                        //do some other work
-                    }
+
                 }
             }
         });
@@ -165,10 +173,6 @@ public class KeyboardFragment extends Fragment {
 
         registerSP.edit().clear().apply();
 
-        Toast.makeText(activity, "Registration successful!", Toast.LENGTH_SHORT).show();
-
-        Intent intent = new Intent(activity, LoginActivity.class);
-        activity.startActivity(intent);
-        activity.finish();
+        Toast.makeText(activity, "Success!", Toast.LENGTH_SHORT).show();
     }
 }

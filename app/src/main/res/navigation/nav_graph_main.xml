@@ -17,12 +17,16 @@
     </fragment>
     <fragment
         android:id="@+id/pinRegisterFragmentMain"
-        android:name="rs.ac.bg.etf.diplomski.authenticationapp.app_setup.PinRegisterFragment"
+        android:name="rs.ac.bg.etf.diplomski.authenticationapp.app_second_factor_register.PinRegisterFragment"
         android:label="fragment_pin_register"
         tools:layout="@layout/fragment_pin_register" >
         <action
             android:id="@+id/action_pinRegisterFragmentMain_to_nav_graph_pin"
             app:destination="@id/nav_graph_pin" />
+        <action
+            android:id="@+id/action_pinRegisterFragmentMain_pop"
+            app:popUpTo="@id/pinRegisterFragmentMain"
+            app:popUpToInclusive="true" />
     </fragment>
     <action android:id="@+id/action_global_pinRegisterFragmentMain" app:destination="@id/pinRegisterFragmentMain" />
     <action android:id="@+id/action_global_homeFragment" app:destination="@id/homeFragment" />

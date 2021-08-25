@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_graph_pin_register"
+    app:startDestination="@id/pinRegisterFragment">
+
+
+    <fragment
+        android:id="@+id/pinRegisterFragment"
+        android:name="rs.ac.bg.etf.diplomski.authenticationapp.app_second_factor_register.PinRegisterFragment"
+        android:label="fragment_pin_register"
+        tools:layout="@layout/fragment_pin_register" >
+        <action
+            android:id="@+id/action_pinRegisterFragment_to_nav_graph_pin"
+            app:destination="@id/nav_graph_pin" />
+    </fragment>
+    <include app:graph="@navigation/nav_graph_pin" />
+</navigation>

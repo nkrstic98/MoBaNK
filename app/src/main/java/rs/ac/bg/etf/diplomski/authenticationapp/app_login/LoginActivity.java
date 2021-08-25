@@ -17,5 +17,11 @@ public class LoginActivity extends AppCompatActivity {
 
         binding = ActivityLoginBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
+
+//        getSharedPreferences(BiometricAuthenticator.SHARED_PREFERENCES_ACCOUNT, MODE_PRIVATE)
+//                .edit()
+//                .remove(BiometricAuthenticator.SHARED_PREFERENCES_PIN_CODE_PARAMETER)
+//                .remove(BiometricAuthenticator.SHARED_PREFERENCES_BIOMETRY_PARAMETER)
+//                .commit();
     }
 }

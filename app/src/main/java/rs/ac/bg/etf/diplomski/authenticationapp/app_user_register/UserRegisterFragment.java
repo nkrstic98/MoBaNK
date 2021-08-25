@@ -1,6 +1,7 @@
-package rs.ac.bg.etf.diplomski.authenticationapp.app_setup;
+package rs.ac.bg.etf.diplomski.authenticationapp.app_user_register;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -24,8 +25,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import rs.ac.bg.etf.diplomski.authenticationapp.BiometricAuthenticator;
-import rs.ac.bg.etf.diplomski.authenticationapp.app_setup.UserRegisterFragmentArgs;
-import rs.ac.bg.etf.diplomski.authenticationapp.app_setup.UserRegisterFragmentDirections;
+import rs.ac.bg.etf.diplomski.authenticationapp.app_second_factor_register.PinRegisterActivity;
+import rs.ac.bg.etf.diplomski.authenticationapp.app_user_register.UserRegisterFragmentArgs;
 import rs.ac.bg.etf.diplomski.authenticationapp.databinding.FragmentUserRegisterBinding;
 import rs.ac.bg.etf.diplomski.authenticationapp.models.User;
 
@@ -187,9 +188,10 @@ public class UserRegisterFragment extends Fragment {
 
                                                                                     Toast.makeText(registerActivity, "Registration successful!", Toast.LENGTH_SHORT).show();
 
-                                                                                    navController.navigate(
-                                                                                            UserRegisterFragmentDirections.actionUserRegisterFragmentToPinRegisterFragment()
-                                                                                    );
+                                                                                    Intent intent = new Intent(registerActivity, PinRegisterActivity.class);
+                                                                                    intent.putExtra(PinRegisterActivity.REGISTRATION_INVOKED, false);
+                                                                                    registerActivity.startActivity(intent);
+                                                                                    registerActivity.finish();
                                                                                 })
                                                                                 .addOnFailureListener(registerActivity, e -> {
                                                                                     Toast.makeText(registerActivity, e.getMessage(), Toast.LENGTH_SHORT).show();
