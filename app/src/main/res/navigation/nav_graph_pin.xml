@@ -9,5 +9,10 @@
         android:id="@+id/keyboardFragment"
         android:name="rs.ac.bg.etf.diplomski.authenticationapp.KeyboardFragment"
         android:label="fragment_keyboard"
-        tools:layout="@layout/fragment_keyboard" />
+        tools:layout="@layout/fragment_keyboard" >
+        <action
+            android:id="@+id/action_keyboardFragment_pop"
+            app:popUpTo="@id/keyboardFragment"
+            app:popUpToInclusive="true" />
+    </fragment><action android:id="@+id/action_global_keyboardFragment" app:destination="@id/keyboardFragment"/>
 </navigation>

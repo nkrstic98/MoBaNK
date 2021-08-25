@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_graph_main"
+    app:startDestination="@id/homeFragment">
+
+    <fragment
+        android:id="@+id/homeFragment"
+        android:name="rs.ac.bg.etf.diplomski.authenticationapp.app_main.HomeFragment"
+        android:label="fragment_home"
+        tools:layout="@layout/fragment_home" >
+        <action
+            android:id="@+id/action_homeFragment_pop"
+            app:popUpTo="@id/homeFragment"
+            app:popUpToInclusive="true" />
+    </fragment>
+    <fragment
+        android:id="@+id/pinRegisterFragmentMain"
+        android:name="rs.ac.bg.etf.diplomski.authenticationapp.app_setup.PinRegisterFragment"
+        android:label="fragment_pin_register"
+        tools:layout="@layout/fragment_pin_register" />
+    <action android:id="@+id/action_global_pinRegisterFragmentMain" app:destination="@id/pinRegisterFragmentMain" />
+    <action android:id="@+id/action_global_homeFragment" app:destination="@id/homeFragment" />
+</navigation>

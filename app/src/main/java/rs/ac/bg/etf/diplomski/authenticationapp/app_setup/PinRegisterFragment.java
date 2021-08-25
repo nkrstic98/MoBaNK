@@ -21,6 +21,7 @@ import android.widget.Toast;
 
 import com.davidmiguel.numberkeyboard.NumberKeyboardListener;
 
+import rs.ac.bg.etf.diplomski.authenticationapp.KeyboardFragmentDirections;
 import rs.ac.bg.etf.diplomski.authenticationapp.app_login.LoginActivity;
 import rs.ac.bg.etf.diplomski.authenticationapp.BiometricAuthenticator;
 import rs.ac.bg.etf.diplomski.authenticationapp.databinding.FragmentPinRegisterBinding;
@@ -125,7 +126,7 @@ public class PinRegisterFragment extends Fragment {
                 }
                 else {
                     navController.navigate(
-                            PinRegisterFragmentDirections.actionPinRegisterFragmentToNavGraphPin()
+                            KeyboardFragmentDirections.actionGlobalKeyboardFragment()
                     );
                 }
             }
@@ -152,7 +153,7 @@ public class PinRegisterFragment extends Fragment {
                     .commit();
 
             navController.navigate(
-                PinRegisterFragmentDirections.actionPinRegisterFragmentToNavGraphPin()
+                    KeyboardFragmentDirections.actionGlobalKeyboardFragment()
             );
         }
 
