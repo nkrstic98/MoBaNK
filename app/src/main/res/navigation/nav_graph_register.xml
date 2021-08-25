@@ -60,5 +60,13 @@
         <argument
             android:name="documentId"
             app:argType="string" />
+        <argument
+            android:name="pinCode"
+            app:argType="string"
+            android:defaultValue='""' />
+        <argument
+            android:name="biometry"
+            app:argType="boolean"
+            android:defaultValue="false" />
     </fragment>
 </navigation>

@@ -15,12 +15,13 @@ import java.util.concurrent.Executor;
 public class BiometricAuthenticator {
 
     public interface  Callback {
-        void invoke();
-        void encrypt();
+        void failure();
+        void success();
     }
 
-    public static final String SHARED_PREFERENCES_BIOMETRY = "shared-preferences-authentication-data";
+    public static final String SHARED_PREFERENCES_ACCOUNT = "shared-preferences-authentication-data";
 
+    public static final String SHARED_PREFERENCES_EMAIL_PARAMETER = "shared-preferences-email-parameter";
     public static final String SHARED_PREFERENCES_BIOMETRY_PARAMETER = "shared-preferences-biometry-parameter";
     public static final String SHARED_PREFERENCES_PIN_CODE_PARAMETER = "shared-preferences-pin-code-parameter";
 
@@ -39,14 +40,14 @@ public class BiometricAuthenticator {
             @Override
             public void onAuthenticationError(int errorCode, @NonNull CharSequence errString) {
                 super.onAuthenticationError(errorCode, errString);
-                callback.invoke();
+                callback.failure();
             }
 
             @Override
             public void onAuthenticationSucceeded(@NonNull BiometricPrompt.AuthenticationResult result) {
                 super.onAuthenticationSucceeded(result);
 
-                callback.encrypt();
+                callback.success();
 
                 Toast.makeText(context,
                         "Authentication succeeded!", Toast.LENGTH_SHORT).show();
@@ -72,13 +73,7 @@ public class BiometricAuthenticator {
         biometricPrompt.authenticate(promptInfo);
     }
 
-    public void encrypt(String data) {
-        Toast.makeText(context, "Registration successful!", Toast.LENGTH_SHORT).show();
-
-        Intent intent = new Intent(context, LoginActivity.class);
-        context.startActivity(intent);
-        ((Activity) context).finish();
-
+//    public void encrypt() {
 //        FirebaseFirestore firebaseFirestore = FirebaseFirestore.getInstance();
 //
 //        //SECRET
@@ -117,7 +112,7 @@ public class BiometricAuthenticator {
 //                .addOnFailureListener((Activity) context, e -> {
 //                    Toast.makeText(context, "Something went wrong. Please try again!", Toast.LENGTH_SHORT).show();
 //                });
-    }
+//    }
 
 //    private String shuffle(String input){
 //        List<Character> characters = new ArrayList<Character>();

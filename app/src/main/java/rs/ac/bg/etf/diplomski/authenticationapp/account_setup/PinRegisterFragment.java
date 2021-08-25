@@ -1,8 +1,8 @@
 package rs.ac.bg.etf.diplomski.authenticationapp.account_setup;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
-import android.os.Build;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -20,11 +20,7 @@ import android.widget.Toast;
 
 import com.davidmiguel.numberkeyboard.NumberKeyboardListener;
 
-import java.security.InvalidKeyException;
-
-import javax.crypto.Cipher;
-import javax.crypto.SecretKey;
-
+import rs.ac.bg.etf.diplomski.authenticationapp.LoginActivity;
 import rs.ac.bg.etf.diplomski.authenticationapp.account_setup.PinRegisterFragmentArgs;
 import rs.ac.bg.etf.diplomski.authenticationapp.account_setup.PinRegisterFragmentDirections;
 import rs.ac.bg.etf.diplomski.authenticationapp.BiometricAuthenticator;
@@ -35,7 +31,7 @@ import static androidx.biometric.BiometricManager.Authenticators.DEVICE_CREDENTI
 
 public class PinRegisterFragment extends Fragment {
 
-    private static final int MAX_CHARS = 4;
+    private static final int MAX_CHARS = 6;
 
     private RegisterActivity registerActivity;
     private FragmentPinRegisterBinding binding;
@@ -120,18 +116,11 @@ public class PinRegisterFragment extends Fragment {
 
         binding.buttonSubmit.setOnClickListener(v -> {
             if(pin_code.equals("") || pin_code.length() < MAX_CHARS) {
-                Toast.makeText(registerActivity, "You must enter 4 digit PIN code in order to continue", Toast.LENGTH_SHORT).show();
+                Toast.makeText(registerActivity, "You must enter " + MAX_CHARS + " digit PIN code in order to continue", Toast.LENGTH_SHORT).show();
                 pin_code = "";
                 binding.pinCode.setText("");
             }
             else {
-
-                SharedPreferences sharedPreferences = registerActivity.getSharedPreferences(BiometricAuthenticator.SHARED_PREFERENCES_BIOMETRY, Context.MODE_PRIVATE);
-                SharedPreferences.Editor editor = sharedPreferences.edit();
-                editor.putBoolean(BiometricAuthenticator.SHARED_PREFERENCES_BIOMETRY_PARAMETER, biometry_used.getValue());
-                editor.putString(BiometricAuthenticator.SHARED_PREFERENCES_PIN_CODE_PARAMETER, pin_code);
-                editor.commit();
-
                 if(biometry_used.getValue()) {
                     biometricAuthenticator.authenticate();
                 }
@@ -156,16 +145,28 @@ public class PinRegisterFragment extends Fragment {
     public class PinRegisterCallback implements BiometricAuthenticator.Callback {
 
         @Override
-        public void invoke() {
+        public void failure() {
             PinRegisterFragmentDirections.ActionPinRegisterFragmentToKeyboardFragment action =
                     PinRegisterFragmentDirections.actionPinRegisterFragmentToKeyboardFragment(documentId.getValue());
+            action.setPinCode(pin_code);
+            action.setBiometry(biometry_used.getValue());
             action.setDocumentId(documentId.getValue());
             navController.navigate(action);
         }
 
         @Override
-        public void encrypt() {
-            biometricAuthenticator.encrypt(documentId.getValue());
+        public void success() {
+            SharedPreferences sharedPreferences = registerActivity.getSharedPreferences(BiometricAuthenticator.SHARED_PREFERENCES_ACCOUNT, Context.MODE_PRIVATE);
+            SharedPreferences.Editor editor = sharedPreferences.edit();
+            editor.putBoolean(BiometricAuthenticator.SHARED_PREFERENCES_BIOMETRY_PARAMETER, biometry_used.getValue());
+            editor.putString(BiometricAuthenticator.SHARED_PREFERENCES_PIN_CODE_PARAMETER, pin_code);
+            editor.apply();
+
+            Toast.makeText(registerActivity, "Registration successful!", Toast.LENGTH_SHORT).show();
+
+            Intent intent = new Intent(registerActivity, LoginActivity.class);
+            registerActivity.startActivity(intent);
+            registerActivity.finish();
         }
     }
 }

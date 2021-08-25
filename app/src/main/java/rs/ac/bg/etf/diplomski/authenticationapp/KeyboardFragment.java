@@ -1,6 +1,7 @@
 package rs.ac.bg.etf.diplomski.authenticationapp;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
@@ -33,7 +34,7 @@ import rs.ac.bg.etf.diplomski.authenticationapp.databinding.FragmentKeyboardBind
 
 public class KeyboardFragment extends Fragment {
 
-    private static final int MAX_CHARS = 4;
+    private static final int MAX_CHARS = 6;
     private static final int MAX_TRIES = 3;
 
     private FragmentActivity activity;
@@ -61,7 +62,7 @@ public class KeyboardFragment extends Fragment {
 
         activity = requireActivity();
 
-        sharedPreferences = activity.getSharedPreferences(BiometricAuthenticator.SHARED_PREFERENCES_BIOMETRY, Context.MODE_PRIVATE);
+        sharedPreferences = activity.getSharedPreferences(BiometricAuthenticator.SHARED_PREFERENCES_ACCOUNT, Context.MODE_PRIVATE);
 
         firebaseFirestore = FirebaseFirestore.getInstance();
 
@@ -104,7 +105,7 @@ public class KeyboardFragment extends Fragment {
         });
 
         binding.buttonSubmit.setOnClickListener(v -> {
-            String sp_pin = sharedPreferences.getString(BiometricAuthenticator.SHARED_PREFERENCES_PIN_CODE_PARAMETER, "");
+            String sp_pin = KeyboardFragmentArgs.fromBundle(getArguments()).getPinCode();
 
             if(!pin_code.equals(sp_pin)) {
                 if(num_tries.getValue() < MAX_TRIES) {
@@ -142,8 +143,21 @@ public class KeyboardFragment extends Fragment {
             }
             else {
                 if(activity instanceof RegisterActivity) {
-                    BiometricAuthenticator biometricAuthenticator = new BiometricAuthenticator(activity, null);
-                    biometricAuthenticator.encrypt(documentId.getValue());
+                    String pin = KeyboardFragmentArgs.fromBundle(getArguments()).getPinCode();
+                    boolean biometry = KeyboardFragmentArgs.fromBundle(getArguments()).getBiometry();
+
+                    SharedPreferences sharedPreferences = activity.getSharedPreferences(BiometricAuthenticator.SHARED_PREFERENCES_ACCOUNT, Context.MODE_PRIVATE);
+                    sharedPreferences
+                            .edit()
+                            .putBoolean(BiometricAuthenticator.SHARED_PREFERENCES_BIOMETRY_PARAMETER, biometry)
+                            .putString(BiometricAuthenticator.SHARED_PREFERENCES_PIN_CODE_PARAMETER, pin)
+                            .apply();
+
+                    Toast.makeText(activity, "Registration successful!", Toast.LENGTH_SHORT).show();
+
+                    Intent intent = new Intent(activity, LoginActivity.class);
+                    activity.startActivity(intent);
+                    activity.finish();
                 }
                 else {
 

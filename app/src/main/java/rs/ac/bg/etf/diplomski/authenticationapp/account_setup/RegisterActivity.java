@@ -25,7 +25,7 @@ public class RegisterActivity extends AppCompatActivity {
 
         setContentView(binding.getRoot());
 
-        sharedPreferences = this.getSharedPreferences(BiometricAuthenticator.SHARED_PREFERENCES_BIOMETRY, MODE_PRIVATE);
+        sharedPreferences = this.getSharedPreferences(BiometricAuthenticator.SHARED_PREFERENCES_ACCOUNT, MODE_PRIVATE);
 
         if(sharedPreferences.contains(BiometricAuthenticator.SHARED_PREFERENCES_PIN_CODE_PARAMETER)) {
             Intent intent = new Intent(this, LoginActivity.class);

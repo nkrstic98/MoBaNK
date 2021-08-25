@@ -105,7 +105,7 @@ public class CodeScannerFragment extends Fragment {
             try {
                 String[] scanned_data = result.getText().split("@");
 
-                verifyUserKey(scanned_data[0], scanned_data[1], scanned_data[2]);
+                verifyUserKey(scanned_data[0], scanned_data[1]);
             }
             catch (Exception e) {
                 registerActivity.runOnUiThread(() -> {
@@ -125,16 +125,15 @@ public class CodeScannerFragment extends Fragment {
         });
     }
 
-    private void verifyUserKey(String id, String key, String phoneNumber) {
+    private void verifyUserKey(String key, String phoneNumber) {
         firebaseFirestore
                 .collection("users")
-                .whereEqualTo("id", id)
+                .document(key)
                 .get()
-                .addOnSuccessListener(command -> {
-                    List<DocumentSnapshot> documentSnapshotList = command.getDocuments();
-                    if(documentSnapshotList.size() != 0 && documentSnapshotList.get(0).getId().equals(key)) {
+                .addOnSuccessListener(documentSnapshot -> {
+                    if(documentSnapshot != null && documentSnapshot.getId().equals(key)) {
                         Toast.makeText(registerActivity, "QR Code successfully read! Wait for SMS code to proceed.", Toast.LENGTH_SHORT).show();
-                        verifyPhoneNumber(phoneNumber, id, key);
+                        verifyPhoneNumber(phoneNumber, key);
                     }
                     else {
                         Toast.makeText(registerActivity, "Invalid QR code! Use different code, or contact QR Code provider.", Toast.LENGTH_SHORT).show();
@@ -146,7 +145,7 @@ public class CodeScannerFragment extends Fragment {
                 });
     }
 
-    private void verifyPhoneNumber(String phoneNumber, String id, String documentId) {
+    private void verifyPhoneNumber(String phoneNumber, String documentId) {
 
         PhoneAuthOptions phoneAuthOptions =
                 PhoneAuthOptions

@@ -1,5 +1,6 @@
 package rs.ac.bg.etf.diplomski.authenticationapp.account_setup;
 
+import android.content.Context;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -22,6 +23,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import rs.ac.bg.etf.diplomski.authenticationapp.BiometricAuthenticator;
 import rs.ac.bg.etf.diplomski.authenticationapp.account_setup.UserRegisterFragmentArgs;
 import rs.ac.bg.etf.diplomski.authenticationapp.account_setup.UserRegisterFragmentDirections;
 import rs.ac.bg.etf.diplomski.authenticationapp.databinding.FragmentUserRegisterBinding;
@@ -176,6 +178,12 @@ public class UserRegisterFragment extends Fragment {
                                                                                         "email", email
                                                                                 )
                                                                                 .addOnSuccessListener(registerActivity, aVoid2 -> {
+                                                                                    registerActivity
+                                                                                            .getSharedPreferences(BiometricAuthenticator.SHARED_PREFERENCES_ACCOUNT, Context.MODE_PRIVATE)
+                                                                                            .edit()
+                                                                                            .putString(BiometricAuthenticator.SHARED_PREFERENCES_EMAIL_PARAMETER, email)
+                                                                                            .apply();
+
                                                                                     UserRegisterFragmentDirections.ActionUserRegisterFragmentToPinRegisterFragment action =
                                                                                             UserRegisterFragmentDirections.actionUserRegisterFragmentToPinRegisterFragment(documentId.getValue());
                                                                                     action.setDocumentId(documentId.getValue());
