@@ -1,4 +1,4 @@
-package rs.ac.bg.etf.diplomski.authenticationapp.account_setup;
+package rs.ac.bg.etf.diplomski.authenticationapp.app_setup;
 
 import android.content.Context;
 import android.os.Bundle;
@@ -24,8 +24,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import rs.ac.bg.etf.diplomski.authenticationapp.BiometricAuthenticator;
-import rs.ac.bg.etf.diplomski.authenticationapp.account_setup.UserRegisterFragmentArgs;
-import rs.ac.bg.etf.diplomski.authenticationapp.account_setup.UserRegisterFragmentDirections;
+import rs.ac.bg.etf.diplomski.authenticationapp.app_setup.UserRegisterFragmentArgs;
+import rs.ac.bg.etf.diplomski.authenticationapp.app_setup.UserRegisterFragmentDirections;
 import rs.ac.bg.etf.diplomski.authenticationapp.databinding.FragmentUserRegisterBinding;
 import rs.ac.bg.etf.diplomski.authenticationapp.models.User;
 
@@ -185,10 +185,9 @@ public class UserRegisterFragment extends Fragment {
                                                                                             .putString(BiometricAuthenticator.SHARED_PREFERENCES_USER_INFO, firstname + " " + lastname)
                                                                                             .apply();
 
-                                                                                    UserRegisterFragmentDirections.ActionUserRegisterFragmentToPinRegisterFragment action =
-                                                                                            UserRegisterFragmentDirections.actionUserRegisterFragmentToPinRegisterFragment(documentId.getValue());
-                                                                                    action.setDocumentId(documentId.getValue());
-                                                                                    navController.navigate(action);
+                                                                                    navController.navigate(
+                                                                                            UserRegisterFragmentDirections.actionUserRegisterFragmentToPinRegisterFragment()
+                                                                                    );
                                                                                 })
                                                                                 .addOnFailureListener(registerActivity, e -> {
                                                                                     Toast.makeText(registerActivity, e.getMessage(), Toast.LENGTH_SHORT).show();

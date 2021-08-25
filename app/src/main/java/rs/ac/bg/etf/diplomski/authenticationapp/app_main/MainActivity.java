@@ -1,4 +1,4 @@
-package rs.ac.bg.etf.diplomski.authenticationapp;
+package rs.ac.bg.etf.diplomski.authenticationapp.app_main;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -7,7 +7,8 @@ import android.os.Bundle;
 
 import com.google.firebase.auth.FirebaseAuth;
 
-import rs.ac.bg.etf.diplomski.authenticationapp.account_login.LoginActivity;
+import rs.ac.bg.etf.diplomski.authenticationapp.R;
+import rs.ac.bg.etf.diplomski.authenticationapp.app_login.LoginActivity;
 
 public class MainActivity extends AppCompatActivity {
 

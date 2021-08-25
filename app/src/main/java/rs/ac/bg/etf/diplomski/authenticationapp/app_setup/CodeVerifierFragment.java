@@ -1,4 +1,4 @@
-package rs.ac.bg.etf.diplomski.authenticationapp.account_setup;
+package rs.ac.bg.etf.diplomski.authenticationapp.app_setup;
 
 import android.os.Bundle;
 
@@ -18,8 +18,8 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.PhoneAuthProvider;
 import com.google.firebase.firestore.FirebaseFirestore;
 
-import rs.ac.bg.etf.diplomski.authenticationapp.account_setup.CodeVerifierFragmentArgs;
-import rs.ac.bg.etf.diplomski.authenticationapp.account_setup.CodeVerifierFragmentDirections;
+import rs.ac.bg.etf.diplomski.authenticationapp.app_setup.CodeVerifierFragmentArgs;
+import rs.ac.bg.etf.diplomski.authenticationapp.app_setup.CodeVerifierFragmentDirections;
 import rs.ac.bg.etf.diplomski.authenticationapp.databinding.FragmentCodeVerifierBinding;
 
 public class CodeVerifierFragment extends Fragment {

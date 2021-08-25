@@ -25,8 +25,8 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import rs.ac.bg.etf.diplomski.authenticationapp.account_login.LoginActivity;
-import rs.ac.bg.etf.diplomski.authenticationapp.account_setup.RegisterActivity;
+import rs.ac.bg.etf.diplomski.authenticationapp.app_login.LoginActivity;
+import rs.ac.bg.etf.diplomski.authenticationapp.app_setup.RegisterActivity;
 import rs.ac.bg.etf.diplomski.authenticationapp.databinding.FragmentKeyboardBinding;
 
 public class KeyboardFragment extends Fragment {
@@ -36,11 +36,6 @@ public class KeyboardFragment extends Fragment {
 
     private FragmentActivity activity;
     private FragmentKeyboardBinding binding;
-    private SharedPreferences sharedPreferences;
-
-    private FirebaseFirestore firebaseFirestore;
-
-    private MutableLiveData<String> documentId = new MutableLiveData<>();
 
     private MutableLiveData<Integer> num_tries = new MutableLiveData<>(0);
     private MutableLiveData<Boolean> can_enter = new MutableLiveData<>(true);
@@ -58,12 +53,6 @@ public class KeyboardFragment extends Fragment {
         super.onCreate(savedInstanceState);
 
         activity = requireActivity();
-
-        sharedPreferences = activity.getSharedPreferences(BiometricAuthenticator.SHARED_PREFERENCES_ACCOUNT, Context.MODE_PRIVATE);
-
-        firebaseFirestore = FirebaseFirestore.getInstance();
-
-        documentId.setValue(KeyboardFragmentArgs.fromBundle(requireArguments()).getDocumentId());
     }
 
     @RequiresApi(api = Build.VERSION_CODES.M)

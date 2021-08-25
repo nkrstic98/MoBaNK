@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context=".account_setup.PinRegisterFragment">
+    tools:context=".app_setup.PinRegisterFragment">
 
     <TextView
         android:layout_width="wrap_content"

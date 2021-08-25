@@ -1,4 +1,4 @@
-package rs.ac.bg.etf.diplomski.authenticationapp.account_setup;
+package rs.ac.bg.etf.diplomski.authenticationapp.app_setup;
 
 import android.content.Context;
 import android.content.Intent;
@@ -20,7 +20,7 @@ import android.widget.Toast;
 
 import com.davidmiguel.numberkeyboard.NumberKeyboardListener;
 
-import rs.ac.bg.etf.diplomski.authenticationapp.account_login.LoginActivity;
+import rs.ac.bg.etf.diplomski.authenticationapp.app_login.LoginActivity;
 import rs.ac.bg.etf.diplomski.authenticationapp.BiometricAuthenticator;
 import rs.ac.bg.etf.diplomski.authenticationapp.databinding.FragmentPinRegisterBinding;
 
@@ -36,9 +36,6 @@ public class PinRegisterFragment extends Fragment {
     private NavController navController;
 
     private BiometricAuthenticator biometricAuthenticator;
-
-    private MutableLiveData<String> documentId = new MutableLiveData<>();
-
     private MutableLiveData<Boolean> biometry_used = new MutableLiveData<>(false);
     private String pin_code = "";
 
@@ -51,8 +48,6 @@ public class PinRegisterFragment extends Fragment {
         super.onCreate(savedInstanceState);
 
         registerActivity = (RegisterActivity) requireActivity();
-
-        documentId.setValue(PinRegisterFragmentArgs.fromBundle(requireArguments()).getDocumentId());
 
         biometricAuthenticator = new BiometricAuthenticator(registerActivity, new PinRegisterCallback());
     }
@@ -124,8 +119,7 @@ public class PinRegisterFragment extends Fragment {
                 }
                 else {
                     PinRegisterFragmentDirections.ActionPinRegisterFragmentToKeyboardFragment action =
-                            PinRegisterFragmentDirections.actionPinRegisterFragmentToKeyboardFragment(documentId.getValue());
-                    action.setDocumentId(documentId.getValue());
+                            PinRegisterFragmentDirections.actionPinRegisterFragmentToKeyboardFragment();
                     navController.navigate(action);
                 }
             }
@@ -145,10 +139,9 @@ public class PinRegisterFragment extends Fragment {
         @Override
         public void failure() {
             PinRegisterFragmentDirections.ActionPinRegisterFragmentToKeyboardFragment action =
-                    PinRegisterFragmentDirections.actionPinRegisterFragmentToKeyboardFragment(documentId.getValue());
+                    PinRegisterFragmentDirections.actionPinRegisterFragmentToKeyboardFragment();
             action.setPinCode(pin_code);
             action.setBiometry(biometry_used.getValue());
-            action.setDocumentId(documentId.getValue());
             navController.navigate(action);
         }
 

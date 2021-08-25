@@ -1,4 +1,4 @@
-package rs.ac.bg.etf.diplomski.authenticationapp.account_login;
+package rs.ac.bg.etf.diplomski.authenticationapp.app_login;
 
 import androidx.appcompat.app.AppCompatActivity;
 

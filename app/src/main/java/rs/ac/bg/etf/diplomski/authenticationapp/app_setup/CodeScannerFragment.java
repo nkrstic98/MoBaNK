@@ -1,4 +1,4 @@
-package rs.ac.bg.etf.diplomski.authenticationapp.account_setup;
+package rs.ac.bg.etf.diplomski.authenticationapp.app_setup;
 
 import android.Manifest;
 import android.content.pm.PackageManager;
@@ -26,13 +26,11 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.PhoneAuthCredential;
 import com.google.firebase.auth.PhoneAuthOptions;
 import com.google.firebase.auth.PhoneAuthProvider;
-import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
-import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-import rs.ac.bg.etf.diplomski.authenticationapp.account_setup.CodeScannerFragmentDirections;
+import rs.ac.bg.etf.diplomski.authenticationapp.app_setup.CodeScannerFragmentDirections;
 import rs.ac.bg.etf.diplomski.authenticationapp.databinding.FragmentCodeScannerBinding;
 
 public class CodeScannerFragment extends Fragment {

@@ -1,4 +1,4 @@
-package rs.ac.bg.etf.diplomski.authenticationapp.account_setup;
+package rs.ac.bg.etf.diplomski.authenticationapp.app_setup;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -8,7 +8,7 @@ import android.os.Bundle;
 
 import dagger.hilt.android.AndroidEntryPoint;
 import rs.ac.bg.etf.diplomski.authenticationapp.BiometricAuthenticator;
-import rs.ac.bg.etf.diplomski.authenticationapp.account_login.LoginActivity;
+import rs.ac.bg.etf.diplomski.authenticationapp.app_login.LoginActivity;
 import rs.ac.bg.etf.diplomski.authenticationapp.databinding.ActivityRegisterBinding;
 
 @AndroidEntryPoint

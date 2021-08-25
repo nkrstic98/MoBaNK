@@ -1,4 +1,4 @@
-package rs.ac.bg.etf.diplomski.authenticationapp.account_login;
+package rs.ac.bg.etf.diplomski.authenticationapp.app_login;
 
 import android.content.Context;
 import android.content.Intent;
@@ -20,8 +20,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
 import rs.ac.bg.etf.diplomski.authenticationapp.BiometricAuthenticator;
-import rs.ac.bg.etf.diplomski.authenticationapp.MainActivity;
-import rs.ac.bg.etf.diplomski.authenticationapp.R;
+import rs.ac.bg.etf.diplomski.authenticationapp.app_main.MainActivity;
 import rs.ac.bg.etf.diplomski.authenticationapp.databinding.FragmentLoginBinding;
 
 public class LoginFragment extends Fragment {
