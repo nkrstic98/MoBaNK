@@ -59,7 +59,15 @@ public class LoginFragment extends Fragment {
         });
 
         binding.forgotPassword.setOnClickListener(v -> {
-
+            String email = sharedPreferences.getString(BiometricAuthenticator.SHARED_PREFERENCES_EMAIL_PARAMETER, "");
+            firebaseAuth
+                    .sendPasswordResetEmail(email)
+                    .addOnSuccessListener(loginActivity, aVoid -> {
+                        Toast.makeText(loginActivity, "Password reset email is sent to the address associated with this account!", Toast.LENGTH_SHORT).show();
+                    })
+                    .addOnFailureListener(loginActivity, e -> {
+                        Toast.makeText(loginActivity, e.getMessage(), Toast.LENGTH_SHORT).show();
+                    });
         });
 
         return binding.getRoot();
