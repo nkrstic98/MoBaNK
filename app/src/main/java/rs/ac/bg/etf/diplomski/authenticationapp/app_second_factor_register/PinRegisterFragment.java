@@ -9,7 +9,6 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.biometric.BiometricManager;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentActivity;
 import androidx.lifecycle.MutableLiveData;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
@@ -23,10 +22,9 @@ import com.davidmiguel.numberkeyboard.NumberKeyboardListener;
 import com.google.firebase.auth.FirebaseAuth;
 
 import rs.ac.bg.etf.diplomski.authenticationapp.app_login.LoginActivity;
-import rs.ac.bg.etf.diplomski.authenticationapp.BiometricAuthenticator;
+import rs.ac.bg.etf.diplomski.authenticationapp.modules.BiometricAuthenticator;
 import rs.ac.bg.etf.diplomski.authenticationapp.app_main.HomeFragmentDirections;
 import rs.ac.bg.etf.diplomski.authenticationapp.app_main.MainActivity;
-import rs.ac.bg.etf.diplomski.authenticationapp.app_user_register.RegisterActivity;
 import rs.ac.bg.etf.diplomski.authenticationapp.databinding.FragmentPinRegisterBinding;
 
 import static androidx.biometric.BiometricManager.Authenticators.BIOMETRIC_STRONG;

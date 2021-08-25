@@ -1,4 +1,4 @@
-package rs.ac.bg.etf.diplomski.authenticationapp;
+package rs.ac.bg.etf.diplomski.authenticationapp.modules;
 
 import android.content.Context;
 import android.content.Intent;
@@ -30,6 +30,7 @@ import rs.ac.bg.etf.diplomski.authenticationapp.app_main.MainActivity;
 import rs.ac.bg.etf.diplomski.authenticationapp.app_second_factor_register.PinRegisterActivity;
 import rs.ac.bg.etf.diplomski.authenticationapp.app_second_factor_register.PinRegisterFragment;
 import rs.ac.bg.etf.diplomski.authenticationapp.databinding.FragmentKeyboardBinding;
+import rs.ac.bg.etf.diplomski.authenticationapp.modules.BiometricAuthenticator;
 
 public class KeyboardFragment extends Fragment {
 

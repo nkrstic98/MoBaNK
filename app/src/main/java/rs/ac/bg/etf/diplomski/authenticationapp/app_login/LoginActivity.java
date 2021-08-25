@@ -4,7 +4,6 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.Bundle;
 
-import rs.ac.bg.etf.diplomski.authenticationapp.BiometricAuthenticator;
 import rs.ac.bg.etf.diplomski.authenticationapp.databinding.ActivityLoginBinding;
 
 public class LoginActivity extends AppCompatActivity {

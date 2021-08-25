@@ -19,7 +19,7 @@ import android.widget.Toast;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
-import rs.ac.bg.etf.diplomski.authenticationapp.BiometricAuthenticator;
+import rs.ac.bg.etf.diplomski.authenticationapp.modules.BiometricAuthenticator;
 import rs.ac.bg.etf.diplomski.authenticationapp.app_main.MainActivity;
 import rs.ac.bg.etf.diplomski.authenticationapp.databinding.FragmentLoginBinding;
 

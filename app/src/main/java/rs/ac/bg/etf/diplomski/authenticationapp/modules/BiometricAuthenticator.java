@@ -1,4 +1,4 @@
-package rs.ac.bg.etf.diplomski.authenticationapp;
+package rs.ac.bg.etf.diplomski.authenticationapp.modules;
 
 import android.app.Activity;
 import android.content.Context;

@@ -7,7 +7,7 @@
 
     <fragment
         android:id="@+id/keyboardFragment"
-        android:name="rs.ac.bg.etf.diplomski.authenticationapp.KeyboardFragment"
+        android:name="rs.ac.bg.etf.diplomski.authenticationapp.modules.KeyboardFragment"
         android:label="fragment_keyboard"
         tools:layout="@layout/fragment_keyboard" >
         <action

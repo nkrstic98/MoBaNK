@@ -24,7 +24,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import rs.ac.bg.etf.diplomski.authenticationapp.BiometricAuthenticator;
+import rs.ac.bg.etf.diplomski.authenticationapp.modules.BiometricAuthenticator;
 import rs.ac.bg.etf.diplomski.authenticationapp.app_second_factor_register.PinRegisterActivity;
 import rs.ac.bg.etf.diplomski.authenticationapp.app_user_register.UserRegisterFragmentArgs;
 import rs.ac.bg.etf.diplomski.authenticationapp.databinding.FragmentUserRegisterBinding;
