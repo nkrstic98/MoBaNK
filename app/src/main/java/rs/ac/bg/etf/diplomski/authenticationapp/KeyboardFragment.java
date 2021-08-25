@@ -44,6 +44,7 @@ public class KeyboardFragment extends Fragment {
     private String pin_code = "";
 
     SharedPreferences registerSP;
+    SharedPreferences sharedPreferences;
 
     private final Timer timer = new Timer();
 
@@ -58,6 +59,7 @@ public class KeyboardFragment extends Fragment {
         activity = requireActivity();
 
         registerSP = activity.getSharedPreferences(PinRegisterFragment.SHARED_PREFERENCES_REGISTER, Context.MODE_PRIVATE);
+        sharedPreferences = activity.getSharedPreferences(BiometricAuthenticator.SHARED_PREFERENCES_ACCOUNT, Context.MODE_PRIVATE);
     }
 
     @RequiresApi(api = Build.VERSION_CODES.M)
@@ -135,31 +137,38 @@ public class KeyboardFragment extends Fragment {
             }
             else {
                 if(activity instanceof RegisterActivity) {
-                    registerSP = activity.getSharedPreferences(PinRegisterFragment.SHARED_PREFERENCES_REGISTER, Context.MODE_PRIVATE);
-                    String pin = registerSP.getString(PinRegisterFragment.SHARED_PREFERENCES_REGISTER_PIN, "");
-                    boolean biometry = registerSP.getBoolean(PinRegisterFragment.SHARED_PREFERENCES_REGISTER_BIOMETRY, false);
-
-                    SharedPreferences sharedPreferences = activity.getSharedPreferences(BiometricAuthenticator.SHARED_PREFERENCES_ACCOUNT, Context.MODE_PRIVATE);
-                    sharedPreferences
-                            .edit()
-                            .putBoolean(BiometricAuthenticator.SHARED_PREFERENCES_BIOMETRY_PARAMETER, biometry)
-                            .putString(BiometricAuthenticator.SHARED_PREFERENCES_PIN_CODE_PARAMETER, pin)
-                            .apply();
-
-                    registerSP.edit().clear().apply();
-
-                    Toast.makeText(activity, "Registration successful!", Toast.LENGTH_SHORT).show();
-
-                    Intent intent = new Intent(activity, LoginActivity.class);
-                    activity.startActivity(intent);
-                    activity.finish();
+                   finishRegistration();
                 }
                 else {
-
+                    if(!registerSP.contains(BiometricAuthenticator.SHARED_PREFERENCES_PIN_CODE_PARAMETER)) {
+                        finishRegistration();
+                    }
+                    else {
+                        //do some other work
+                    }
                 }
             }
         });
 
         return binding.getRoot();
+    }
+
+    private void finishRegistration() {
+        String pin = registerSP.getString(PinRegisterFragment.SHARED_PREFERENCES_REGISTER_PIN, "");
+        boolean biometry = registerSP.getBoolean(PinRegisterFragment.SHARED_PREFERENCES_REGISTER_BIOMETRY, false);
+
+        sharedPreferences
+                .edit()
+                .putBoolean(BiometricAuthenticator.SHARED_PREFERENCES_BIOMETRY_PARAMETER, biometry)
+                .putString(BiometricAuthenticator.SHARED_PREFERENCES_PIN_CODE_PARAMETER, pin)
+                .apply();
+
+        registerSP.edit().clear().apply();
+
+        Toast.makeText(activity, "Registration successful!", Toast.LENGTH_SHORT).show();
+
+        Intent intent = new Intent(activity, LoginActivity.class);
+        activity.startActivity(intent);
+        activity.finish();
     }
 }

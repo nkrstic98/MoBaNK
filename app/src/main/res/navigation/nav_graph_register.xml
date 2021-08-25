@@ -44,5 +44,10 @@
         android:id="@+id/pinRegisterFragment"
         android:name="rs.ac.bg.etf.diplomski.authenticationapp.app_setup.PinRegisterFragment"
         android:label="fragment_pin_register"
-        tools:layout="@layout/fragment_pin_register" />
+        tools:layout="@layout/fragment_pin_register" >
+        <action
+            android:id="@+id/action_pinRegisterFragment_to_nav_graph_pin"
+            app:destination="@id/nav_graph_pin" />
+    </fragment>
+    <include app:graph="@navigation/nav_graph_pin" />
 </navigation>

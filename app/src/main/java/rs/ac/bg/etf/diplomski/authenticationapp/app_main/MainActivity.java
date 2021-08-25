@@ -43,7 +43,7 @@ public class MainActivity extends AppCompatActivity {
             );
 
             navController.navigate(
-                    PinRegisterFragmentDirections.actionGlobalPinRegisterFragmentMain()
+                    HomeFragmentDirections.actionGlobalPinRegisterFragmentMain()
             );
         }
     }

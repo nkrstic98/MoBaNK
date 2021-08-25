@@ -185,6 +185,8 @@ public class UserRegisterFragment extends Fragment {
                                                                                             .putString(BiometricAuthenticator.SHARED_PREFERENCES_USER_INFO, firstname + " " + lastname)
                                                                                             .apply();
 
+                                                                                    Toast.makeText(registerActivity, "Registration successful!", Toast.LENGTH_SHORT).show();
+
                                                                                     navController.navigate(
                                                                                             UserRegisterFragmentDirections.actionUserRegisterFragmentToPinRegisterFragment()
                                                                                     );

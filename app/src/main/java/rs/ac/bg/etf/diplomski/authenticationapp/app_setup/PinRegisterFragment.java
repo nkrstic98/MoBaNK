@@ -125,8 +125,15 @@ public class PinRegisterFragment extends Fragment {
                     biometricAuthenticator.authenticate();
                 }
                 else {
+                    activity
+                            .getSharedPreferences(PinRegisterFragment.SHARED_PREFERENCES_REGISTER, Context.MODE_PRIVATE)
+                            .edit()
+                            .putString(PinRegisterFragment.SHARED_PREFERENCES_REGISTER_PIN, pin_code)
+                            .putBoolean(PinRegisterFragment.SHARED_PREFERENCES_REGISTER_BIOMETRY, biometry_used.getValue())
+                            .commit();
+
                     navController.navigate(
-                            KeyboardFragmentDirections.actionGlobalKeyboardFragment()
+                            PinRegisterFragmentDirections.actionPinRegisterFragmentMainToNavGraphPin()
                     );
                 }
             }
@@ -153,7 +160,7 @@ public class PinRegisterFragment extends Fragment {
                     .commit();
 
             navController.navigate(
-                    KeyboardFragmentDirections.actionGlobalKeyboardFragment()
+                    PinRegisterFragmentDirections.actionPinRegisterFragmentMainToNavGraphPin()
             );
         }
 
@@ -165,7 +172,7 @@ public class PinRegisterFragment extends Fragment {
             editor.putString(BiometricAuthenticator.SHARED_PREFERENCES_PIN_CODE_PARAMETER, pin_code);
             editor.apply();
 
-            Toast.makeText(activity, "Registration successful!", Toast.LENGTH_SHORT).show();
+            Toast.makeText(activity, "Success!", Toast.LENGTH_SHORT).show();
 
             Intent intent = new Intent(activity, LoginActivity.class);
             activity.startActivity(intent);

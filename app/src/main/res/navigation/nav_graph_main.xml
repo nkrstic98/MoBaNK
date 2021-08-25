@@ -19,7 +19,12 @@
         android:id="@+id/pinRegisterFragmentMain"
         android:name="rs.ac.bg.etf.diplomski.authenticationapp.app_setup.PinRegisterFragment"
         android:label="fragment_pin_register"
-        tools:layout="@layout/fragment_pin_register" />
+        tools:layout="@layout/fragment_pin_register" >
+        <action
+            android:id="@+id/action_pinRegisterFragmentMain_to_nav_graph_pin"
+            app:destination="@id/nav_graph_pin" />
+    </fragment>
     <action android:id="@+id/action_global_pinRegisterFragmentMain" app:destination="@id/pinRegisterFragmentMain" />
     <action android:id="@+id/action_global_homeFragment" app:destination="@id/homeFragment" />
+    <include app:graph="@navigation/nav_graph_pin" />
 </navigation>
