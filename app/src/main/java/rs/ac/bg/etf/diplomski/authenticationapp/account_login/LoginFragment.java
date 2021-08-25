@@ -93,6 +93,14 @@ public class LoginFragment extends Fragment {
             return;
         }
 
+        if(!email.equals(sharedPreferences.getString(BiometricAuthenticator.SHARED_PREFERENCES_EMAIL_PARAMETER, ""))) {
+            Toast.makeText(loginActivity, "Entered email is not associated with this account!", Toast.LENGTH_SHORT).show();
+            binding.email.setText("");
+            binding.password.setText("");
+            binding.emailLabel.getEditText().requestFocus();
+            return;
+        }
+
         firebaseAuth.signInWithEmailAndPassword(email, password)
                 .addOnCompleteListener(loginActivity, task -> {
                     if(task.isSuccessful()) {
