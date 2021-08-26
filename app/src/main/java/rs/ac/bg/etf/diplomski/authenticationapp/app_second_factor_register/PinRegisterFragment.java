@@ -169,7 +169,7 @@ public class PinRegisterFragment extends Fragment {
             SharedPreferences.Editor editor = sharedPreferences.edit();
             editor.putBoolean(BiometricAuthenticator.SHARED_PREFERENCES_BIOMETRY_PARAMETER, biometry_used.getValue());
             editor.putString(BiometricAuthenticator.SHARED_PREFERENCES_PIN_CODE_PARAMETER, pin_code);
-            editor.apply();
+            editor.commit();
 
             if(FirebaseAuth.getInstance().getCurrentUser().isEmailVerified()) {
                 Intent intent = new Intent(pinRegisterActivity, MainActivity.class);

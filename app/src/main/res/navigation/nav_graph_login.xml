@@ -9,6 +9,11 @@
         android:id="@+id/loginFragment"
         android:name="rs.ac.bg.etf.diplomski.authenticationapp.app_login.LoginFragment"
         android:label="fragment_login"
-        tools:layout="@layout/fragment_login" />
+        tools:layout="@layout/fragment_login" >
+        <action
+            android:id="@+id/action_loginFragment_to_nav_graph_pin"
+            app:destination="@id/nav_graph_pin" />
+    </fragment>
+    <include app:graph="@navigation/nav_graph_pin" />
 
 </navigation>

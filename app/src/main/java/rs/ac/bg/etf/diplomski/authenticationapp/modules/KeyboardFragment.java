@@ -3,6 +3,7 @@ package rs.ac.bg.etf.diplomski.authenticationapp.modules;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.hardware.biometrics.BiometricPrompt;
 import android.os.Build;
 import android.os.Bundle;
 
@@ -29,6 +30,7 @@ import rs.ac.bg.etf.diplomski.authenticationapp.app_login.LoginActivity;
 import rs.ac.bg.etf.diplomski.authenticationapp.app_main.MainActivity;
 import rs.ac.bg.etf.diplomski.authenticationapp.app_second_factor_register.PinRegisterActivity;
 import rs.ac.bg.etf.diplomski.authenticationapp.app_second_factor_register.PinRegisterFragment;
+import rs.ac.bg.etf.diplomski.authenticationapp.app_user_register.RegisterActivity;
 import rs.ac.bg.etf.diplomski.authenticationapp.databinding.FragmentKeyboardBinding;
 import rs.ac.bg.etf.diplomski.authenticationapp.modules.BiometricAuthenticator;
 
@@ -101,7 +103,13 @@ public class KeyboardFragment extends Fragment {
 
         binding.buttonSubmit.setOnClickListener(v -> {
 
-            String sp_pin = registerSP.getString(PinRegisterFragment.SHARED_PREFERENCES_REGISTER_PIN, "");
+            String sp_pin;
+            if(activity instanceof RegisterActivity) {
+                sp_pin = registerSP.getString(PinRegisterFragment.SHARED_PREFERENCES_REGISTER_PIN, "");
+            }
+            else {
+                sp_pin = sharedPreferences.getString(BiometricAuthenticator.SHARED_PREFERENCES_PIN_CODE_PARAMETER, "");
+            }
 
             if(!pin_code.equals(sp_pin)) {
                 if(num_tries.getValue() < MAX_TRIES) {
@@ -153,8 +161,20 @@ public class KeyboardFragment extends Fragment {
                        activity.finish();
                    }
                 }
-                else {
+                else if (activity instanceof LoginActivity) {
+                    String email = sharedPreferences.getString(BiometricAuthenticator.SHARED_PREFERENCES_EMAIL_PARAMETER, "");
+                    FirebaseAuth.getInstance()
+                            .sendPasswordResetEmail(email)
+                            .addOnSuccessListener(activity, aVoid -> {
+                                Toast.makeText(activity, "Password reset email is sent to the address associated with this account!", Toast.LENGTH_SHORT).show();
+                            })
+                            .addOnFailureListener(activity, e -> {
+                                Toast.makeText(activity, e.getMessage(), Toast.LENGTH_SHORT).show();
+                            });
 
+                    Intent intent = new Intent(activity, LoginActivity.class);
+                    activity.startActivity(intent);
+                    activity.finish();
                 }
             }
         });
@@ -170,7 +190,7 @@ public class KeyboardFragment extends Fragment {
                 .edit()
                 .putBoolean(BiometricAuthenticator.SHARED_PREFERENCES_BIOMETRY_PARAMETER, biometry)
                 .putString(BiometricAuthenticator.SHARED_PREFERENCES_PIN_CODE_PARAMETER, pin)
-                .apply();
+                .commit();
 
         registerSP.edit().clear().apply();
 

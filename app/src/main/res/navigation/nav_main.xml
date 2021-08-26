@@ -3,15 +3,16 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/nav_graph_main"
-    app:startDestination="@id/homeFragment">
+    app:startDestination="@id/nav_home">
 
     <fragment
-        android:id="@+id/homeFragment"
+        android:id="@+id/nav_home"
         android:name="rs.ac.bg.etf.diplomski.authenticationapp.app_main.HomeFragment"
         android:label="Home"
-        tools:layout="@layout/fragment_home" >
-
-    </fragment>
-
-    <include app:graph="@navigation/nav_graph_pin" />
+        tools:layout="@layout/fragment_home" />
+    <fragment
+        android:id="@+id/nav_account_settings"
+        android:name="rs.ac.bg.etf.diplomski.authenticationapp.app_main.AccountSettingsFragment"
+        android:label="Account"
+        tools:layout="@layout/fragment_account_settings" />
 </navigation>

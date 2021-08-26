@@ -1,18 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
-<menu
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    tools:showIn="navigation_view"
-    >
+    tools:showIn="navigation_view">
 
     <group android:id="@+id/group1" android:checkableBehavior="single">
         <item
-            android:id="@+id/bottom_navigation_routes"
+            android:id="@+id/nav_home"
             android:icon="@drawable/outline_home_black_48"
             android:title="Home" />
 
         <item
-            android:id="@+id/bottom_navigation_workouts"
+            android:id="@+id/nav_account_settings"
             android:icon="@drawable/outline_manage_accounts_black_18"
             android:title="Account" />
     </group>

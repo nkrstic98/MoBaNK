@@ -22,6 +22,8 @@ import com.google.firebase.auth.FirebaseUser;
 import rs.ac.bg.etf.diplomski.authenticationapp.modules.BiometricAuthenticator;
 import rs.ac.bg.etf.diplomski.authenticationapp.app_main.MainActivity;
 import rs.ac.bg.etf.diplomski.authenticationapp.databinding.FragmentLoginBinding;
+import rs.ac.bg.etf.diplomski.authenticationapp.modules.KeyboardFragment;
+import rs.ac.bg.etf.diplomski.authenticationapp.modules.KeyboardFragmentDirections;
 
 public class LoginFragment extends Fragment {
 
@@ -58,15 +60,17 @@ public class LoginFragment extends Fragment {
         });
 
         binding.forgotPassword.setOnClickListener(v -> {
-            String email = sharedPreferences.getString(BiometricAuthenticator.SHARED_PREFERENCES_EMAIL_PARAMETER, "");
-            firebaseAuth
-                    .sendPasswordResetEmail(email)
-                    .addOnSuccessListener(loginActivity, aVoid -> {
-                        Toast.makeText(loginActivity, "Password reset email is sent to the address associated with this account!", Toast.LENGTH_SHORT).show();
-                    })
-                    .addOnFailureListener(loginActivity, e -> {
-                        Toast.makeText(loginActivity, e.getMessage(), Toast.LENGTH_SHORT).show();
-                    });
+            new BiometricAuthenticator(loginActivity, new BiometricAuthenticator.Callback() {
+                @Override
+                public void failure() {
+                    navController.navigate(LoginFragmentDirections.actionLoginFragmentToNavGraphPin());
+                }
+
+                @Override
+                public void success() {
+                    sendForgotPasswordEmail();
+                }
+            }).authenticate();
         });
 
         return binding.getRoot();
@@ -127,6 +131,18 @@ public class LoginFragment extends Fragment {
                         binding.passwordLabel.getEditText().requestFocus();
                         Toast.makeText(loginActivity, task.getException().getMessage(), Toast.LENGTH_SHORT).show();
                     }
+                });
+    }
+
+    private void sendForgotPasswordEmail() {
+        String email = sharedPreferences.getString(BiometricAuthenticator.SHARED_PREFERENCES_EMAIL_PARAMETER, "");
+        firebaseAuth
+                .sendPasswordResetEmail(email)
+                .addOnSuccessListener(loginActivity, aVoid -> {
+                    Toast.makeText(loginActivity, "Password reset email is sent to the address associated with this account!", Toast.LENGTH_SHORT).show();
+                })
+                .addOnFailureListener(loginActivity, e -> {
+                    Toast.makeText(loginActivity, e.getMessage(), Toast.LENGTH_SHORT).show();
                 });
     }
 }
