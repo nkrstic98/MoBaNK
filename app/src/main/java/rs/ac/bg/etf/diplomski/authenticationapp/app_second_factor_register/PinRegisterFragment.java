@@ -23,7 +23,6 @@ import com.google.firebase.auth.FirebaseAuth;
 
 import rs.ac.bg.etf.diplomski.authenticationapp.app_login.LoginActivity;
 import rs.ac.bg.etf.diplomski.authenticationapp.modules.BiometricAuthenticator;
-import rs.ac.bg.etf.diplomski.authenticationapp.app_main.HomeFragmentDirections;
 import rs.ac.bg.etf.diplomski.authenticationapp.app_main.MainActivity;
 import rs.ac.bg.etf.diplomski.authenticationapp.databinding.FragmentPinRegisterBinding;
 

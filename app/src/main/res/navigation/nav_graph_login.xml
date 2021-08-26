@@ -10,4 +10,5 @@
         android:name="rs.ac.bg.etf.diplomski.authenticationapp.app_login.LoginFragment"
         android:label="fragment_login"
         tools:layout="@layout/fragment_login" />
+
 </navigation>

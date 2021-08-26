@@ -8,6 +8,15 @@
     android:orientation="vertical"
     >
 
+    <com.google.android.material.appbar.MaterialToolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="parent"
+        style="@style/Widget.MaterialComponents.Toolbar.Primary"
+        app:title="@string/app_name"
+        />
+
     <TextView
         android:id="@+id/welcome_text"
         android:layout_width="wrap_content"
@@ -16,6 +25,8 @@
         android:layout_marginLeft="20dp"
         android:layout_marginRight="20dp"
         android:textSize="20dp"
+        android:layout_gravity="center"
+        android:textAlignment="center"
         />
 
     <TextView
@@ -27,6 +38,8 @@
         android:layout_marginTop="10dp"
         android:text="Please enter email and password for future logins"
         android:textSize="16dp"
+        android:layout_gravity="center"
+        android:textAlignment="center"
         />
 
     <androidx.constraintlayout.widget.ConstraintLayout

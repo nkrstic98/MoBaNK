@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:showIn="navigation_view"
+    >
+
+    <group android:id="@+id/group1" android:checkableBehavior="single">
+        <item
+            android:id="@+id/bottom_navigation_routes"
+            android:icon="@drawable/outline_home_black_48"
+            android:title="Home" />
+
+        <item
+            android:id="@+id/bottom_navigation_workouts"
+            android:icon="@drawable/outline_manage_accounts_black_18"
+            android:title="Account" />
+    </group>
+
+    <group android:id="@+id/group2" android:checkableBehavior="single">
+        <item
+            android:id="@+id/menu_logout"
+            android:title="Log Out"
+            android:icon="@drawable/outline_logout_black_48"
+            />
+    </group>
+</menu>
