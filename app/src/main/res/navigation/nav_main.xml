@@ -15,4 +15,18 @@
         android:name="rs.ac.bg.etf.diplomski.authenticationapp.app_main.AccountSettingsFragment"
         android:label="Account"
         tools:layout="@layout/fragment_account_settings" />
+    <fragment
+        android:id="@+id/keyboard_fragment_main"
+        android:name="rs.ac.bg.etf.diplomski.authenticationapp.modules.KeyboardFragment"
+        android:label="Verify your identity"
+        tools:layout="@layout/fragment_keyboard" >
+        <action
+            android:id="@+id/action_keyboard_fragment_main_pop"
+            app:popUpTo="@id/keyboard_fragment_main"
+            app:popUpToInclusive="true" />
+        <argument
+            android:name="operation"
+            app:argType="rs.ac.bg.etf.diplomski.authenticationapp.models.OPERATION" />
+    </fragment>
+    <action android:id="@+id/action_global_keyboard_fragment_main" app:destination="@id/keyboard_fragment_main" />
 </navigation>

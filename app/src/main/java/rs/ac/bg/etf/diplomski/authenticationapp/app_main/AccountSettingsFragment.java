@@ -1,66 +1,162 @@
 package rs.ac.bg.etf.diplomski.authenticationapp.app_main;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.MutableLiveData;
+import androidx.navigation.NavController;
+import androidx.navigation.Navigation;
 
+import android.transition.AutoTransition;
+import android.transition.TransitionManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import rs.ac.bg.etf.diplomski.authenticationapp.R;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
 
-/**
- * A simple {@link Fragment} subclass.
- * Use the {@link AccountSettingsFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
+import java.util.List;
+
+import rs.ac.bg.etf.diplomski.authenticationapp.R;
+import rs.ac.bg.etf.diplomski.authenticationapp.databinding.FragmentAccountSettingsBinding;
+import rs.ac.bg.etf.diplomski.authenticationapp.models.OPERATION;
+import rs.ac.bg.etf.diplomski.authenticationapp.models.User;
+import rs.ac.bg.etf.diplomski.authenticationapp.modules.BiometricAuthenticator;
+import rs.ac.bg.etf.diplomski.authenticationapp.modules.KeyboardFragment;
+import rs.ac.bg.etf.diplomski.authenticationapp.modules.KeyboardFragmentDirections;
+
 public class AccountSettingsFragment extends Fragment {
 
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
+    private MainActivity mainActivity;
+    private FragmentAccountSettingsBinding binding;
+    private SharedPreferences sharedPreferences;
+    private NavController navController;
 
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
+    private MutableLiveData<Boolean> moreOptions = new MutableLiveData<>(false);
+    private MutableLiveData<String> userPhone = new MutableLiveData<>("");
+    private MutableLiveData<Boolean> use_biometry = new MutableLiveData<>(false);
+
+    private FirebaseAuth firebaseAuth;
+    private FirebaseFirestore firebaseFirestore;
+    private FirebaseUser user;
 
     public AccountSettingsFragment() {
         // Required empty public constructor
     }
 
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment AccountSettingsFragment.
-     */
-    // TODO: Rename and change types and number of parameters
-    public static AccountSettingsFragment newInstance(String param1, String param2) {
-        AccountSettingsFragment fragment = new AccountSettingsFragment();
-        Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
-        fragment.setArguments(args);
-        return fragment;
-    }
-
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
-        }
+
+        mainActivity = (MainActivity) requireActivity();
+        sharedPreferences = mainActivity.getSharedPreferences(BiometricAuthenticator.SHARED_PREFERENCES_ACCOUNT, Context.MODE_PRIVATE);
+
+        firebaseAuth=  FirebaseAuth.getInstance();
+        firebaseFirestore = FirebaseFirestore.getInstance();
+        user = firebaseAuth.getCurrentUser();
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_account_settings, container, false);
+
+        binding = FragmentAccountSettingsBinding.inflate(inflater, container, false);
+
+        use_biometry.setValue(sharedPreferences.getBoolean(BiometricAuthenticator.SHARED_PREFERENCES_BIOMETRY_PARAMETER, false));
+
+        firebaseFirestore.collection("users")
+                .whereEqualTo("email", firebaseAuth.getCurrentUser().getEmail())
+                .get()
+                .addOnCompleteListener(mainActivity, task -> {
+                    if(task.isSuccessful()) {
+                        List<DocumentSnapshot> documents =  task.getResult().getDocuments();
+                        if(documents.size() != 0) {
+                            User myUser = documents.get(0).toObject(User.class);
+                            userPhone.setValue(myUser.getPhone());
+                            binding.phone.setText(userPhone.getValue());
+                        }
+                    }
+                });
+
+        binding.user.setText(user.getDisplayName());
+        binding.email.setText(user.getEmail());
+
+        binding.optionsMore.setVisibility(moreOptions.getValue() ? View.VISIBLE : View.GONE);
+        binding.buttonMoreOptions.setImageDrawable(
+                moreOptions.getValue()
+                        ?
+                        ContextCompat.getDrawable(mainActivity, R.drawable.outline_keyboard_arrow_up_24)
+                        :
+                        ContextCompat.getDrawable(mainActivity, R.drawable.outline_keyboard_arrow_down_24)
+        );
+
+        binding.buttonMoreOptions.setOnClickListener(v -> {
+            moreOptions.setValue(!moreOptions.getValue());
+
+            if(moreOptions.getValue()) {
+                TransitionManager.beginDelayedTransition(binding.optionsMore, new AutoTransition());
+                binding.optionsMore.setVisibility(View.VISIBLE);
+                binding.buttonMoreOptions.setImageDrawable(ContextCompat.getDrawable(mainActivity, R.drawable.outline_keyboard_arrow_up_24));
+                binding.security.setText("Collapse for fewer options");
+            }
+            else {
+                TransitionManager.beginDelayedTransition(binding.optionsMore, new AutoTransition());
+                binding.optionsMore.setVisibility(View.GONE);
+                binding.buttonMoreOptions.setImageDrawable(ContextCompat.getDrawable(mainActivity, R.drawable.outline_keyboard_arrow_down_24));
+                binding.security.setText("Expand for more options");
+            }
+        });
+
+        binding.biometryAuth.setChecked(use_biometry.getValue());
+        binding.biometryAuth.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            if(use_biometry.getValue()) {
+                new BiometricAuthenticator(mainActivity, new BiometricAuthenticator.Callback() {
+                    @Override
+                    public void failure() {
+                        navController.navigate(KeyboardFragmentDirections.actionGlobalKeyboardFragmentMain(OPERATION.SET_FINGERPRINT));
+                    }
+
+                    @Override
+                    public void success() {
+                        use_biometry.setValue(isChecked);
+                        sharedPreferences
+                                .edit()
+                                .putBoolean(BiometricAuthenticator.SHARED_PREFERENCES_BIOMETRY_PARAMETER, isChecked)
+                                .commit();
+                    }
+                }).authenticate();
+            }
+            else {
+                navController.navigate(KeyboardFragmentDirections.actionGlobalKeyboardFragmentMain(OPERATION.SET_FINGERPRINT));
+            }
+        });
+
+        binding.emailCard.setOnClickListener(v -> {
+
+        });
+
+        binding.passwordCard.setOnClickListener(v -> {
+
+        });
+
+        binding.pinCard.setOnClickListener(v -> {
+
+        });
+
+        return binding.getRoot();
+    }
+
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        navController = Navigation.findNavController(view);
     }
 }

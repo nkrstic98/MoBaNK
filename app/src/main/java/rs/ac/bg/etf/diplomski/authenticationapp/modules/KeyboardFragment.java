@@ -7,10 +7,14 @@ import android.hardware.biometrics.BiometricPrompt;
 import android.os.Build;
 import android.os.Bundle;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
 import androidx.lifecycle.MutableLiveData;
+import androidx.navigation.NavController;
+import androidx.navigation.Navigation;
 
 import android.os.Handler;
 import android.os.Looper;
@@ -32,7 +36,10 @@ import rs.ac.bg.etf.diplomski.authenticationapp.app_second_factor_register.PinRe
 import rs.ac.bg.etf.diplomski.authenticationapp.app_second_factor_register.PinRegisterFragment;
 import rs.ac.bg.etf.diplomski.authenticationapp.app_user_register.RegisterActivity;
 import rs.ac.bg.etf.diplomski.authenticationapp.databinding.FragmentKeyboardBinding;
+import rs.ac.bg.etf.diplomski.authenticationapp.models.OPERATION;
 import rs.ac.bg.etf.diplomski.authenticationapp.modules.BiometricAuthenticator;
+
+import static rs.ac.bg.etf.diplomski.authenticationapp.models.OPERATION.*;
 
 public class KeyboardFragment extends Fragment {
 
@@ -41,6 +48,7 @@ public class KeyboardFragment extends Fragment {
 
     private FragmentActivity activity;
     private FragmentKeyboardBinding binding;
+    private NavController navController;
 
     private MutableLiveData<Integer> num_tries = new MutableLiveData<>(0);
     private MutableLiveData<Boolean> can_enter = new MutableLiveData<>(true);
@@ -176,10 +184,20 @@ public class KeyboardFragment extends Fragment {
                     activity.startActivity(intent);
                     activity.finish();
                 }
+                else {
+                    doWork();
+                    navController.navigate(KeyboardFragmentDirections.actionKeyboardFragmentMainPop());
+                }
             }
         });
 
         return binding.getRoot();
+    }
+
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        navController = Navigation.findNavController(view);
     }
 
     private void finishRegistration() {
@@ -195,5 +213,28 @@ public class KeyboardFragment extends Fragment {
         registerSP.edit().clear().apply();
 
         Toast.makeText(activity, "Success!", Toast.LENGTH_SHORT).show();
+    }
+
+    private void doWork() {
+        OPERATION operation = KeyboardFragmentArgs.fromBundle(getArguments()).getOperation();
+
+        switch (operation)
+        {
+            case SET_FINGERPRINT:
+                fingerprint();
+                break;
+
+            default:
+                break;
+        }
+    }
+
+    private void fingerprint() {
+        sharedPreferences
+                .edit()
+                .putBoolean(
+                        BiometricAuthenticator.SHARED_PREFERENCES_BIOMETRY_PARAMETER, !sharedPreferences.getBoolean(BiometricAuthenticator.SHARED_PREFERENCES_BIOMETRY_PARAMETER, false)
+                )
+                .apply();
     }
 }

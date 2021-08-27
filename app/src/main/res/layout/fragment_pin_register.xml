@@ -8,15 +8,6 @@
     android:orientation="vertical"
     tools:context=".app_second_factor_register.PinRegisterFragment">
 
-    <com.google.android.material.appbar.MaterialToolbar
-        android:id="@+id/toolbar"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:layout_constraintTop_toTopOf="parent"
-        style="@style/Widget.MaterialComponents.Toolbar.Primary"
-        app:title="@string/app_name"
-        />
-
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
