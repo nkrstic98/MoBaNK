@@ -164,15 +164,25 @@ public class AccountSettingsFragment extends Fragment {
 
                 @Override
                 public void success() {
-                    userViewModel.updateEmail(email, (data, alertDialog) -> binding.email.setText(email));
+                    userViewModel.updateEmail(email, (data, alertDialog) -> {
+                        binding.email.setText(email);
+                        updateSharedPreferencesEmail(email);
+                    });
                     dialog.dismiss();
                 }
             }).authenticate();
         }
         else {
             dialog.dismiss();
-            navController.navigate(KeyboardFragmentDirections.actionGlobalKeyboardFragmentMain(OPERATION.SET_PASSWORD, email));
+            navController.navigate(KeyboardFragmentDirections.actionGlobalKeyboardFragmentMain(OPERATION.SET_EMAIL, email));
         }
+    }
+
+    private void updateSharedPreferencesEmail(String email) {
+        sharedPreferences
+                .edit()
+                .putString(BiometricAuthenticator.SHARED_PREFERENCES_EMAIL_PARAMETER, email)
+                .apply();
     }
 
     private void changePassword(String pass, AlertDialog dialog) {

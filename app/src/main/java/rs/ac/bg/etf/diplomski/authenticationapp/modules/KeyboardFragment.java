@@ -13,6 +13,7 @@ import androidx.annotation.RequiresApi;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
 import androidx.lifecycle.MutableLiveData;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 
@@ -32,6 +33,7 @@ import java.util.TimerTask;
 
 import rs.ac.bg.etf.diplomski.authenticationapp.app_login.LoginActivity;
 import rs.ac.bg.etf.diplomski.authenticationapp.app_main.MainActivity;
+import rs.ac.bg.etf.diplomski.authenticationapp.app_main.UserViewModel;
 import rs.ac.bg.etf.diplomski.authenticationapp.app_second_factor_register.PinRegisterActivity;
 import rs.ac.bg.etf.diplomski.authenticationapp.app_second_factor_register.PinRegisterFragment;
 import rs.ac.bg.etf.diplomski.authenticationapp.app_user_register.RegisterActivity;
@@ -47,6 +49,7 @@ public class KeyboardFragment extends Fragment {
     private static final int MAX_TRIES = 3;
 
     private FragmentActivity activity;
+    private UserViewModel userViewModel;
     private FragmentKeyboardBinding binding;
     private NavController navController;
 
@@ -55,8 +58,8 @@ public class KeyboardFragment extends Fragment {
     private MutableLiveData<Integer> time_to_wait = new MutableLiveData<>(30);
     private String pin_code = "";
 
-    SharedPreferences registerSP;
-    SharedPreferences sharedPreferences;
+    private SharedPreferences registerSP;
+    private SharedPreferences sharedPreferences;
 
     private final Timer timer = new Timer();
 
@@ -69,6 +72,11 @@ public class KeyboardFragment extends Fragment {
         super.onCreate(savedInstanceState);
 
         activity = requireActivity();
+
+        userViewModel = null;
+        if(activity instanceof MainActivity) {
+            userViewModel = new ViewModelProvider(activity).get(UserViewModel.class);
+        }
 
         registerSP = activity.getSharedPreferences(PinRegisterFragment.SHARED_PREFERENCES_REGISTER, Context.MODE_PRIVATE);
         sharedPreferences = activity.getSharedPreferences(BiometricAuthenticator.SHARED_PREFERENCES_ACCOUNT, Context.MODE_PRIVATE);
@@ -208,7 +216,7 @@ public class KeyboardFragment extends Fragment {
                 .edit()
                 .putBoolean(BiometricAuthenticator.SHARED_PREFERENCES_BIOMETRY_PARAMETER, biometry)
                 .putString(BiometricAuthenticator.SHARED_PREFERENCES_PIN_CODE_PARAMETER, pin)
-                .commit();
+                .apply();
 
         registerSP.edit().clear().apply();
 
@@ -217,11 +225,20 @@ public class KeyboardFragment extends Fragment {
 
     private void doWork() {
         OPERATION operation = KeyboardFragmentArgs.fromBundle(getArguments()).getOperation();
+        String data = KeyboardFragmentArgs.fromBundle(getArguments()).getData();
 
         switch (operation)
         {
             case SET_FINGERPRINT:
                 fingerprint();
+                break;
+
+            case SET_EMAIL:
+                changeEmail(data);
+                break;
+
+            case SET_PASSWORD:
+                changePassword(data);
                 break;
 
             default:
@@ -236,5 +253,18 @@ public class KeyboardFragment extends Fragment {
                         BiometricAuthenticator.SHARED_PREFERENCES_BIOMETRY_PARAMETER, !sharedPreferences.getBoolean(BiometricAuthenticator.SHARED_PREFERENCES_BIOMETRY_PARAMETER, false)
                 )
                 .apply();
+    }
+
+    private void changeEmail(String email) {
+        userViewModel.updateEmail(email, (data, alertDialog) -> {
+            sharedPreferences
+                    .edit()
+                    .putString(BiometricAuthenticator.SHARED_PREFERENCES_EMAIL_PARAMETER, email)
+                    .apply();
+        });
+    }
+
+    private void changePassword(String pass) {
+        userViewModel.changePassword(pass);
     }
 }
