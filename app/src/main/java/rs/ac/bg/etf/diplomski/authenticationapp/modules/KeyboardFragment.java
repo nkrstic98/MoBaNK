@@ -3,13 +3,13 @@ package rs.ac.bg.etf.diplomski.authenticationapp.modules;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.hardware.biometrics.BiometricPrompt;
 import android.os.Build;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
+import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
 import androidx.lifecycle.MutableLiveData;
@@ -31,6 +31,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import rs.ac.bg.etf.diplomski.authenticationapp.R;
 import rs.ac.bg.etf.diplomski.authenticationapp.app_login.LoginActivity;
 import rs.ac.bg.etf.diplomski.authenticationapp.app_main.MainActivity;
 import rs.ac.bg.etf.diplomski.authenticationapp.app_main.UserViewModel;
@@ -39,7 +40,6 @@ import rs.ac.bg.etf.diplomski.authenticationapp.app_second_factor_register.PinRe
 import rs.ac.bg.etf.diplomski.authenticationapp.app_user_register.RegisterActivity;
 import rs.ac.bg.etf.diplomski.authenticationapp.databinding.FragmentKeyboardBinding;
 import rs.ac.bg.etf.diplomski.authenticationapp.models.OPERATION;
-import rs.ac.bg.etf.diplomski.authenticationapp.modules.BiometricAuthenticator;
 
 import static rs.ac.bg.etf.diplomski.authenticationapp.models.OPERATION.*;
 
@@ -89,6 +89,20 @@ public class KeyboardFragment extends Fragment {
 
         binding = FragmentKeyboardBinding.inflate(inflater, container, false);
 
+        if(activity instanceof MainActivity) {
+            OPERATION operation = KeyboardFragmentArgs.fromBundle(getArguments()).getOperation();
+            if(operation == SET_NEW_PIN) {
+                binding.pinLabel.setText("Enter new PIN");
+                Toolbar toolbar = (Toolbar) activity.findViewById(R.id.toolbar_main);
+                toolbar.setTitle("Register new PIN Code");
+            }
+            else if(operation == CONFIRM_NEW_PIN) {
+                binding.pinLabel.setText("Confirm new PIN");
+                Toolbar toolbar = (Toolbar) activity.findViewById(R.id.toolbar_main);
+                toolbar.setTitle("Register new PIN Code");
+            }
+        }
+
         binding.numberKeyboard.setListener(new NumberKeyboardListener() {
             @Override
             public void onNumberClicked(int i) {
@@ -118,85 +132,8 @@ public class KeyboardFragment extends Fragment {
         });
 
         binding.buttonSubmit.setOnClickListener(v -> {
-
-            String sp_pin;
-            if(activity instanceof RegisterActivity) {
-                sp_pin = registerSP.getString(PinRegisterFragment.SHARED_PREFERENCES_REGISTER_PIN, "");
-            }
-            else {
-                sp_pin = sharedPreferences.getString(BiometricAuthenticator.SHARED_PREFERENCES_PIN_CODE_PARAMETER, "");
-            }
-
-            if(!pin_code.equals(sp_pin)) {
-                if(num_tries.getValue() < MAX_TRIES) {
-                    Toast.makeText(activity, "Invalid PIN Code. Try again!", Toast.LENGTH_SHORT).show();
-                    num_tries.setValue(num_tries.getValue() + 1);
-                }
-                else {
-                    if(!can_enter.getValue()) {
-                        Toast.makeText(activity, "Wrong PIN Code entered multiple times: wait for " + time_to_wait.getValue() + " seconds and try again.", Toast.LENGTH_SHORT).show();
-                        return;
-                    }
-
-                    Toast.makeText(activity, "Wrong PIN code was inserted 3 times. Wait 30 seconds and try again.", Toast.LENGTH_SHORT).show();
-                    can_enter.setValue(false);
-
-                    Handler handler = new Handler(Looper.getMainLooper());
-
-                    timer.schedule(new TimerTask() {
-                        @Override
-                        public void run() {
-                            handler.post(() -> {
-                                time_to_wait.setValue(time_to_wait.getValue() - 1);
-                                Log.d("timer-task", "Remaining time: " + time_to_wait.getValue());
-
-                                if(time_to_wait.getValue() == 0) {
-                                    time_to_wait.setValue(30);
-                                    can_enter.setValue(true);
-                                    num_tries.setValue(0);
-                                    timer.cancel();
-                                }
-                            });
-                        }
-                    }, 0, 1000);
-                }
-            }
-            else {
-                if(activity instanceof PinRegisterActivity) {
-                   finishRegistration();
-
-                   if(FirebaseAuth.getInstance().getCurrentUser().isEmailVerified()) {
-                       Intent intent = new Intent(activity, MainActivity.class);
-                       intent.putExtra(MainActivity.REGISTRATION_COMPLETED, true);
-                       activity.startActivity(intent);
-                       activity.finish();
-                   }
-                   else {
-                       Intent intent = new Intent(activity, LoginActivity.class);
-                       activity.startActivity(intent);
-                       activity.finish();
-                   }
-                }
-                else if (activity instanceof LoginActivity) {
-                    String email = sharedPreferences.getString(BiometricAuthenticator.SHARED_PREFERENCES_EMAIL_PARAMETER, "");
-                    FirebaseAuth.getInstance()
-                            .sendPasswordResetEmail(email)
-                            .addOnSuccessListener(activity, aVoid -> {
-                                Toast.makeText(activity, "Password reset email is sent to the address associated with this account!", Toast.LENGTH_SHORT).show();
-                            })
-                            .addOnFailureListener(activity, e -> {
-                                Toast.makeText(activity, e.getMessage(), Toast.LENGTH_SHORT).show();
-                            });
-
-                    Intent intent = new Intent(activity, LoginActivity.class);
-                    activity.startActivity(intent);
-                    activity.finish();
-                }
-                else {
-                    doWork();
-                    navController.navigate(KeyboardFragmentDirections.actionKeyboardFragmentMainPop());
-                }
-            }
+            if(newPinOperation()) return;
+            validatePin();
         });
 
         return binding.getRoot();
@@ -206,6 +143,65 @@ public class KeyboardFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         navController = Navigation.findNavController(view);
+    }
+
+    private void validatePin() {
+        String sp_pin;
+        if(activity instanceof RegisterActivity) {
+            sp_pin = registerSP.getString(PinRegisterFragment.SHARED_PREFERENCES_REGISTER_PIN, "");
+        }
+        else {
+            sp_pin = sharedPreferences.getString(BiometricAuthenticator.SHARED_PREFERENCES_PIN_CODE_PARAMETER, "");
+        }
+
+        if(!pin_code.equals(sp_pin)) {
+            if(num_tries.getValue() < MAX_TRIES) {
+                Toast.makeText(activity, "Invalid PIN Code. Try again!", Toast.LENGTH_SHORT).show();
+                pin_code = "";
+                binding.pinCode.setText("");
+                num_tries.setValue(num_tries.getValue() + 1);
+            }
+            else {
+                if(!can_enter.getValue()) {
+                    Toast.makeText(activity, "Wrong PIN Code entered multiple times: wait for " + time_to_wait.getValue() + " seconds and try again.", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
+                Toast.makeText(activity, "Wrong PIN code was inserted 3 times. Wait 30 seconds and try again.", Toast.LENGTH_SHORT).show();
+                can_enter.setValue(false);
+
+                Handler handler = new Handler(Looper.getMainLooper());
+
+                timer.schedule(new TimerTask() {
+                    @Override
+                    public void run() {
+                        handler.post(() -> {
+                            time_to_wait.setValue(time_to_wait.getValue() - 1);
+                            Log.d("timer-task", "Remaining time: " + time_to_wait.getValue());
+
+                            if(time_to_wait.getValue() == 0) {
+                                time_to_wait.setValue(30);
+                                can_enter.setValue(true);
+                                num_tries.setValue(0);
+                                timer.cancel();
+                            }
+                        });
+                    }
+                }, 0, 1000);
+            }
+        }
+        else {
+            if(activity instanceof PinRegisterActivity) {
+                finishRegistration();
+            }
+            else if (activity instanceof LoginActivity) {
+                sendPasswordResetEmail();
+            }
+            else {
+                doWork();
+                navController.navigate(KeyboardFragmentDirections.actionKeyboardFragmentMainPop());
+            }
+        }
     }
 
     private void finishRegistration() {
@@ -221,6 +217,73 @@ public class KeyboardFragment extends Fragment {
         registerSP.edit().clear().apply();
 
         Toast.makeText(activity, "Success!", Toast.LENGTH_SHORT).show();
+
+        if(FirebaseAuth.getInstance().getCurrentUser().isEmailVerified()) {
+            Intent intent = new Intent(activity, MainActivity.class);
+            intent.putExtra(MainActivity.REGISTRATION_COMPLETED, true);
+            activity.startActivity(intent);
+            activity.finish();
+        }
+        else {
+            Intent intent = new Intent(activity, LoginActivity.class);
+            activity.startActivity(intent);
+            activity.finish();
+        }
+    }
+
+    private void sendPasswordResetEmail() {
+        String email = sharedPreferences.getString(BiometricAuthenticator.SHARED_PREFERENCES_EMAIL_PARAMETER, "");
+        FirebaseAuth.getInstance()
+                .sendPasswordResetEmail(email)
+                .addOnSuccessListener(activity, aVoid -> {
+                    Toast.makeText(activity, "Password reset email is sent to the address associated with this account!", Toast.LENGTH_SHORT).show();
+
+                    Intent intent = new Intent(activity, LoginActivity.class);
+                    activity.startActivity(intent);
+                    activity.finish();
+                })
+                .addOnFailureListener(activity, e -> {
+                    Toast.makeText(activity, e.getMessage(), Toast.LENGTH_SHORT).show();
+
+                    Intent intent = new Intent(activity, LoginActivity.class);
+                    activity.startActivity(intent);
+                    activity.finish();
+                });
+    }
+
+    private boolean newPinOperation() {
+        if(activity instanceof MainActivity) {
+            OPERATION operation = KeyboardFragmentArgs.fromBundle(getArguments()).getOperation();
+
+            if(operation == SET_NEW_PIN || operation == CONFIRM_NEW_PIN) {
+                if(pin_code.length() < MAX_CHARS) {
+                    Toast.makeText(activity, "Pin code must be 6 characters long", Toast.LENGTH_SHORT).show();
+                    pin_code = "";
+                    binding.pinCode.setText("");
+                    return true;
+                }
+            }
+
+            if(operation == SET_NEW_PIN) {
+                navController.navigate(KeyboardFragmentDirections.actionGlobalKeyboardFragmentMain(CONFIRM_NEW_PIN, pin_code));
+                return true;
+            }
+            else if(operation == CONFIRM_NEW_PIN) {
+                String firstPin = KeyboardFragmentArgs.fromBundle(getArguments()).getData();
+                if(firstPin.equals(pin_code)) {
+                    changePin();
+                }
+                else {
+                    Toast.makeText(activity, "Pin and confirm pin do not match. Try again!", Toast.LENGTH_SHORT).show();
+                    navController.navigate(KeyboardFragmentDirections.actionKeyboardFragmentMainPop());
+                    navController.navigate(KeyboardFragmentDirections.actionKeyboardFragmentMainPop());
+                    navController.navigate(KeyboardFragmentDirections.actionGlobalKeyboardFragmentMain(SET_NEW_PIN, ""));
+                }
+                return true;
+            }
+        }
+
+        return false;
     }
 
     private void doWork() {
@@ -239,6 +302,10 @@ public class KeyboardFragment extends Fragment {
 
             case SET_PASSWORD:
                 changePassword(data);
+                break;
+
+            case REGISTER_NEW_PIN:
+                updatePin();
                 break;
 
             default:
@@ -266,5 +333,36 @@ public class KeyboardFragment extends Fragment {
 
     private void changePassword(String pass) {
         userViewModel.changePassword(pass);
+    }
+
+    private void changePin() {
+        if(sharedPreferences.getBoolean(BiometricAuthenticator.SHARED_PREFERENCES_BIOMETRY_PARAMETER, false)) {
+            new BiometricAuthenticator(activity, new BiometricAuthenticator.Callback() {
+                @Override
+                public void failure() {
+                    navController.navigate(KeyboardFragmentDirections.actionGlobalKeyboardFragmentMain(REGISTER_NEW_PIN, pin_code));
+                }
+
+                @Override
+                public void success() {
+                    updatePin();
+                }
+            }).authenticate();
+        }
+        else {
+            navController.navigate(KeyboardFragmentDirections.actionGlobalKeyboardFragmentMain(REGISTER_NEW_PIN, pin_code));
+        }
+    }
+
+    private void updatePin() {
+        sharedPreferences
+                .edit()
+                .putString(BiometricAuthenticator.SHARED_PREFERENCES_PIN_CODE_PARAMETER, pin_code)
+                .apply();
+
+        Toast.makeText(activity, "New pin successfully set", Toast.LENGTH_SHORT).show();
+
+        navController.navigate(KeyboardFragmentDirections.actionKeyboardFragmentMainPop());
+        navController.navigate(KeyboardFragmentDirections.actionKeyboardFragmentMainPop());
     }
 }

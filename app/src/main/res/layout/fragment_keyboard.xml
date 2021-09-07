@@ -9,6 +9,7 @@
     tools:context=".modules.KeyboardFragment">
 
     <TextView
+        android:id="@+id/pin_label"
         android:layout_width="wrap_content"
         android:layout_height="50dp"
         android:layout_gravity="center"

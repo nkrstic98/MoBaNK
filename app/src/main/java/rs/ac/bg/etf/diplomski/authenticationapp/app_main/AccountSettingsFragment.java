@@ -114,7 +114,7 @@ public class AccountSettingsFragment extends Fragment {
         });
 
         binding.pinCard.setOnClickListener(v -> {
-
+            navController.navigate(KeyboardFragmentDirections.actionGlobalKeyboardFragmentMain(OPERATION.SET_NEW_PIN, ""));
         });
 
         return binding.getRoot();
