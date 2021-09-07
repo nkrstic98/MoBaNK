@@ -21,6 +21,7 @@ import rs.ac.bg.etf.diplomski.authenticationapp.app_main.AccountSettingsFragment
 import rs.ac.bg.etf.diplomski.authenticationapp.app_main.MainActivity;
 import rs.ac.bg.etf.diplomski.authenticationapp.app_main.UserViewModel;
 import rs.ac.bg.etf.diplomski.authenticationapp.databinding.DialogPasswordChangeBinding;
+import rs.ac.bg.etf.diplomski.authenticationapp.models.OPERATION;
 
 public class PasswordChangeDialog extends DialogFragment {
 
@@ -88,7 +89,7 @@ public class PasswordChangeDialog extends DialogFragment {
                 }
 
                 if(pass.equals(passc)) {
-                    callback.invoke(pass, dialog);
+                    callback.invoke(OPERATION.SET_PASSWORD, pass, dialog);
                 }
                 else {
                     ((EditText) dialog.findViewById(R.id.password)).setText("");

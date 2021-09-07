@@ -305,7 +305,11 @@ public class KeyboardFragment extends Fragment {
                 break;
 
             case REGISTER_NEW_PIN:
-                updatePin();
+                updatePin(data);
+                break;
+
+            case DELETE_ACCOUNT:
+                deleteUser();
                 break;
 
             default:
@@ -323,7 +327,7 @@ public class KeyboardFragment extends Fragment {
     }
 
     private void changeEmail(String email) {
-        userViewModel.updateEmail(email, (data, alertDialog) -> {
+        userViewModel.updateEmail(email, (op, data, alertDialog) -> {
             sharedPreferences
                     .edit()
                     .putString(BiometricAuthenticator.SHARED_PREFERENCES_EMAIL_PARAMETER, email)
@@ -345,7 +349,7 @@ public class KeyboardFragment extends Fragment {
 
                 @Override
                 public void success() {
-                    updatePin();
+                    updatePin(pin_code);
                 }
             }).authenticate();
         }
@@ -354,15 +358,25 @@ public class KeyboardFragment extends Fragment {
         }
     }
 
-    private void updatePin() {
+    private void updatePin(String data) {
         sharedPreferences
                 .edit()
-                .putString(BiometricAuthenticator.SHARED_PREFERENCES_PIN_CODE_PARAMETER, pin_code)
+                .putString(BiometricAuthenticator.SHARED_PREFERENCES_PIN_CODE_PARAMETER, data)
                 .apply();
 
         Toast.makeText(activity, "New pin successfully set", Toast.LENGTH_SHORT).show();
 
         navController.navigate(KeyboardFragmentDirections.actionKeyboardFragmentMainPop());
         navController.navigate(KeyboardFragmentDirections.actionKeyboardFragmentMainPop());
+    }
+
+    private void deleteUser() {
+        userViewModel.deleteUser((op, data, alertDialog) -> {
+            sharedPreferences.edit().clear().commit();
+
+            Intent intent = new Intent(activity, RegisterActivity.class);
+            activity.startActivity(intent);
+            activity.finish();
+        });
     }
 }

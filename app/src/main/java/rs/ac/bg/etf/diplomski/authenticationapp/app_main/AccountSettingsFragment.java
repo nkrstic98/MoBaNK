@@ -1,7 +1,9 @@
 package rs.ac.bg.etf.diplomski.authenticationapp.app_main;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -27,6 +29,7 @@ import dagger.hilt.android.scopes.ViewModelScoped;
 import rs.ac.bg.etf.diplomski.authenticationapp.R;
 import rs.ac.bg.etf.diplomski.authenticationapp.app_main.dialogs.EmailChangeDialog;
 import rs.ac.bg.etf.diplomski.authenticationapp.app_main.dialogs.PasswordChangeDialog;
+import rs.ac.bg.etf.diplomski.authenticationapp.app_user_register.RegisterActivity;
 import rs.ac.bg.etf.diplomski.authenticationapp.databinding.FragmentAccountSettingsBinding;
 import rs.ac.bg.etf.diplomski.authenticationapp.models.OPERATION;
 import rs.ac.bg.etf.diplomski.authenticationapp.modules.BiometricAuthenticator;
@@ -69,7 +72,7 @@ public class AccountSettingsFragment extends Fragment {
         binding.user.setText(user.getDisplayName());
         binding.email.setText(user.getEmail());
 
-        userViewModel.setData(mainActivity, (data, dialog) -> {
+        userViewModel.setData(mainActivity, (op, data, dialog) -> {
             binding.phone.setText(userViewModel.getPhone());
         });
 
@@ -99,22 +102,48 @@ public class AccountSettingsFragment extends Fragment {
             }
         });
 
-        binding.biometryAuth.setChecked(use_biometry.getValue());
-
-        binding.biometryAuth.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            updateBiometry(isChecked);
-        });
-
         binding.emailCard.setOnClickListener(v -> {
-            new EmailChangeDialog(this::changeEmail).show(getChildFragmentManager(), "input-dialog");
+            new EmailChangeDialog(this::sendUpdateRequest).show(getChildFragmentManager(), "input-dialog");
         });
 
         binding.passwordCard.setOnClickListener(v -> {
-            new PasswordChangeDialog(this::changePassword).show(getChildFragmentManager(), "password-change-dialog");
+            new PasswordChangeDialog(this::sendUpdateRequest).show(getChildFragmentManager(), "password-change-dialog");
         });
 
         binding.pinCard.setOnClickListener(v -> {
             navController.navigate(KeyboardFragmentDirections.actionGlobalKeyboardFragmentMain(OPERATION.SET_NEW_PIN, ""));
+        });
+
+        binding.biometryAuth.setChecked(use_biometry.getValue());
+        binding.biometryAuth.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            updateBiometry(isChecked);
+        });
+
+        binding.buttonDeleteAccount.setOnClickListener(v -> {
+            AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+
+            builder
+                    .setTitle("Delete account")
+                    .setMessage("Are you sure you want to delete your account?")
+                    .setIcon(R.drawable.outline_warning_24)
+                    .setPositiveButton("Delete", (dialog, which) -> {
+
+                    })
+                    .setNegativeButton("Abort", (dialog, which) -> {
+                        dialog.dismiss();
+                    });
+
+            AlertDialog dialog = builder.create();
+
+            dialog.setOnShowListener(dialog1 -> {
+                dialog.getButton(AlertDialog.BUTTON_POSITIVE).setBackgroundColor(Color.RED);
+                dialog.getButton(AlertDialog.BUTTON_POSITIVE).setTextColor(Color.WHITE);
+                dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(v1 -> {
+                    sendUpdateRequest(OPERATION.DELETE_ACCOUNT, "", dialog);
+                });
+            });
+
+            dialog.show();
         });
 
         return binding.getRoot();
@@ -127,7 +156,7 @@ public class AccountSettingsFragment extends Fragment {
     }
 
     public interface OperationCallback {
-        void invoke(String data, AlertDialog alertDialog);
+        void invoke(OPERATION operation, String data, AlertDialog alertDialog);
     }
 
     private void updateBiometry(boolean isChecked) {
@@ -153,57 +182,67 @@ public class AccountSettingsFragment extends Fragment {
         }
     }
 
-    private void changeEmail(String email, AlertDialog dialog) {
+    private void sendUpdateRequest(OPERATION operation, String data, AlertDialog dialog) {
         if(sharedPreferences.getBoolean(BiometricAuthenticator.SHARED_PREFERENCES_BIOMETRY_PARAMETER, false)) {
             new BiometricAuthenticator(mainActivity, new BiometricAuthenticator.Callback() {
                 @Override
                 public void failure() {
                     dialog.dismiss();
-                    navController.navigate(KeyboardFragmentDirections.actionGlobalKeyboardFragmentMain(OPERATION.SET_EMAIL, email));
+                    navController.navigate(KeyboardFragmentDirections.actionGlobalKeyboardFragmentMain(operation, data));
                 }
 
                 @Override
                 public void success() {
-                    userViewModel.updateEmail(email, (data, alertDialog) -> {
-                        binding.email.setText(email);
-                        updateSharedPreferencesEmail(email);
-                    });
+                    executeUpdate(operation, data);
                     dialog.dismiss();
                 }
             }).authenticate();
         }
         else {
             dialog.dismiss();
-            navController.navigate(KeyboardFragmentDirections.actionGlobalKeyboardFragmentMain(OPERATION.SET_EMAIL, email));
+            navController.navigate(KeyboardFragmentDirections.actionGlobalKeyboardFragmentMain(operation, data));
         }
     }
 
-    private void updateSharedPreferencesEmail(String email) {
-        sharedPreferences
-                .edit()
-                .putString(BiometricAuthenticator.SHARED_PREFERENCES_EMAIL_PARAMETER, email)
-                .apply();
+    private void executeUpdate(OPERATION operation, String data) {
+        switch (operation)
+        {
+            case SET_EMAIL:
+                updateEmail(data);
+                break;
+
+            case SET_PASSWORD:
+                updatePassword(data);
+                break;
+
+            case DELETE_ACCOUNT:
+                deleteUser();
+                break;
+        }
     }
 
-    private void changePassword(String pass, AlertDialog dialog) {
-        if(sharedPreferences.getBoolean(BiometricAuthenticator.SHARED_PREFERENCES_BIOMETRY_PARAMETER, false)) {
-            new BiometricAuthenticator(mainActivity, new BiometricAuthenticator.Callback() {
-                @Override
-                public void failure() {
-                    dialog.dismiss();
-                    navController.navigate(KeyboardFragmentDirections.actionGlobalKeyboardFragmentMain(OPERATION.SET_PASSWORD, pass));
-                }
+    private void updateEmail(String email) {
+        userViewModel.updateEmail(email, (op, data, alertDialog) -> {
+            binding.email.setText(email);
 
-                @Override
-                public void success() {
-                    userViewModel.changePassword(pass);
-                    dialog.dismiss();
-                }
-            }).authenticate();
-        }
-        else {
-            dialog.dismiss();
-            navController.navigate(KeyboardFragmentDirections.actionGlobalKeyboardFragmentMain(OPERATION.SET_PASSWORD, pass));
-        }
+            sharedPreferences
+                    .edit()
+                    .putString(BiometricAuthenticator.SHARED_PREFERENCES_EMAIL_PARAMETER, email)
+                    .apply();
+        });
+    }
+
+    private void updatePassword(String pass) {
+        userViewModel.changePassword(pass);
+    }
+
+    private void deleteUser() {
+        userViewModel.deleteUser((op, data, alertDialog) -> {
+            sharedPreferences.edit().clear().commit();
+
+            Intent intent = new Intent(mainActivity, RegisterActivity.class);
+            mainActivity.startActivity(intent);
+            mainActivity.finish();
+        });
     }
 }

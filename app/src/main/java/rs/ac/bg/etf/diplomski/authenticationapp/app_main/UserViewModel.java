@@ -16,6 +16,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.List;
 
+import rs.ac.bg.etf.diplomski.authenticationapp.models.OPERATION;
 import rs.ac.bg.etf.diplomski.authenticationapp.models.User;
 import rs.ac.bg.etf.diplomski.authenticationapp.modules.BiometricAuthenticator;
 
@@ -51,7 +52,7 @@ public class UserViewModel extends ViewModel {
                                 .collection("users")
                                 .document(docs.get(0).getId());
 
-                        callback.invoke("", null);
+                        callback.invoke(OPERATION.DO_NOTHING, "", null);
                     }
                 })
                 .addOnFailureListener(command -> {
@@ -87,7 +88,7 @@ public class UserViewModel extends ViewModel {
 
                                 showMessage("Email successfully changed!");
 
-                                callback.invoke(null, null);
+                                callback.invoke(OPERATION.DO_NOTHING, null, null);
                             })
                             .addOnFailureListener(mainActivity, e -> {
                                 showMessage(e.getMessage());
@@ -103,6 +104,24 @@ public class UserViewModel extends ViewModel {
                 .updatePassword(pass)
                 .addOnSuccessListener(mainActivity, aVoid -> {
                     showMessage("Password successfully updated!");
+                })
+                .addOnFailureListener(mainActivity, e -> {
+                    showMessage(e.getMessage());
+                });
+    }
+
+    public void deleteUser(AccountSettingsFragment.OperationCallback callback) {
+        firebaseUser.delete()
+                .addOnSuccessListener(mainActivity, aVoid -> {
+                    userReference
+                            .update("email", null)
+                            .addOnSuccessListener(mainActivity, aVoid1 -> {
+                                showMessage("Account deleted!!!");
+                                callback.invoke(OPERATION.DO_NOTHING, null, null);
+                            })
+                            .addOnFailureListener(mainActivity, e -> {
+                                showMessage(e.getMessage());
+                            });
                 })
                 .addOnFailureListener(mainActivity, e -> {
                     showMessage(e.getMessage());

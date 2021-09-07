@@ -21,6 +21,7 @@ import rs.ac.bg.etf.diplomski.authenticationapp.R;
 import rs.ac.bg.etf.diplomski.authenticationapp.app_main.AccountSettingsFragment;
 import rs.ac.bg.etf.diplomski.authenticationapp.app_main.MainActivity;
 import rs.ac.bg.etf.diplomski.authenticationapp.databinding.DialogEmailChangeBinding;
+import rs.ac.bg.etf.diplomski.authenticationapp.models.OPERATION;
 
 public class EmailChangeDialog extends DialogFragment {
 
@@ -89,7 +90,7 @@ public class EmailChangeDialog extends DialogFragment {
                     });
                 }
                 else {
-                    callback.invoke(data, dialog);
+                    callback.invoke(OPERATION.SET_EMAIL, data, dialog);
                 }
             });
         });
