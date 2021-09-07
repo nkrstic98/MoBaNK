@@ -6,9 +6,11 @@ import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.MutableLiveData;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 
@@ -20,33 +22,27 @@ import android.view.ViewGroup;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.FirebaseFirestore;
 
-import java.util.List;
-
+import dagger.hilt.android.scopes.ViewModelScoped;
 import rs.ac.bg.etf.diplomski.authenticationapp.R;
+import rs.ac.bg.etf.diplomski.authenticationapp.app_main.dialogs.EmailChangeDialog;
+import rs.ac.bg.etf.diplomski.authenticationapp.app_main.dialogs.PasswordChangeDialog;
 import rs.ac.bg.etf.diplomski.authenticationapp.databinding.FragmentAccountSettingsBinding;
 import rs.ac.bg.etf.diplomski.authenticationapp.models.OPERATION;
-import rs.ac.bg.etf.diplomski.authenticationapp.models.User;
 import rs.ac.bg.etf.diplomski.authenticationapp.modules.BiometricAuthenticator;
-import rs.ac.bg.etf.diplomski.authenticationapp.modules.KeyboardFragment;
 import rs.ac.bg.etf.diplomski.authenticationapp.modules.KeyboardFragmentDirections;
 
+@ViewModelScoped
 public class AccountSettingsFragment extends Fragment {
 
     private MainActivity mainActivity;
+    private UserViewModel userViewModel;
     private FragmentAccountSettingsBinding binding;
     private SharedPreferences sharedPreferences;
     private NavController navController;
 
     private MutableLiveData<Boolean> moreOptions = new MutableLiveData<>(false);
-    private MutableLiveData<String> userPhone = new MutableLiveData<>("");
     private MutableLiveData<Boolean> use_biometry = new MutableLiveData<>(false);
-
-    private FirebaseAuth firebaseAuth;
-    private FirebaseFirestore firebaseFirestore;
-    private FirebaseUser user;
 
     public AccountSettingsFragment() {
         // Required empty public constructor
@@ -57,11 +53,8 @@ public class AccountSettingsFragment extends Fragment {
         super.onCreate(savedInstanceState);
 
         mainActivity = (MainActivity) requireActivity();
+        userViewModel = new ViewModelProvider(mainActivity).get(UserViewModel.class);
         sharedPreferences = mainActivity.getSharedPreferences(BiometricAuthenticator.SHARED_PREFERENCES_ACCOUNT, Context.MODE_PRIVATE);
-
-        firebaseAuth=  FirebaseAuth.getInstance();
-        firebaseFirestore = FirebaseFirestore.getInstance();
-        user = firebaseAuth.getCurrentUser();
     }
 
     @Override
@@ -72,22 +65,13 @@ public class AccountSettingsFragment extends Fragment {
 
         use_biometry.setValue(sharedPreferences.getBoolean(BiometricAuthenticator.SHARED_PREFERENCES_BIOMETRY_PARAMETER, false));
 
-        firebaseFirestore.collection("users")
-                .whereEqualTo("email", firebaseAuth.getCurrentUser().getEmail())
-                .get()
-                .addOnCompleteListener(mainActivity, task -> {
-                    if(task.isSuccessful()) {
-                        List<DocumentSnapshot> documents =  task.getResult().getDocuments();
-                        if(documents.size() != 0) {
-                            User myUser = documents.get(0).toObject(User.class);
-                            userPhone.setValue(myUser.getPhone());
-                            binding.phone.setText(userPhone.getValue());
-                        }
-                    }
-                });
-
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         binding.user.setText(user.getDisplayName());
         binding.email.setText(user.getEmail());
+
+        userViewModel.setData(mainActivity, (data, dialog) -> {
+            binding.phone.setText(userViewModel.getPhone());
+        });
 
         binding.optionsMore.setVisibility(moreOptions.getValue() ? View.VISIBLE : View.GONE);
         binding.buttonMoreOptions.setImageDrawable(
@@ -116,35 +100,17 @@ public class AccountSettingsFragment extends Fragment {
         });
 
         binding.biometryAuth.setChecked(use_biometry.getValue());
-        binding.biometryAuth.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            if(use_biometry.getValue()) {
-                new BiometricAuthenticator(mainActivity, new BiometricAuthenticator.Callback() {
-                    @Override
-                    public void failure() {
-                        navController.navigate(KeyboardFragmentDirections.actionGlobalKeyboardFragmentMain(OPERATION.SET_FINGERPRINT));
-                    }
 
-                    @Override
-                    public void success() {
-                        use_biometry.setValue(isChecked);
-                        sharedPreferences
-                                .edit()
-                                .putBoolean(BiometricAuthenticator.SHARED_PREFERENCES_BIOMETRY_PARAMETER, isChecked)
-                                .commit();
-                    }
-                }).authenticate();
-            }
-            else {
-                navController.navigate(KeyboardFragmentDirections.actionGlobalKeyboardFragmentMain(OPERATION.SET_FINGERPRINT));
-            }
+        binding.biometryAuth.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            updateBiometry(isChecked);
         });
 
         binding.emailCard.setOnClickListener(v -> {
-
+            new EmailChangeDialog(this::changeEmail).show(getChildFragmentManager(), "input-dialog");
         });
 
         binding.passwordCard.setOnClickListener(v -> {
-
+            new PasswordChangeDialog(this::changePassword).show(getChildFragmentManager(), "password-change-dialog");
         });
 
         binding.pinCard.setOnClickListener(v -> {
@@ -158,5 +124,76 @@ public class AccountSettingsFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         navController = Navigation.findNavController(view);
+    }
+
+    public interface OperationCallback {
+        void invoke(String data, AlertDialog alertDialog);
+    }
+
+    private void updateBiometry(boolean isChecked) {
+        if(use_biometry.getValue()) {
+            new BiometricAuthenticator(mainActivity, new BiometricAuthenticator.Callback() {
+                @Override
+                public void failure() {
+                    navController.navigate(KeyboardFragmentDirections.actionGlobalKeyboardFragmentMain(OPERATION.SET_FINGERPRINT, ""));
+                }
+
+                @Override
+                public void success() {
+                    use_biometry.setValue(isChecked);
+                    sharedPreferences
+                            .edit()
+                            .putBoolean(BiometricAuthenticator.SHARED_PREFERENCES_BIOMETRY_PARAMETER, isChecked)
+                            .apply();
+                }
+            }).authenticate();
+        }
+        else {
+            navController.navigate(KeyboardFragmentDirections.actionGlobalKeyboardFragmentMain(OPERATION.SET_FINGERPRINT, ""));
+        }
+    }
+
+    private void changeEmail(String email, AlertDialog dialog) {
+        if(sharedPreferences.getBoolean(BiometricAuthenticator.SHARED_PREFERENCES_BIOMETRY_PARAMETER, false)) {
+            new BiometricAuthenticator(mainActivity, new BiometricAuthenticator.Callback() {
+                @Override
+                public void failure() {
+                    dialog.dismiss();
+                    navController.navigate(KeyboardFragmentDirections.actionGlobalKeyboardFragmentMain(OPERATION.SET_EMAIL, email));
+                }
+
+                @Override
+                public void success() {
+                    userViewModel.updateEmail(email, (data, alertDialog) -> binding.email.setText(email));
+                    dialog.dismiss();
+                }
+            }).authenticate();
+        }
+        else {
+            dialog.dismiss();
+            navController.navigate(KeyboardFragmentDirections.actionGlobalKeyboardFragmentMain(OPERATION.SET_PASSWORD, email));
+        }
+    }
+
+    private void changePassword(String pass, AlertDialog dialog) {
+        if(sharedPreferences.getBoolean(BiometricAuthenticator.SHARED_PREFERENCES_BIOMETRY_PARAMETER, false)) {
+            new BiometricAuthenticator(mainActivity, new BiometricAuthenticator.Callback() {
+                @Override
+                public void failure() {
+                    dialog.dismiss();
+                    navController.navigate(KeyboardFragmentDirections.actionGlobalKeyboardFragmentMain(OPERATION.SET_PASSWORD, pass));
+                }
+
+                @Override
+                public void success() {
+                    userViewModel.changePassword(pass);
+                    dialog.dismiss();
+                }
+            }).authenticate();
+        }
+        else {
+            dialog.dismiss();
+            navController.navigate(KeyboardFragmentDirections.actionGlobalKeyboardFragmentMain(OPERATION.SET_PASSWORD, pass));
+        }
     }
 }

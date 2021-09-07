@@ -27,6 +27,9 @@
         <argument
             android:name="operation"
             app:argType="rs.ac.bg.etf.diplomski.authenticationapp.models.OPERATION" />
+        <argument
+            android:name="data"
+            app:argType="string" />
     </fragment>
     <action android:id="@+id/action_global_keyboard_fragment_main" app:destination="@id/keyboard_fragment_main" />
 </navigation>
