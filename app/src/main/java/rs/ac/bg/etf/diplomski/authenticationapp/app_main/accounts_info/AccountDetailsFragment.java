@@ -41,8 +41,8 @@ public class AccountDetailsFragment extends Fragment {
         Account account = accountViewModel.getAccount(accId);
 
         binding.number.setText(account.getNumber());
-        binding.type.setText(account.getType().equals("RSD") ? "Basic" : "Foreign Exchange");
-        binding.balance.setText(account.getBalance() + "  " + account.getType());
+        binding.type.setText(account.getCurrency().equals("RSD") ? "Basic" : "Foreign Exchange");
+        binding.balance.setText(account.getBalance() + "  " + account.getCurrency());
         binding.status.setText(account.getStatus() ? "ACTIVE" : "NOT ACTIVE");
 
 

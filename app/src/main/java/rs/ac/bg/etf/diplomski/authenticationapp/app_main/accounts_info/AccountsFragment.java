@@ -50,10 +50,10 @@ public class AccountsFragment extends Fragment {
                              Bundle savedInstanceState) {
         binding = FragmentAccountsBinding.inflate(inflater, container, false);
 
-        AccountAdapter accountAdapter = new AccountAdapter(parameter -> {
-            navController.navigate(AccountsFragmentDirections.actionNavAccountsToTransactionsFragment(accountViewModel.getAccountId(parameter)));
-        }, parameter -> {
-            navController.navigate(AccountsFragmentDirections.actionNavAccountsToAccountDetailsFragment(accountViewModel.getAccountId(parameter)));
+        AccountAdapter accountAdapter = new AccountAdapter((param1, param2) -> {
+            navController.navigate(AccountsFragmentDirections.actionNavAccountsToTransactionsFragment(accountViewModel.getAccountId(param1), param2));
+        }, (param1, param2) -> {
+            navController.navigate(AccountsFragmentDirections.actionNavAccountsToAccountDetailsFragment(accountViewModel.getAccountId(param1)));
         });
 
         accountViewModel.subscribeToRealtimeUpdates(accountAdapter);

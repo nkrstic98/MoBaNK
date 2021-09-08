@@ -15,15 +15,15 @@ import rs.ac.bg.etf.diplomski.authenticationapp.models.Account;
 
 public class AccountAdapter extends RecyclerView.Adapter<AccountAdapter.AccountViewHolder> {
 
-    public interface Callback<T> {
-        void invoke(T parameter);
+    public interface Callback<T, B> {
+        void invoke(T param1, B param2);
     }
 
     List<Account> accountList;
-    private final Callback<Integer> callbackTransactions;
-    private final Callback<Integer> callbackDetails;
+    private final Callback<Integer, String> callbackTransactions;
+    private final Callback<Integer, Integer> callbackDetails;
 
-    public AccountAdapter(Callback<Integer> callbackTransactions, Callback<Integer> callbackDetails) {
+    public AccountAdapter(Callback<Integer, String> callbackTransactions, Callback<Integer, Integer> callbackDetails) {
         this.callbackTransactions = callbackTransactions;
         this.callbackDetails = callbackDetails;
 
@@ -65,12 +65,12 @@ public class AccountAdapter extends RecyclerView.Adapter<AccountAdapter.AccountV
         public void bind(Account account) {
             binding.accountNumber.setText(account.getNumber());
             binding.accountBalance.setText(account.getBalance() + "");
-            binding.accountType.setText(account.getType());
+            binding.accountType.setText(account.getCurrency());
             binding.buttonTransactions.setOnClickListener(v -> {
-                callbackTransactions.invoke(getAdapterPosition());
+                callbackTransactions.invoke(getAdapterPosition(), account.getCurrency());
             });
             binding.buttonDetails.setOnClickListener(v -> {
-                callbackDetails.invoke(getAdapterPosition());
+                callbackDetails.invoke(getAdapterPosition(), null);
             });
         }
     }

@@ -41,11 +41,14 @@
     </fragment>
     <fragment
         android:id="@+id/fragment_transactions"
-        android:name="rs.ac.bg.etf.diplomski.authenticationapp.app_main.accounts_info.transactions.TransactionsFragment"
+        android:name="rs.ac.bg.etf.diplomski.authenticationapp.app_main.transactions.TransactionsFragment"
         android:label="Transactions"
         tools:layout="@layout/fragment_transactions" >
         <argument
             android:name="accountId"
+            app:argType="string" />
+        <argument
+            android:name="currency"
             app:argType="string" />
     </fragment>
     <fragment

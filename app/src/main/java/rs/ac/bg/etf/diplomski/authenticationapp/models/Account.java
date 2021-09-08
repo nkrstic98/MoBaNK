@@ -3,7 +3,7 @@ package rs.ac.bg.etf.diplomski.authenticationapp.models;
 public class Account {
     private String number;
     private double balance;
-    private String type;
+    private String currency;
     private boolean status;
 
     public Account() {
@@ -12,7 +12,7 @@ public class Account {
     public Account(String number, double balance, String type, boolean status) {
         this.number = number;
         this.balance = balance;
-        this.type = type;
+        this.currency = type;
         this.status = status;
     }
 
@@ -32,12 +32,12 @@ public class Account {
         this.balance = balance;
     }
 
-    public String getType() {
-        return type;
+    public String getCurrency() {
+        return currency;
     }
 
-    public void setType(String type) {
-        this.type = type;
+    public void setCurrency(String currency) {
+        this.currency = currency;
     }
 
     public boolean getStatus() {

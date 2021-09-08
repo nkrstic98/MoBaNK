@@ -10,9 +10,12 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import rs.ac.bg.etf.diplomski.authenticationapp.models.Account;
+import rs.ac.bg.etf.diplomski.authenticationapp.models.TRANSACTION_TYPE;
+import rs.ac.bg.etf.diplomski.authenticationapp.models.Transaction;
 
 public class AccountViewModel extends ViewModel {
 
