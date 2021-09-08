@@ -63,6 +63,11 @@ public class AccountViewModel extends ViewModel {
                 });
     }
 
+    public Account getAccount(String id) {
+        int pos = accountIds.indexOf(id);
+        return accounts.get(pos);
+    }
+
     public String getAccountId(int index) {
         return accountIds.get(index);
     }

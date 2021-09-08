@@ -40,7 +40,7 @@ public class Account {
         this.type = type;
     }
 
-    public boolean isStatus() {
+    public boolean getStatus() {
         return status;
     }
 
