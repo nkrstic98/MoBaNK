@@ -17,9 +17,8 @@ import android.widget.Toast;
 import com.google.android.material.textfield.TextInputLayout;
 
 import rs.ac.bg.etf.diplomski.authenticationapp.R;
-import rs.ac.bg.etf.diplomski.authenticationapp.app_main.AccountSettingsFragment;
+import rs.ac.bg.etf.diplomski.authenticationapp.app_main.user_management.AccountSettingsFragment;
 import rs.ac.bg.etf.diplomski.authenticationapp.app_main.MainActivity;
-import rs.ac.bg.etf.diplomski.authenticationapp.app_main.UserViewModel;
 import rs.ac.bg.etf.diplomski.authenticationapp.databinding.DialogPasswordChangeBinding;
 import rs.ac.bg.etf.diplomski.authenticationapp.models.OPERATION;
 

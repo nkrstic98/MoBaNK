@@ -2,7 +2,6 @@ package rs.ac.bg.etf.diplomski.authenticationapp.app_main.dialogs;
 
 import android.app.Dialog;
 import android.content.DialogInterface;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -18,7 +17,7 @@ import androidx.fragment.app.DialogFragment;
 import com.google.firebase.auth.FirebaseAuth;
 
 import rs.ac.bg.etf.diplomski.authenticationapp.R;
-import rs.ac.bg.etf.diplomski.authenticationapp.app_main.AccountSettingsFragment;
+import rs.ac.bg.etf.diplomski.authenticationapp.app_main.user_management.AccountSettingsFragment;
 import rs.ac.bg.etf.diplomski.authenticationapp.app_main.MainActivity;
 import rs.ac.bg.etf.diplomski.authenticationapp.databinding.DialogEmailChangeBinding;
 import rs.ac.bg.etf.diplomski.authenticationapp.models.OPERATION;

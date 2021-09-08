@@ -1,4 +1,4 @@
-package rs.ac.bg.etf.diplomski.authenticationapp.app_main;
+package rs.ac.bg.etf.diplomski.authenticationapp.app_main.user_management;
 
 import android.content.Context;
 import android.content.Intent;
@@ -27,6 +27,7 @@ import com.google.firebase.auth.FirebaseUser;
 
 import dagger.hilt.android.scopes.ViewModelScoped;
 import rs.ac.bg.etf.diplomski.authenticationapp.R;
+import rs.ac.bg.etf.diplomski.authenticationapp.app_main.MainActivity;
 import rs.ac.bg.etf.diplomski.authenticationapp.app_main.dialogs.EmailChangeDialog;
 import rs.ac.bg.etf.diplomski.authenticationapp.app_main.dialogs.PasswordChangeDialog;
 import rs.ac.bg.etf.diplomski.authenticationapp.app_user_register.RegisterActivity;

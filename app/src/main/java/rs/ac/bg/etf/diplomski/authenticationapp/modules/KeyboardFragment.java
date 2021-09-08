@@ -34,7 +34,7 @@ import java.util.TimerTask;
 import rs.ac.bg.etf.diplomski.authenticationapp.R;
 import rs.ac.bg.etf.diplomski.authenticationapp.app_login.LoginActivity;
 import rs.ac.bg.etf.diplomski.authenticationapp.app_main.MainActivity;
-import rs.ac.bg.etf.diplomski.authenticationapp.app_main.UserViewModel;
+import rs.ac.bg.etf.diplomski.authenticationapp.app_main.user_management.UserViewModel;
 import rs.ac.bg.etf.diplomski.authenticationapp.app_second_factor_register.PinRegisterActivity;
 import rs.ac.bg.etf.diplomski.authenticationapp.app_second_factor_register.PinRegisterFragment;
 import rs.ac.bg.etf.diplomski.authenticationapp.app_user_register.RegisterActivity;
