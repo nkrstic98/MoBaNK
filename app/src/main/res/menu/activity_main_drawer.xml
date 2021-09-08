@@ -10,6 +10,21 @@
             android:title="My Accounts" />
 
         <item
+            android:id="@+id/nav_payments"
+            android:icon="@drawable/outline_payment_black_18"
+            android:title="Payments" />
+
+        <item
+            android:id="@+id/nav_money_transfer"
+            android:icon="@drawable/outline_swap_horiz_black_18"
+            android:title="Transfers" />
+
+        <item
+            android:id="@+id/nav_exchange_office"
+            android:icon="@drawable/outline_euro_black_18"
+            android:title="Exchange Office" />
+
+        <item
             android:id="@+id/nav_user_settings"
             android:icon="@drawable/outline_manage_accounts_black_18"
             android:title="Profile Settings" />

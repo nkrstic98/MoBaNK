@@ -60,4 +60,19 @@
             android:name="accountId"
             app:argType="string" />
     </fragment>
+    <fragment
+        android:id="@+id/nav_exchange_office"
+        android:name="rs.ac.bg.etf.diplomski.authenticationapp.app_main.exchange_office.ExchangeOfficeFragment"
+        android:label="Exchange Office"
+        tools:layout="@layout/fragment_exchange_office" />
+    <fragment
+        android:id="@+id/nav_money_transfer"
+        android:name="rs.ac.bg.etf.diplomski.authenticationapp.app_main.money_transfer.MoneyTransferFragment"
+        android:label="Transfer Funds"
+        tools:layout="@layout/fragment_money_transfer" />
+    <fragment
+        android:id="@+id/nav_payments"
+        android:name="rs.ac.bg.etf.diplomski.authenticationapp.app_main.payments.PaymentsFragment"
+        android:label="Payments"
+        tools:layout="@layout/fragment_payments" />
 </navigation>

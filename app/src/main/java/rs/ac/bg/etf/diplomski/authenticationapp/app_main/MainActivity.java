@@ -59,6 +59,9 @@ public class MainActivity extends AppCompatActivity {
 
         appBarConfiguration = new AppBarConfiguration.Builder(
                 R.id.nav_accounts,
+                R.id.nav_payments,
+                R.id.nav_money_transfer,
+                R.id.nav_exchange_office,
                 R.id.nav_user_settings
         )
         .setDrawerLayout(drawerLayout)
