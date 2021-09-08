@@ -3,18 +3,13 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/nav_graph_main"
-    app:startDestination="@id/nav_home">
+    app:startDestination="@id/nav_accounts">
 
     <fragment
-        android:id="@+id/nav_home"
-        android:name="rs.ac.bg.etf.diplomski.authenticationapp.app_main.HomeFragment"
-        android:label="Home"
-        tools:layout="@layout/fragment_home" />
-    <fragment
-        android:id="@+id/nav_account_settings"
-        android:name="rs.ac.bg.etf.diplomski.authenticationapp.app_main.user_management.AccountSettingsFragment"
+        android:id="@+id/nav_user_settings"
+        android:name="rs.ac.bg.etf.diplomski.authenticationapp.app_main.user_management.UserSettingsFragment"
         android:label="Account"
-        tools:layout="@layout/fragment_account_settings" />
+        tools:layout="@layout/fragment_user_settings" />
     <fragment
         android:id="@+id/keyboard_fragment_main"
         android:name="rs.ac.bg.etf.diplomski.authenticationapp.modules.KeyboardFragment"
@@ -32,4 +27,34 @@
             app:argType="string" />
     </fragment>
     <action android:id="@+id/action_global_keyboard_fragment_main" app:destination="@id/keyboard_fragment_main" />
+    <fragment
+        android:id="@+id/nav_accounts"
+        android:name="rs.ac.bg.etf.diplomski.authenticationapp.app_main.accounts_info.AccountsFragment"
+        android:label="My Accounts"
+        tools:layout="@layout/fragment_accounts" >
+        <action
+            android:id="@+id/action_nav_accounts_to_transactionsFragment"
+            app:destination="@id/fragment_transactions" />
+        <action
+            android:id="@+id/action_nav_accounts_to_accountDetailsFragment"
+            app:destination="@id/fragment_account_details" />
+    </fragment>
+    <fragment
+        android:id="@+id/fragment_transactions"
+        android:name="rs.ac.bg.etf.diplomski.authenticationapp.app_main.accounts_info.transactions.TransactionsFragment"
+        android:label="Transactions"
+        tools:layout="@layout/fragment_transactions" >
+        <argument
+            android:name="accountId"
+            app:argType="string" />
+    </fragment>
+    <fragment
+        android:id="@+id/fragment_account_details"
+        android:name="rs.ac.bg.etf.diplomski.authenticationapp.app_main.accounts_info.AccountDetailsFragment"
+        android:label="Account Details"
+        tools:layout="@layout/fragment_account_details" >
+        <argument
+            android:name="accountId"
+            app:argType="string" />
+    </fragment>
 </navigation>

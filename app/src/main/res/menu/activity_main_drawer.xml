@@ -5,14 +5,14 @@
 
     <group android:id="@+id/group1" android:checkableBehavior="single">
         <item
-            android:id="@+id/nav_home"
-            android:icon="@drawable/outline_home_black_48"
-            android:title="Home" />
+            android:id="@+id/nav_accounts"
+            android:icon="@drawable/outline_account_balance_wallet_black_18"
+            android:title="My Accounts" />
 
         <item
-            android:id="@+id/nav_account_settings"
+            android:id="@+id/nav_user_settings"
             android:icon="@drawable/outline_manage_accounts_black_18"
-            android:title="Account" />
+            android:title="Profile Settings" />
     </group>
 
     <group android:id="@+id/group2" android:checkableBehavior="single">

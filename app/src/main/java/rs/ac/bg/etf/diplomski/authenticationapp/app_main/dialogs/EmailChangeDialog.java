@@ -17,7 +17,7 @@ import androidx.fragment.app.DialogFragment;
 import com.google.firebase.auth.FirebaseAuth;
 
 import rs.ac.bg.etf.diplomski.authenticationapp.R;
-import rs.ac.bg.etf.diplomski.authenticationapp.app_main.user_management.AccountSettingsFragment;
+import rs.ac.bg.etf.diplomski.authenticationapp.app_main.user_management.UserSettingsFragment;
 import rs.ac.bg.etf.diplomski.authenticationapp.app_main.MainActivity;
 import rs.ac.bg.etf.diplomski.authenticationapp.databinding.DialogEmailChangeBinding;
 import rs.ac.bg.etf.diplomski.authenticationapp.models.OPERATION;
@@ -29,13 +29,13 @@ public class EmailChangeDialog extends DialogFragment {
 
     private AlertDialog dialog;
 
-    private AccountSettingsFragment.OperationCallback callback;
+    private UserSettingsFragment.OperationCallback callback;
 
     public EmailChangeDialog() {
         // Required empty public constructor
     }
 
-    public EmailChangeDialog(AccountSettingsFragment.OperationCallback callback) {
+    public EmailChangeDialog(UserSettingsFragment.OperationCallback callback) {
         this.callback = callback;
     }
 

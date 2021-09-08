@@ -1,20 +1,19 @@
 package rs.ac.bg.etf.diplomski.authenticationapp.models;
 
-import java.util.List;
-
 public class Account {
     private String number;
     private double balance;
     private String type;
     private boolean status;
-    private List<Transaction> transactions;
 
-    public Account(String number, double balance, String type, boolean status, List<Transaction> transactions) {
+    public Account() {
+    }
+
+    public Account(String number, double balance, String type, boolean status) {
         this.number = number;
         this.balance = balance;
         this.type = type;
         this.status = status;
-        this.transactions = transactions;
     }
 
     public String getNumber() {
@@ -47,13 +46,5 @@ public class Account {
 
     public void setStatus(boolean status) {
         this.status = status;
-    }
-
-    public List<Transaction> getTransactions() {
-        return transactions;
-    }
-
-    public void setTransactions(List<Transaction> transactions) {
-        this.transactions = transactions;
     }
 }

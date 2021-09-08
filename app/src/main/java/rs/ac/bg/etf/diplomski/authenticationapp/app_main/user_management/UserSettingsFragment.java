@@ -31,24 +31,24 @@ import rs.ac.bg.etf.diplomski.authenticationapp.app_main.MainActivity;
 import rs.ac.bg.etf.diplomski.authenticationapp.app_main.dialogs.EmailChangeDialog;
 import rs.ac.bg.etf.diplomski.authenticationapp.app_main.dialogs.PasswordChangeDialog;
 import rs.ac.bg.etf.diplomski.authenticationapp.app_user_register.RegisterActivity;
-import rs.ac.bg.etf.diplomski.authenticationapp.databinding.FragmentAccountSettingsBinding;
+import rs.ac.bg.etf.diplomski.authenticationapp.databinding.FragmentUserSettingsBinding;
 import rs.ac.bg.etf.diplomski.authenticationapp.models.OPERATION;
 import rs.ac.bg.etf.diplomski.authenticationapp.modules.BiometricAuthenticator;
 import rs.ac.bg.etf.diplomski.authenticationapp.modules.KeyboardFragmentDirections;
 
 @ViewModelScoped
-public class AccountSettingsFragment extends Fragment {
+public class UserSettingsFragment extends Fragment {
 
     private MainActivity mainActivity;
     private UserViewModel userViewModel;
-    private FragmentAccountSettingsBinding binding;
+    private FragmentUserSettingsBinding binding;
     private SharedPreferences sharedPreferences;
     private NavController navController;
 
     private MutableLiveData<Boolean> moreOptions = new MutableLiveData<>(false);
     private MutableLiveData<Boolean> use_biometry = new MutableLiveData<>(false);
 
-    public AccountSettingsFragment() {
+    public UserSettingsFragment() {
         // Required empty public constructor
     }
 
@@ -65,7 +65,7 @@ public class AccountSettingsFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
-        binding = FragmentAccountSettingsBinding.inflate(inflater, container, false);
+        binding = FragmentUserSettingsBinding.inflate(inflater, container, false);
 
         use_biometry.setValue(sharedPreferences.getBoolean(BiometricAuthenticator.SHARED_PREFERENCES_BIOMETRY_PARAMETER, false));
 

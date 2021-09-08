@@ -17,7 +17,6 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import java.util.List;
 
 import rs.ac.bg.etf.diplomski.authenticationapp.app_main.MainActivity;
-import rs.ac.bg.etf.diplomski.authenticationapp.app_main.user_management.AccountSettingsFragment;
 import rs.ac.bg.etf.diplomski.authenticationapp.models.OPERATION;
 import rs.ac.bg.etf.diplomski.authenticationapp.models.User;
 import rs.ac.bg.etf.diplomski.authenticationapp.modules.BiometricAuthenticator;
@@ -33,7 +32,7 @@ public class UserViewModel extends ViewModel {
 
     private MutableLiveData<User> user = new MutableLiveData<>(null);
 
-    public void setData(MainActivity mainActivity, AccountSettingsFragment.OperationCallback callback) {
+    public void setData(MainActivity mainActivity, UserSettingsFragment.OperationCallback callback) {
         sharedPreferences = mainActivity.getSharedPreferences(BiometricAuthenticator.SHARED_PREFERENCES_ACCOUNT, Context.MODE_PRIVATE);
 
         firebaseAuth = FirebaseAuth.getInstance();
@@ -76,7 +75,7 @@ public class UserViewModel extends ViewModel {
         return user.getValue().getPhone();
     }
 
-    public void updateEmail(String data, AccountSettingsFragment.OperationCallback callback) {
+    public void updateEmail(String data, UserSettingsFragment.OperationCallback callback) {
         firebaseUser
                 .updateEmail(data)
                 .addOnSuccessListener(mainActivity, aVoid -> {
@@ -112,7 +111,7 @@ public class UserViewModel extends ViewModel {
                 });
     }
 
-    public void deleteUser(AccountSettingsFragment.OperationCallback callback) {
+    public void deleteUser(UserSettingsFragment.OperationCallback callback) {
         firebaseUser.delete()
                 .addOnSuccessListener(mainActivity, aVoid -> {
                     userReference

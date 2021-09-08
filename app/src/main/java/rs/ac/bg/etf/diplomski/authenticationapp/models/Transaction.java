@@ -8,6 +8,9 @@ public class Transaction {
     private String payer;
     private String recipient;
 
+    public Transaction() {
+    }
+
     public Transaction(Date date, double amount, String payer, String recipient) {
         this.date = date;
         this.amount = amount;

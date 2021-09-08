@@ -26,6 +26,7 @@ public class BiometricAuthenticator {
     public static final String SHARED_PREFERENCES_PIN_CODE_PARAMETER = "shared-preferences-pin-code-parameter";
 
     public static final String SHARED_PREFERENCES_USER_INFO = "shared-preferences-user-info";
+    public static final String SHARED_PREFERENCES_USER_ID = "shared-preferences-user-id";
 
     private Executor executor;
     private BiometricPrompt biometricPrompt;

@@ -17,7 +17,7 @@ import android.widget.Toast;
 import com.google.android.material.textfield.TextInputLayout;
 
 import rs.ac.bg.etf.diplomski.authenticationapp.R;
-import rs.ac.bg.etf.diplomski.authenticationapp.app_main.user_management.AccountSettingsFragment;
+import rs.ac.bg.etf.diplomski.authenticationapp.app_main.user_management.UserSettingsFragment;
 import rs.ac.bg.etf.diplomski.authenticationapp.app_main.MainActivity;
 import rs.ac.bg.etf.diplomski.authenticationapp.databinding.DialogPasswordChangeBinding;
 import rs.ac.bg.etf.diplomski.authenticationapp.models.OPERATION;
@@ -29,13 +29,13 @@ public class PasswordChangeDialog extends DialogFragment {
 
     private AlertDialog dialog;
 
-    private AccountSettingsFragment.OperationCallback callback;
+    private UserSettingsFragment.OperationCallback callback;
 
     public PasswordChangeDialog() {
         // Required empty public constructor
     }
 
-    public PasswordChangeDialog(AccountSettingsFragment.OperationCallback callback) {
+    public PasswordChangeDialog(UserSettingsFragment.OperationCallback callback) {
         this.callback = callback;
     }
 

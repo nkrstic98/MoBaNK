@@ -1,5 +1,7 @@
 package rs.ac.bg.etf.diplomski.authenticationapp.models;
 
+import java.util.List;
+
 public class User {
     private String id = "";
     private String firstname = "";
@@ -13,13 +15,14 @@ public class User {
 
     }
 
-    public User(String id, String firstname, String lastname, String email, String phone, String gender) {
+    public User(String id, String firstname, String lastname, String email, String phone, String gender, String secret_key) {
         this.id = id;
         this.firstname = firstname;
         this.lastname = lastname;
         this.email = email;
         this.phone = phone;
         this.gender = gender;
+        this.secret_key = secret_key;
     }
 
     public String getId() {
