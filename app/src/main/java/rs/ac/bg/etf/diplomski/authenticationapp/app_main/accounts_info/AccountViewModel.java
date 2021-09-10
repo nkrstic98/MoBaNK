@@ -1,7 +1,10 @@
 package rs.ac.bg.etf.diplomski.authenticationapp.app_main.accounts_info;
 
+import android.os.Build;
 import android.util.Log;
+import android.widget.ArrayAdapter;
 
+import androidx.annotation.RequiresApi;
 import androidx.lifecycle.ViewModel;
 
 import com.google.firebase.firestore.CollectionReference;
@@ -73,5 +76,17 @@ public class AccountViewModel extends ViewModel {
 
     public String getAccountId(int index) {
         return accountIds.get(index);
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.N)
+    public List<String> getAccounts(String currency) {
+        List<String> list = new ArrayList<>();
+        accounts.forEach(account -> {
+            if(account.getCurrency().equals(currency)) {
+                list.add(account.getNumber());
+            }
+        });
+
+        return list;
     }
 }

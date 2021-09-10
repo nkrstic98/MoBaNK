@@ -1,14 +1,105 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:layout_marginTop="50dp"
+    android:layout_marginLeft="30dp"
+    android:layout_marginRight="30dp"
     tools:context=".app_main.exchange_office.ExchangeOfficeFragment">
 
-    <!-- TODO: Update blank fragment layout -->
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:text="@string/hello_blank_fragment" />
+    <com.google.android.material.button.MaterialButtonToggleGroup
+        android:id="@+id/operation_group"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        app:singleSelection="true">
 
-</FrameLayout>
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/button_buy"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="BUY"
+            style="?attr/materialButtonOutlinedStyle" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/button_sell"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="SELL"
+            style="?attr/materialButtonOutlinedStyle" />
+
+    </com.google.android.material.button.MaterialButtonToggleGroup>
+
+    <TextView
+        android:id="@+id/first_currency_label"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        tools:text="Basic accounts"
+        android:textSize="18dp"
+        android:layout_marginTop="50dp"
+        />
+
+    <Spinner
+        android:id="@+id/first_currency"
+        android:layout_width="match_parent"
+        android:layout_height="58dp"
+        android:layout_marginTop="5dp"
+        tools:listitem="@android:layout/simple_list_item_1"
+        android:background="@drawable/blue_outline"
+        android:popupBackground="@drawable/blue_outline_white_background"
+        android:spinnerMode="dropdown"
+        />
+
+
+    <TextView
+        android:id="@+id/second_currency_label"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        tools:text="Foreign exchange accounts"
+        android:layout_marginTop="20dp"
+        android:textSize="18dp"
+        />
+
+    <Spinner
+        android:id="@+id/second_currency"
+        android:layout_width="match_parent"
+        android:layout_height="58dp"
+        android:layout_marginTop="5dp"
+        tools:listitem="@android:layout/simple_list_item_1"
+        android:background="@drawable/blue_outline"
+        android:popupBackground="@drawable/blue_outline_white_background"
+        android:spinnerMode="dropdown"
+        />
+
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/amount_label"
+        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp"
+        android:layout_marginTop="50dp"
+        android:hint="Amount"
+        >
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/amount"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="numberDecimal" />
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/button_exchange"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="50dp"
+        android:layout_gravity="center"
+        android:text="Exchange"
+        />
+
+</LinearLayout>

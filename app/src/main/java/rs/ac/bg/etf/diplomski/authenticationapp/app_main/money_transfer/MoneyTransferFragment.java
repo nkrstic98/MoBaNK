@@ -1,66 +1,95 @@
 package rs.ac.bg.etf.diplomski.authenticationapp.app_main.money_transfer;
 
+import android.os.Build;
 import android.os.Bundle;
 
+import androidx.annotation.RequiresApi;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
 
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 
-import rs.ac.bg.etf.diplomski.authenticationapp.R;
+import java.util.List;
 
-/**
- * A simple {@link Fragment} subclass.
- * Use the {@link MoneyTransferFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
+import rs.ac.bg.etf.diplomski.authenticationapp.app_main.MainActivity;
+import rs.ac.bg.etf.diplomski.authenticationapp.app_main.accounts_info.AccountViewModel;
+import rs.ac.bg.etf.diplomski.authenticationapp.app_main.transactions.TransactionViewModel;
+import rs.ac.bg.etf.diplomski.authenticationapp.databinding.FragmentMoneyTransferBinding;
+
 public class MoneyTransferFragment extends Fragment {
 
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
+    private MainActivity mainActivity;
+    private AccountViewModel accountViewModel;
+    private TransactionViewModel transactionViewModel;
 
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
+    private FragmentMoneyTransferBinding binding;
 
     public MoneyTransferFragment() {
         // Required empty public constructor
     }
 
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment MoneyTransferFragment.
-     */
-    // TODO: Rename and change types and number of parameters
-    public static MoneyTransferFragment newInstance(String param1, String param2) {
-        MoneyTransferFragment fragment = new MoneyTransferFragment();
-        Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
-        fragment.setArguments(args);
-        return fragment;
-    }
-
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
-        }
+
+        mainActivity = (MainActivity) requireActivity();
+
+        accountViewModel = new ViewModelProvider(mainActivity).get(AccountViewModel.class);
+        transactionViewModel = new ViewModelProvider(mainActivity).get(TransactionViewModel.class);
+
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.N)
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_money_transfer, container, false);
+        binding = FragmentMoneyTransferBinding.inflate(inflater, container, false);
+
+        setupInitialState();
+
+        binding.secondAccount.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                if(position == binding.secondAccount.getAdapter().getCount() - 1) {
+                    binding.freeEnterAccountLabel.setVisibility(View.VISIBLE);
+                }
+                else {
+                    binding.freeEnterAccountLabel.setVisibility(View.GONE);
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
+
+        return binding.getRoot();
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.N)
+    private void setupInitialState() {
+
+        binding.freeEnterAccountLabel.setVisibility(View.GONE);
+
+        ArrayAdapter<String> from = new ArrayAdapter<>(
+                mainActivity,
+                android.R.layout.simple_list_item_1,
+                accountViewModel.getAccounts("RSD")
+        );
+        binding.firstAccount.setAdapter(from);
+
+        List<String> list = accountViewModel.getAccounts("RSD");
+        list.add("Enter another account...");
+        ArrayAdapter<String> to = new ArrayAdapter<>(
+                mainActivity,
+                android.R.layout.simple_list_item_1,
+                list
+        );
+        binding.secondAccount.setAdapter(to);
     }
 }

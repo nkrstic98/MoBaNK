@@ -1,66 +1,98 @@
 package rs.ac.bg.etf.diplomski.authenticationapp.app_main.exchange_office;
 
+import android.os.Build;
 import android.os.Bundle;
 
+import androidx.annotation.RequiresApi;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModel;
+import androidx.lifecycle.ViewModelProvider;
 
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
 
 import rs.ac.bg.etf.diplomski.authenticationapp.R;
+import rs.ac.bg.etf.diplomski.authenticationapp.app_main.MainActivity;
+import rs.ac.bg.etf.diplomski.authenticationapp.app_main.accounts_info.AccountViewModel;
+import rs.ac.bg.etf.diplomski.authenticationapp.app_main.transactions.TransactionViewModel;
+import rs.ac.bg.etf.diplomski.authenticationapp.databinding.FragmentExchangeOfficeBinding;
+import rs.ac.bg.etf.diplomski.authenticationapp.databinding.FragmentTransactionsBinding;
 
-/**
- * A simple {@link Fragment} subclass.
- * Use the {@link ExchangeOfficeFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
 public class ExchangeOfficeFragment extends Fragment {
 
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
+    public static final String EUR_CURRENCY = "EUR";
+    public static final String RSD_CURRENCY = "RSD";
 
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
+    private MainActivity mainActivity;
+    private AccountViewModel accountViewModel;
+    private TransactionViewModel transactionViewModel;
+
+    private FragmentExchangeOfficeBinding binding;
+
+    private String currency1;
 
     public ExchangeOfficeFragment() {
         // Required empty public constructor
     }
 
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment ExchangeOfficeFragment.
-     */
-    // TODO: Rename and change types and number of parameters
-    public static ExchangeOfficeFragment newInstance(String param1, String param2) {
-        ExchangeOfficeFragment fragment = new ExchangeOfficeFragment();
-        Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
-        fragment.setArguments(args);
-        return fragment;
-    }
-
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
-        }
+
+        mainActivity = (MainActivity) requireActivity();
+
+        accountViewModel = new ViewModelProvider(mainActivity).get(AccountViewModel.class);
+        transactionViewModel = new ViewModelProvider(mainActivity).get(TransactionViewModel.class);
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.N)
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_exchange_office, container, false);
+
+        binding = FragmentExchangeOfficeBinding.inflate(inflater, container, false);
+
+        currency1 = RSD_CURRENCY;
+        setupInitialState();
+
+        binding.buttonBuy.setOnClickListener(v -> {
+            currency1 = RSD_CURRENCY;
+
+            setupInitialState();
+        });
+
+        binding.buttonSell.setOnClickListener(v -> {
+            currency1 = EUR_CURRENCY;
+
+            setupInitialState();
+        });
+
+        return binding.getRoot();
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.N)
+    private void setupInitialState() {
+        binding.operationGroup.check(currency1.equals(RSD_CURRENCY) ? R.id.button_buy : R.id.button_sell);
+
+        binding.firstCurrencyLabel.setText(currency1.equals(RSD_CURRENCY) ? "Basic accounts" : "Foreign Exchange accounts");
+        binding.secondCurrencyLabel.setText(currency1.equals(EUR_CURRENCY) ?  "Basic accounts" : "Foreign Exchange accounts");
+
+        binding.amountLabel.setSuffixText(currency1);
+
+        ArrayAdapter<String> firstCurrency = new ArrayAdapter<>(
+                mainActivity,
+                android.R.layout.simple_list_item_1,
+                accountViewModel.getAccounts(currency1.equals(RSD_CURRENCY) ? RSD_CURRENCY : EUR_CURRENCY)
+        );
+        binding.firstCurrency.setAdapter(firstCurrency);
+
+        ArrayAdapter<String> secondCurrency = new ArrayAdapter<>(
+                mainActivity,
+                android.R.layout.simple_list_item_1,
+                accountViewModel.getAccounts(currency1.equals(RSD_CURRENCY) ? RSD_CURRENCY : EUR_CURRENCY)
+        );
+        binding.secondCurrency.setAdapter(secondCurrency);
     }
 }

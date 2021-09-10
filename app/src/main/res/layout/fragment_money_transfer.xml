@@ -1,14 +1,94 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:layout_marginLeft="30dp"
+    android:layout_marginRight="30dp"
+    android:layout_marginTop="50dp"
     tools:context=".app_main.money_transfer.MoneyTransferFragment">
 
-    <!-- TODO: Update blank fragment layout -->
     <TextView
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:text="@string/hello_blank_fragment" />
+        android:layout_height="wrap_content"
+        android:text="Transfer From"
+        android:textSize="18dp"
+        android:layout_marginTop="50dp"
+        />
 
-</FrameLayout>
+    <Spinner
+        android:id="@+id/first_account"
+        android:layout_width="match_parent"
+        android:layout_height="58dp"
+        android:layout_marginTop="5dp"
+        tools:listitem="@android:layout/simple_list_item_1"
+        android:background="@drawable/blue_outline"
+        android:popupBackground="@drawable/blue_outline_white_background"
+        android:spinnerMode="dropdown"
+        />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Transfer To"
+        android:layout_marginTop="20dp"
+        android:textSize="18dp"
+        />
+
+    <Spinner
+        android:id="@+id/second_account"
+        android:layout_width="match_parent"
+        android:layout_height="58dp"
+        android:layout_marginTop="5dp"
+        tools:listitem="@android:layout/simple_list_item_1"
+        android:background="@drawable/blue_outline"
+        android:popupBackground="@drawable/blue_outline_white_background"
+        android:spinnerMode="dropdown"
+        />
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/free_enter_account_label"
+        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+        android:hint="Enter account number"
+        >
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/free_enter_account"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="numberDecimal" />
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/amount_label"
+        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        android:layout_marginTop="50dp"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp"
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+        android:hint="Enter amount"
+        app:suffixText="RSD"
+        >
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/amount"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="numberDecimal" />
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/button_exchange"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="50dp"
+        android:layout_gravity="center"
+        android:text="Transfer"
+        />
+
+</LinearLayout>
