@@ -5,16 +5,18 @@ import java.util.Date;
 public class Transaction {
     private Date date;
     private double amount;
-    private String executor;
+    private String payer;
+    private String recipient;
     private TRANSACTION_TYPE type;
 
     public Transaction() {
     }
 
-    public Transaction(Date date, double amount, String executor, TRANSACTION_TYPE type) {
+    public Transaction(Date date, double amount, String payer, String recipient, TRANSACTION_TYPE type) {
         this.date = date;
         this.amount = amount;
-        this.executor = executor;
+        this.payer = payer;
+        this.recipient = recipient;
         this.type = type;
     }
 
@@ -34,12 +36,20 @@ public class Transaction {
         this.amount = amount;
     }
 
-    public String getExecutor() {
-        return executor;
+    public String getPayer() {
+        return payer;
     }
 
-    public void setExecutor(String executor) {
-        this.executor = executor;
+    public void setPayer(String payer) {
+        this.payer = payer;
+    }
+
+    public String getRecipient() {
+        return recipient;
+    }
+
+    public void setRecipient(String recipient) {
+        this.recipient = recipient;
     }
 
     public TRANSACTION_TYPE getType() {

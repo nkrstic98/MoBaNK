@@ -42,7 +42,7 @@ public class AccountsFragment extends Fragment {
         sharedPreferences = mainActivity.getSharedPreferences(BiometricAuthenticator.SHARED_PREFERENCES_ACCOUNT, Context.MODE_PRIVATE);
 
         accountViewModel = new ViewModelProvider(mainActivity).get(AccountViewModel.class);
-        accountViewModel.setData(sharedPreferences.getString(BiometricAuthenticator.SHARED_PREFERENCES_USER_ID, ""));
+        accountViewModel.setData(sharedPreferences.getString(BiometricAuthenticator.SHARED_PREFERENCES_USER_ID, ""), mainActivity);
     }
 
     @Override

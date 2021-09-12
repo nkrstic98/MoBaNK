@@ -64,7 +64,7 @@ public class AccountAdapter extends RecyclerView.Adapter<AccountAdapter.AccountV
 
         public void bind(Account account) {
             binding.accountNumber.setText(account.getNumber());
-            binding.accountBalance.setText(((account.getBalance() % 1 == 0) ? ((int)account.getBalance() + ".00") : (account.getBalance() + "")));
+            binding.accountBalance.setText(((account.getBalance() % 1 == 0) ? ((int)account.getBalance() + ".00") : (String.format("%.2f", account.getBalance()))));
             binding.accountType.setText(account.getCurrency());
             binding.buttonTransactions.setOnClickListener(v -> {
                 callbackTransactions.invoke(getAdapterPosition(), account.getCurrency());

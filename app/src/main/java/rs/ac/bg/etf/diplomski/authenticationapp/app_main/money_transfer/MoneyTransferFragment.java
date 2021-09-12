@@ -17,7 +17,6 @@ import java.util.List;
 
 import rs.ac.bg.etf.diplomski.authenticationapp.app_main.MainActivity;
 import rs.ac.bg.etf.diplomski.authenticationapp.app_main.accounts_info.AccountViewModel;
-import rs.ac.bg.etf.diplomski.authenticationapp.app_main.transactions.TransactionViewModel;
 import rs.ac.bg.etf.diplomski.authenticationapp.databinding.FragmentMoneyTransferBinding;
 
 public class MoneyTransferFragment extends Fragment {

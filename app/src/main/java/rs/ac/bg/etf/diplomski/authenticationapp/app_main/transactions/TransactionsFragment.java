@@ -13,6 +13,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import rs.ac.bg.etf.diplomski.authenticationapp.app_main.MainActivity;
+import rs.ac.bg.etf.diplomski.authenticationapp.app_main.accounts_info.AccountViewModel;
 import rs.ac.bg.etf.diplomski.authenticationapp.databinding.FragmentTransactionsBinding;
 import rs.ac.bg.etf.diplomski.authenticationapp.modules.BiometricAuthenticator;
 
@@ -20,8 +21,7 @@ public class TransactionsFragment extends Fragment {
 
     private FragmentTransactionsBinding binding;
     private MainActivity mainActivity;
-    private TransactionViewModel transactionViewModel;
-    private SharedPreferences sharedPreferences;
+    private AccountViewModel accountViewModel;
 
     public TransactionsFragment() {
         // Required empty public constructor
@@ -33,13 +33,7 @@ public class TransactionsFragment extends Fragment {
 
         mainActivity = (MainActivity) requireActivity();
 
-        sharedPreferences = mainActivity.getSharedPreferences(BiometricAuthenticator.SHARED_PREFERENCES_ACCOUNT, Context.MODE_PRIVATE);
-
-        transactionViewModel = new ViewModelProvider(mainActivity).get(TransactionViewModel.class);
-        transactionViewModel.setData(
-                sharedPreferences.getString(BiometricAuthenticator.SHARED_PREFERENCES_USER_ID, ""),
-                TransactionsFragmentArgs.fromBundle(getArguments()).getAccountId()
-                );
+        accountViewModel = new ViewModelProvider(mainActivity).get(AccountViewModel.class);
     }
 
     @Override
@@ -53,7 +47,7 @@ public class TransactionsFragment extends Fragment {
                 mainActivity.getResources()
         );
 
-        transactionViewModel.subscribeToRealtimeUpdates(adapter);
+        accountViewModel.getTransactions(adapter, TransactionsFragmentArgs.fromBundle(getArguments()).getAccountId());
 
         binding.recyclerView.setAdapter(adapter);
         binding.recyclerView.setLayoutManager(new LinearLayoutManager(mainActivity));

@@ -15,12 +15,8 @@ import android.widget.ArrayAdapter;
 
 import com.google.firebase.firestore.FirebaseFirestore;
 
-import java.util.List;
-
-import rs.ac.bg.etf.diplomski.authenticationapp.R;
 import rs.ac.bg.etf.diplomski.authenticationapp.app_main.MainActivity;
 import rs.ac.bg.etf.diplomski.authenticationapp.app_main.accounts_info.AccountViewModel;
-import rs.ac.bg.etf.diplomski.authenticationapp.app_main.transactions.TransactionViewModel;
 import rs.ac.bg.etf.diplomski.authenticationapp.databinding.FragmentPaymentsBinding;
 
 public class PaymentsFragment extends Fragment {

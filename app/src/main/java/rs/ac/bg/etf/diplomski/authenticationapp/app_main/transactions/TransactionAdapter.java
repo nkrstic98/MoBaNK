@@ -67,12 +67,12 @@ public class TransactionAdapter extends RecyclerView.Adapter<TransactionAdapter.
             binding.currency.setText(currency);
             if(t.getType() == TRANSACTION_TYPE.INFLOW) {
                 binding.amount.setText("+ " + ((t.getAmount() % 1 == 0) ? ((int)t.getAmount() + ".00") : t.getAmount()));
-                binding.executor.setText("Payer: " + t.getExecutor());
+                binding.executor.setText("Payer: " + t.getPayer());
                 binding.card.setCardBackgroundColor(resources.getColor(R.color.color_inflow));
             }
             else {
                 binding.amount.setText("- " + ((t.getAmount() % 1 == 0) ? ((int)t.getAmount() + ".00") : t.getAmount()));
-                binding.executor.setText("Recipient: " + t.getExecutor());
+                binding.executor.setText("Recipient: " + t.getRecipient());
                 binding.card.setCardBackgroundColor(resources.getColor(R.color.color_outflow));
             }
         }
