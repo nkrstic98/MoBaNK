@@ -34,6 +34,8 @@ import java.util.TimerTask;
 import rs.ac.bg.etf.diplomski.authenticationapp.R;
 import rs.ac.bg.etf.diplomski.authenticationapp.app_login.LoginActivity;
 import rs.ac.bg.etf.diplomski.authenticationapp.app_main.MainActivity;
+import rs.ac.bg.etf.diplomski.authenticationapp.app_main.accounts_info.AccountViewModel;
+import rs.ac.bg.etf.diplomski.authenticationapp.app_main.exchange_office.ExchangeOfficeFragment;
 import rs.ac.bg.etf.diplomski.authenticationapp.app_main.user_management.UserViewModel;
 import rs.ac.bg.etf.diplomski.authenticationapp.app_second_factor_register.PinRegisterActivity;
 import rs.ac.bg.etf.diplomski.authenticationapp.app_second_factor_register.PinRegisterFragment;
@@ -41,6 +43,8 @@ import rs.ac.bg.etf.diplomski.authenticationapp.app_user_register.RegisterActivi
 import rs.ac.bg.etf.diplomski.authenticationapp.databinding.FragmentKeyboardBinding;
 import rs.ac.bg.etf.diplomski.authenticationapp.models.OPERATION;
 
+import static rs.ac.bg.etf.diplomski.authenticationapp.app_main.exchange_office.ExchangeOfficeFragment.PURCHASING_RATE;
+import static rs.ac.bg.etf.diplomski.authenticationapp.app_main.exchange_office.ExchangeOfficeFragment.SELLING_RATE;
 import static rs.ac.bg.etf.diplomski.authenticationapp.models.OPERATION.*;
 
 public class KeyboardFragment extends Fragment {
@@ -50,6 +54,7 @@ public class KeyboardFragment extends Fragment {
 
     private FragmentActivity activity;
     private UserViewModel userViewModel;
+    private AccountViewModel accountViewModel;
     private FragmentKeyboardBinding binding;
     private NavController navController;
 
@@ -76,6 +81,7 @@ public class KeyboardFragment extends Fragment {
         userViewModel = null;
         if(activity instanceof MainActivity) {
             userViewModel = new ViewModelProvider(activity).get(UserViewModel.class);
+            accountViewModel = new ViewModelProvider(activity).get(AccountViewModel.class);
         }
 
         registerSP = activity.getSharedPreferences(PinRegisterFragment.SHARED_PREFERENCES_REGISTER, Context.MODE_PRIVATE);
@@ -312,6 +318,9 @@ public class KeyboardFragment extends Fragment {
                 deleteUser();
                 break;
 
+            case EXCHANGE_OFFICE:
+                exchangeOffice();
+
             default:
                 break;
         }
@@ -378,5 +387,31 @@ public class KeyboardFragment extends Fragment {
             activity.startActivity(intent);
             activity.finish();
         });
+    }
+
+    private void exchangeOffice() {
+        SharedPreferences sp = activity.getSharedPreferences(ExchangeOfficeFragment.SHARED_PREFERENCES_EXCHANGE_OFFICE, Context.MODE_PRIVATE);
+
+        String payer = sp.getString(ExchangeOfficeFragment.EXCHANGE_OFFICE_PAYER, "");
+        String receiver = sp.getString(ExchangeOfficeFragment.EXCHANGE_OFFICE_RECEIVER, "");
+        double amount = sp.getFloat(ExchangeOfficeFragment.EXCHANGE_OFFICE_AMOUNT, 0);
+
+        double transfer_amount = 0;
+        if(sp.getString(ExchangeOfficeFragment.EXCHANGE_OFFICE_OPERATION, "").equals("buy")) {
+            transfer_amount = amount * SELLING_RATE;
+            if(!accountViewModel.hasEnoughFunds(payer, transfer_amount)) {
+                Toast.makeText(activity, "There is not enough funds on the payer account!", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            accountViewModel.executeInternalTransaction(payer, receiver, transfer_amount, amount);
+        }
+        else {
+            transfer_amount = amount * PURCHASING_RATE;
+            if(!accountViewModel.hasEnoughFunds(payer, amount)) {
+                Toast.makeText(activity, "There is not enough funds on the payer account!", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            accountViewModel.executeInternalTransaction(payer, receiver, amount, transfer_amount);
+        }
     }
 }

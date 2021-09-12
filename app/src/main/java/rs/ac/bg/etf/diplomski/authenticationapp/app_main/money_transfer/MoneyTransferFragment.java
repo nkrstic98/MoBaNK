@@ -23,7 +23,6 @@ public class MoneyTransferFragment extends Fragment {
 
     private MainActivity mainActivity;
     private AccountViewModel accountViewModel;
-    private TransactionViewModel transactionViewModel;
 
     private FragmentMoneyTransferBinding binding;
 
@@ -38,8 +37,6 @@ public class MoneyTransferFragment extends Fragment {
         mainActivity = (MainActivity) requireActivity();
 
         accountViewModel = new ViewModelProvider(mainActivity).get(AccountViewModel.class);
-        transactionViewModel = new ViewModelProvider(mainActivity).get(TransactionViewModel.class);
-
     }
 
     @RequiresApi(api = Build.VERSION_CODES.N)

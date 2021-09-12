@@ -1,11 +1,19 @@
 package rs.ac.bg.etf.diplomski.authenticationapp.app_main.exchange_office;
 
+import android.content.Context;
+import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
+import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.navigation.NavController;
+import androidx.navigation.Navigation;
 
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -24,8 +32,16 @@ import rs.ac.bg.etf.diplomski.authenticationapp.R;
 import rs.ac.bg.etf.diplomski.authenticationapp.app_main.MainActivity;
 import rs.ac.bg.etf.diplomski.authenticationapp.app_main.accounts_info.AccountViewModel;
 import rs.ac.bg.etf.diplomski.authenticationapp.databinding.FragmentExchangeOfficeBinding;
+import rs.ac.bg.etf.diplomski.authenticationapp.models.OPERATION;
+import rs.ac.bg.etf.diplomski.authenticationapp.modules.BiometricAuthenticator;
 
 public class ExchangeOfficeFragment extends Fragment {
+
+    public static final String SHARED_PREFERENCES_EXCHANGE_OFFICE = "shared-preferences-exchange-office";
+    public static final String EXCHANGE_OFFICE_OPERATION = "exchange-office-operation";
+    public static final String EXCHANGE_OFFICE_RECEIVER = "exchange-office-receiver";
+    public static final String EXCHANGE_OFFICE_PAYER = "exchange-office-payer";
+    public static final String EXCHANGE_OFFICE_AMOUNT = "exchange-office-amount";
 
     public enum EXCHANGE_OPERATION { BUY, SELL };
 
@@ -40,10 +56,10 @@ public class ExchangeOfficeFragment extends Fragment {
 
     private MainActivity mainActivity;
     private AccountViewModel accountViewModel;
+    private NavController navController;
 
     private FragmentExchangeOfficeBinding binding;
 
-    private String currency1;
     private EXCHANGE_OPERATION operation;
 
     public ExchangeOfficeFragment() {
@@ -107,43 +123,102 @@ public class ExchangeOfficeFragment extends Fragment {
         });
 
         binding.buttonExchange.setOnClickListener(v -> {
-            executeTransaction();
+            startTransaction();
         });
 
         return binding.getRoot();
     }
 
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        navController = Navigation.findNavController(view);
+    }
+
+    private void startTransaction() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+
+        builder
+                .setTitle("Execute payment?")
+                .setMessage("Are you sure you want to proceed?")
+                .setIcon(R.drawable.outline_euro_20)
+                .setPositiveButton("Execute", (dialog, which) -> {
+
+                })
+                .setNegativeButton("Abort", (dialog, which) -> {
+                    dialog.dismiss();
+                });
+
+        androidx.appcompat.app.AlertDialog dialog = builder.create();
+
+        dialog.setOnShowListener(dialog1 -> {
+            dialog.getButton(androidx.appcompat.app.AlertDialog.BUTTON_POSITIVE).setBackgroundColor(Color.BLUE);
+            dialog.getButton(androidx.appcompat.app.AlertDialog.BUTTON_POSITIVE).setTextColor(Color.WHITE);
+            dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(v1 -> {
+                new BiometricAuthenticator(mainActivity, new BiometricAuthenticator.Callback() {
+                    @Override
+                    public void failure() {
+                        SharedPreferences sp = mainActivity.getSharedPreferences(SHARED_PREFERENCES_EXCHANGE_OFFICE, Context.MODE_PRIVATE);
+                        sp.edit()
+                                .putString(EXCHANGE_OFFICE_OPERATION, operation == EXCHANGE_OPERATION.BUY ? "buy" : "sell")
+                                .putString(EXCHANGE_OFFICE_PAYER, binding.firstCurrency.getSelectedItem().toString())
+                                .putString(EXCHANGE_OFFICE_RECEIVER, binding.secondCurrency.getSelectedItem().toString())
+                                .putFloat(EXCHANGE_OFFICE_AMOUNT, fetchNumber(binding.amountLabel).floatValue())
+                                .apply();
+
+                        dialog.dismiss();
+                        navController.navigate(ExchangeOfficeFragmentDirections.actionGlobalKeyboardFragmentMain(OPERATION.EXCHANGE_OFFICE, ""));
+
+                        binding.amount.setText("");
+                        binding.amountLabel.clearFocus();
+                        binding.targetedAmount.setText("00.00");
+                    }
+
+                    @Override
+                    public void success() {
+                        dialog.dismiss();
+                        executeTransaction();
+
+                        binding.amount.setText("");
+                        binding.amountLabel.clearFocus();
+                        binding.targetedAmount.setText("00.00");
+                    }
+                }).authenticate();
+            });
+        });
+
+        dialog.show();
+    }
+
     private void executeTransaction() {
-        try {
-            String payer = binding.firstCurrency.getSelectedItem().toString();
-            String receiver = binding.secondCurrency.getSelectedItem().toString();
-            double amount = fetchNumber(binding.amountLabel).doubleValue();
+        String payer = binding.firstCurrency.getSelectedItem().toString();
+        String receiver = binding.secondCurrency.getSelectedItem().toString();
+        double amount = fetchNumber(binding.amountLabel).doubleValue();
 
-            double transfer_amount = 0;
-            if(operation == EXCHANGE_OPERATION.BUY) {
-                transfer_amount = amount * SELLING_RATE;
-                if(!accountViewModel.hasEnoughFunds(payer, transfer_amount)) {
-                    Toast.makeText(mainActivity, "There is not enough funds on the payer account!", Toast.LENGTH_SHORT).show();
-                    return;
-                }
-                accountViewModel.executeInternalTransaction(payer, receiver, transfer_amount, amount);
+        double transfer_amount = 0;
+        if(operation == EXCHANGE_OPERATION.BUY) {
+            transfer_amount = amount * SELLING_RATE;
+            if(!accountViewModel.hasEnoughFunds(payer, transfer_amount)) {
+                Toast.makeText(mainActivity, "There is not enough funds on the payer account!", Toast.LENGTH_SHORT).show();
+                return;
             }
-            else {
-                transfer_amount = amount * PURCHASING_RATE;
-                if(!accountViewModel.hasEnoughFunds(payer, amount)) {
-                    Toast.makeText(mainActivity, "There is not enough funds on the payer account!", Toast.LENGTH_SHORT).show();
-                    return;
-                }
-                accountViewModel.executeInternalTransaction(payer, receiver, amount, transfer_amount);
+            accountViewModel.executeInternalTransaction(payer, receiver, transfer_amount, amount);
+        }
+        else {
+            transfer_amount = amount * PURCHASING_RATE;
+            if(!accountViewModel.hasEnoughFunds(payer, amount)) {
+                Toast.makeText(mainActivity, "There is not enough funds on the payer account!", Toast.LENGTH_SHORT).show();
+                return;
             }
-
-        } catch (ParseException e) {
-            e.printStackTrace();
+            accountViewModel.executeInternalTransaction(payer, receiver, amount, transfer_amount);
         }
     }
 
     @RequiresApi(api = Build.VERSION_CODES.N)
     private void setupInitialState() {
+        binding.amount.setText("");
+        binding.targetedAmount.setText("00.00");
+
         binding.operationGroup.check(operation == EXCHANGE_OPERATION.BUY ? R.id.button_buy : R.id.button_sell);
 
         binding.firstCurrencyLabel.setText(operation == EXCHANGE_OPERATION.BUY ? "Basic accounts" : "Foreign Exchange accounts");
@@ -166,7 +241,7 @@ public class ExchangeOfficeFragment extends Fragment {
         binding.secondCurrency.setAdapter(secondCurrency);
     }
 
-    private Number fetchNumber(TextInputLayout textInputLayout) throws ParseException {
+    private Number fetchNumber(TextInputLayout textInputLayout) {
         Number result = 0;
         try {
             result = NumberFormat.getInstance().parse(textInputLayout.getEditText().getText().toString());

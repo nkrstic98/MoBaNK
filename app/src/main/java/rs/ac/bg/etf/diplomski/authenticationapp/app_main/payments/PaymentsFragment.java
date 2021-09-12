@@ -23,7 +23,6 @@ public class PaymentsFragment extends Fragment {
 
     private MainActivity mainActivity;
     private AccountViewModel accountViewModel;
-    private TransactionViewModel transactionViewModel;
     private FirebaseFirestore firebaseFirestore;
 
     private FragmentPaymentsBinding binding;
@@ -39,7 +38,6 @@ public class PaymentsFragment extends Fragment {
         mainActivity = (MainActivity) requireActivity();
 
         accountViewModel = new ViewModelProvider(mainActivity).get(AccountViewModel.class);
-        transactionViewModel = new ViewModelProvider(mainActivity).get(TransactionViewModel.class);
 
         firebaseFirestore = FirebaseFirestore.getInstance();
     }
