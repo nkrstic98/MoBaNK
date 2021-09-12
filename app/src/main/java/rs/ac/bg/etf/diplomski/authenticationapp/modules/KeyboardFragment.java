@@ -27,6 +27,7 @@ import android.widget.Toast;
 
 import com.davidmiguel.numberkeyboard.NumberKeyboardListener;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.type.Money;
 
 import java.util.Timer;
 import java.util.TimerTask;
@@ -36,6 +37,7 @@ import rs.ac.bg.etf.diplomski.authenticationapp.app_login.LoginActivity;
 import rs.ac.bg.etf.diplomski.authenticationapp.app_main.MainActivity;
 import rs.ac.bg.etf.diplomski.authenticationapp.app_main.accounts_info.AccountViewModel;
 import rs.ac.bg.etf.diplomski.authenticationapp.app_main.exchange_office.ExchangeOfficeFragment;
+import rs.ac.bg.etf.diplomski.authenticationapp.app_main.money_transfer.MoneyTransferFragment;
 import rs.ac.bg.etf.diplomski.authenticationapp.app_main.user_management.UserViewModel;
 import rs.ac.bg.etf.diplomski.authenticationapp.app_second_factor_register.PinRegisterActivity;
 import rs.ac.bg.etf.diplomski.authenticationapp.app_second_factor_register.PinRegisterFragment;
@@ -321,6 +323,9 @@ public class KeyboardFragment extends Fragment {
             case EXCHANGE_OFFICE:
                 exchangeOffice();
 
+            case INTERNAL_TRANSFER:
+                internalTransfer();
+
             default:
                 break;
         }
@@ -413,5 +418,22 @@ public class KeyboardFragment extends Fragment {
             }
             accountViewModel.executeInternalTransaction(payer, receiver, amount, transfer_amount);
         }
+
+        sp.edit().clear().apply();
+    }
+
+    private void internalTransfer() {
+        SharedPreferences sp = activity.getSharedPreferences(MoneyTransferFragment.SHARED_PREFERENCES_TRANSFER, Context.MODE_PRIVATE);
+
+        String payer = sp.getString(MoneyTransferFragment.TRANSFER_PAYER, "");
+        String receiver = sp.getString(MoneyTransferFragment.TRANSFER_RECEIVER, "");
+        double amount = sp.getFloat(MoneyTransferFragment.TRANSFER_AMOUNT, 0);
+
+        if(!accountViewModel.hasEnoughFunds(payer, amount)) {
+            Toast.makeText(activity, "There is not enough funds on the payer account!", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        accountViewModel.executeInternalTransaction(payer, receiver, amount, amount);
     }
 }

@@ -2,7 +2,6 @@ package rs.ac.bg.etf.diplomski.authenticationapp.app_main.accounts_info;
 
 import android.os.Build;
 import android.util.Log;
-import android.widget.ArrayAdapter;
 import android.widget.Toast;
 
 import androidx.annotation.RequiresApi;
@@ -18,6 +17,7 @@ import com.google.firebase.firestore.WriteBatch;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicReference;
 
 import rs.ac.bg.etf.diplomski.authenticationapp.app_main.MainActivity;
 import rs.ac.bg.etf.diplomski.authenticationapp.app_main.transactions.TransactionAdapter;
@@ -37,8 +37,12 @@ public class AccountViewModel extends ViewModel {
 
     private MainActivity mainActivity;
 
+    private String uid;
+
     public void setData(String userId, MainActivity mainActivity) {
         this.mainActivity = mainActivity;
+
+        uid = userId;
 
         firebaseFirestore = FirebaseFirestore.getInstance();
 
@@ -144,6 +148,11 @@ public class AccountViewModel extends ViewModel {
     }
 
     public void executeInternalTransaction(String payer, String receiver, double payer_amount, double receiver_amount) {
+        if(!payer.substring(17, 19).equals(receiver.substring(17, 19))) {
+            Toast.makeText(mainActivity, "Chosen account are not of same type! Enter valid accounts.", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
         Date transactionTime = new Date();
 
         Account payerA = getAccount(payer);
@@ -157,23 +166,84 @@ public class AccountViewModel extends ViewModel {
                 )
         );
 
-        Account receiverA = getAccount(receiver);
-        receiverA.getTransactions().add(
-                new Transaction(
-                        transactionTime,
-                        receiver_amount,
-                        payer,
-                        receiver,
-                        TRANSACTION_TYPE.INFLOW
-                )
-        );
+        AtomicReference<Account> receiverA = new AtomicReference<>(getAccount(receiver));
+        //nije moj drugi racun, nego racun u istoj banci, ali drugog korisnika
+        if(receiverA.get() == null) {
+            firebaseFirestore
+                    .collection("users")
+                    .get()
+                    .addOnSuccessListener(mainActivity, queryDocumentSnapshots -> {
+                        for (DocumentSnapshot ds :
+                                queryDocumentSnapshots.getDocuments()) {
+                            firebaseFirestore
+                                    .collection("users")
+                                    .document(ds.getId())
+                                    .collection("accounts")
+                                    .whereEqualTo("number", receiver)
+                                    .get()
+                                    .addOnSuccessListener(mainActivity, documentSnapshots -> {
 
+                                        if(documentSnapshots.getDocuments().size() == 1) {
+                                            receiverA.set(documentSnapshots.getDocuments().get(0).toObject(Account.class));
+
+                                            if(receiverA.get().getTransactions() == null) {
+                                                receiverA.get().setTransactions(new ArrayList<>());
+                                            }
+                                            receiverA.get().getTransactions().add(
+                                                    new Transaction(
+                                                            transactionTime,
+                                                            receiver_amount,
+                                                            payer,
+                                                            receiver,
+                                                            TRANSACTION_TYPE.INFLOW
+                                                    )
+                                            );
+
+                                            executeBatchTransaction(ds.getId(), documentSnapshots.getDocuments().get(0).getId(),
+                                                    payerA, receiverA.get(), payer_amount, receiver_amount);
+                                        }
+
+                                    })
+                                    .addOnFailureListener(mainActivity, e -> {
+                                        Toast.makeText(mainActivity, e.getMessage(), Toast.LENGTH_SHORT).show();
+                                    });
+                        }
+                    })
+                    .addOnFailureListener(mainActivity, e -> {
+                        Toast.makeText(mainActivity, e.getMessage(), Toast.LENGTH_SHORT).show();
+                    });
+        }
+        else {
+            if(receiverA.get().getTransactions() == null) {
+                receiverA.get().setTransactions(new ArrayList<>());
+            }
+            receiverA.get().getTransactions().add(
+                    new Transaction(
+                            transactionTime,
+                            receiver_amount,
+                            payer,
+                            receiver,
+                            TRANSACTION_TYPE.INFLOW
+                    )
+            );
+
+            executeBatchTransaction(uid, "", payerA, receiverA.get(), payer_amount, receiver_amount);
+        }
+    }
+
+    private void executeBatchTransaction(String uid2, String accId, Account payerA, Account receiverA, double payer_amount, double receiver_amount) {
         WriteBatch batch = firebaseFirestore.batch();
 
-        DocumentReference payerRef = accountCollection.document(getId(payer));
+        DocumentReference payerRef = accountCollection.document(getId(payerA.getNumber()));
         batch.update(payerRef, "balance", payerA.getBalance() - payer_amount, "transactions", payerA.getTransactions());
 
-        DocumentReference recRef = accountCollection.document(getId(receiver));
+        DocumentReference recRef;
+        if(uid.equals(uid2)) {
+            recRef = accountCollection.document(getId(receiverA.getNumber()));
+        }
+        else {
+            recRef = firebaseFirestore.collection("users").document(uid2).collection("accounts").document(accId);
+        }
         batch.update(recRef, "balance", receiverA.getBalance() + receiver_amount, "transactions", receiverA.getTransactions());
 
         batch.commit()

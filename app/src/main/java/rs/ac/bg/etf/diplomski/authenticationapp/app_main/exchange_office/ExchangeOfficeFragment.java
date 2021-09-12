@@ -139,7 +139,7 @@ public class ExchangeOfficeFragment extends Fragment {
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
 
         builder
-                .setTitle("Execute payment?")
+                .setTitle("Execute transaction?")
                 .setMessage("Are you sure you want to proceed?")
                 .setIcon(R.drawable.outline_euro_20)
                 .setPositiveButton("Execute", (dialog, which) -> {
@@ -171,7 +171,7 @@ public class ExchangeOfficeFragment extends Fragment {
 
                         binding.amount.setText("");
                         binding.amountLabel.clearFocus();
-                        binding.targetedAmount.setText("00.00");
+                        binding.targetedAmount.setText("");
                     }
 
                     @Override
@@ -181,7 +181,7 @@ public class ExchangeOfficeFragment extends Fragment {
 
                         binding.amount.setText("");
                         binding.amountLabel.clearFocus();
-                        binding.targetedAmount.setText("00.00");
+                        binding.targetedAmount.setText("");
                     }
                 }).authenticate();
             });

@@ -1,7 +1,4 @@
 package rs.ac.bg.etf.diplomski.authenticationapp.app_main.transactions;
-
-import android.content.Context;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
@@ -15,7 +12,6 @@ import android.view.ViewGroup;
 import rs.ac.bg.etf.diplomski.authenticationapp.app_main.MainActivity;
 import rs.ac.bg.etf.diplomski.authenticationapp.app_main.accounts_info.AccountViewModel;
 import rs.ac.bg.etf.diplomski.authenticationapp.databinding.FragmentTransactionsBinding;
-import rs.ac.bg.etf.diplomski.authenticationapp.modules.BiometricAuthenticator;
 
 public class TransactionsFragment extends Fragment {
 
