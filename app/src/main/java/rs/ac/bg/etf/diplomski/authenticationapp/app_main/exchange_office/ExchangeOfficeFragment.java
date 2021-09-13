@@ -238,7 +238,7 @@ public class ExchangeOfficeFragment extends Fragment {
     @RequiresApi(api = Build.VERSION_CODES.N)
     private void setupInitialState() {
         binding.amount.setText("");
-        binding.targetedAmount.setText("00.00");
+        binding.targetedAmount.setText("00.00 RSD");
 
         binding.operationGroup.check(operation == EXCHANGE_OPERATION.BUY ? R.id.button_buy : R.id.button_sell);
 
