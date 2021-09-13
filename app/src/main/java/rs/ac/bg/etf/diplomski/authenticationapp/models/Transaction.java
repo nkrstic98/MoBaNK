@@ -8,16 +8,18 @@ public class Transaction {
     private String payer;
     private String recipient;
     private TRANSACTION_TYPE type;
+    private String purpose;
 
     public Transaction() {
     }
 
-    public Transaction(Date date, double amount, String payer, String recipient, TRANSACTION_TYPE type) {
+    public Transaction(Date date, double amount, String payer, String recipient, TRANSACTION_TYPE type, String purpose) {
         this.date = date;
         this.amount = amount;
         this.payer = payer;
         this.recipient = recipient;
         this.type = type;
+        this.purpose = purpose;
     }
 
     public Date getDate() {
@@ -58,5 +60,13 @@ public class Transaction {
 
     public void setType(TRANSACTION_TYPE type) {
         this.type = type;
+    }
+
+    public String getPurpose() {
+        return purpose;
+    }
+
+    public void setPurpose(String purpose) {
+        this.purpose = purpose;
     }
 }

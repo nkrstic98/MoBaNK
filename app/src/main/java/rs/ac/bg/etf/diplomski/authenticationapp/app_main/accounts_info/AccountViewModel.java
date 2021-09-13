@@ -157,7 +157,8 @@ public class AccountViewModel extends ViewModel {
                         payer_amount,
                         payer,
                         receiver,
-                        TRANSACTION_TYPE.OUTFLOW
+                        TRANSACTION_TYPE.OUTFLOW,
+                        "Internal transaction"
                 )
         );
 
@@ -190,7 +191,8 @@ public class AccountViewModel extends ViewModel {
                                                             receiver_amount,
                                                             payer,
                                                             receiver,
-                                                            TRANSACTION_TYPE.INFLOW
+                                                            TRANSACTION_TYPE.INFLOW,
+                                                            "Internal transaction"
                                                     )
                                             );
 
@@ -218,7 +220,8 @@ public class AccountViewModel extends ViewModel {
                             receiver_amount,
                             payer,
                             receiver,
-                            TRANSACTION_TYPE.INFLOW
+                            TRANSACTION_TYPE.INFLOW,
+                            "Internal transaction"
                     )
             );
 
