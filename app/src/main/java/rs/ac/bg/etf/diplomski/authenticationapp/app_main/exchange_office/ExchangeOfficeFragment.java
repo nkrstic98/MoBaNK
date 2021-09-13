@@ -34,6 +34,7 @@ import rs.ac.bg.etf.diplomski.authenticationapp.app_main.accounts_info.AccountVi
 import rs.ac.bg.etf.diplomski.authenticationapp.databinding.FragmentExchangeOfficeBinding;
 import rs.ac.bg.etf.diplomski.authenticationapp.models.OPERATION;
 import rs.ac.bg.etf.diplomski.authenticationapp.modules.BiometricAuthenticator;
+import rs.ac.bg.etf.diplomski.authenticationapp.modules.NumberOperations;
 
 public class ExchangeOfficeFragment extends Fragment {
 
@@ -136,6 +137,12 @@ public class ExchangeOfficeFragment extends Fragment {
     }
 
     private void startTransaction() {
+        if(binding.amount.getText().toString().equals("")) {
+            Toast.makeText(mainActivity, "Please, enter amount to proceed with transaction!", Toast.LENGTH_SHORT).show();
+            binding.amountLabel.getEditText().requestFocus();
+            return;
+        }
+
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
 
         builder
@@ -163,7 +170,7 @@ public class ExchangeOfficeFragment extends Fragment {
                                 .putString(EXCHANGE_OFFICE_OPERATION, operation == EXCHANGE_OPERATION.BUY ? "buy" : "sell")
                                 .putString(EXCHANGE_OFFICE_PAYER, binding.firstCurrency.getSelectedItem().toString())
                                 .putString(EXCHANGE_OFFICE_RECEIVER, binding.secondCurrency.getSelectedItem().toString())
-                                .putFloat(EXCHANGE_OFFICE_AMOUNT, fetchNumber(binding.amountLabel).floatValue())
+                                .putFloat(EXCHANGE_OFFICE_AMOUNT, NumberOperations.fetchNumber(binding.amountLabel).floatValue())
                                 .apply();
 
                         dialog.dismiss();
@@ -193,7 +200,7 @@ public class ExchangeOfficeFragment extends Fragment {
     private void executeTransaction() {
         String payer = binding.firstCurrency.getSelectedItem().toString();
         String receiver = binding.secondCurrency.getSelectedItem().toString();
-        double amount = fetchNumber(binding.amountLabel).doubleValue();
+        double amount = NumberOperations.fetchNumber(binding.amountLabel).doubleValue();
 
         double transfer_amount = 0;
         if(operation == EXCHANGE_OPERATION.BUY) {
@@ -239,18 +246,5 @@ public class ExchangeOfficeFragment extends Fragment {
                 accountViewModel.getAccounts(operation == EXCHANGE_OPERATION.BUY ? EUR_CURRENCY : RSD_CURRENCY)
         );
         binding.secondCurrency.setAdapter(secondCurrency);
-    }
-
-    private Number fetchNumber(TextInputLayout textInputLayout) {
-        Number result = 0;
-        try {
-            result = NumberFormat.getInstance().parse(textInputLayout.getEditText().getText().toString());
-        }
-        catch (ParseException e) {
-            Toast.makeText(mainActivity, "Wrong value!", Toast.LENGTH_SHORT).show();
-            textInputLayout.getEditText().requestFocus();
-        }
-
-        return result;
     }
 }

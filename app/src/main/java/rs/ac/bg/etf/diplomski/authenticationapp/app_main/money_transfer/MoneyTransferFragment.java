@@ -22,10 +22,6 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Toast;
 
-import com.google.android.material.textfield.TextInputLayout;
-
-import java.text.NumberFormat;
-import java.text.ParseException;
 import java.util.List;
 
 import rs.ac.bg.etf.diplomski.authenticationapp.R;
@@ -34,6 +30,8 @@ import rs.ac.bg.etf.diplomski.authenticationapp.app_main.accounts_info.AccountVi
 import rs.ac.bg.etf.diplomski.authenticationapp.databinding.FragmentMoneyTransferBinding;
 import rs.ac.bg.etf.diplomski.authenticationapp.models.OPERATION;
 import rs.ac.bg.etf.diplomski.authenticationapp.modules.BiometricAuthenticator;
+
+import static rs.ac.bg.etf.diplomski.authenticationapp.modules.NumberOperations.fetchNumber;
 
 public class MoneyTransferFragment extends Fragment {
 
@@ -155,6 +153,20 @@ public class MoneyTransferFragment extends Fragment {
     }
 
     private void startTransaction() {
+        if(binding.recipientAccount1.getText().toString().equals("")
+                || binding.recipientAccount2.getText().toString().equals("")
+                || binding.recipientAccount3.getText().toString().equals("")
+        ) {
+            Toast.makeText(mainActivity, "Account number format is wrong!", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        if(binding.amount.getText().toString().equals("")) {
+            Toast.makeText(mainActivity, "Please, enter amount to proceed with transaction!", Toast.LENGTH_SHORT).show();
+            binding.amountLabel.getEditText().requestFocus();
+            return;
+        }
+
         if(binding.secondAccount.getSelectedItem().equals("Enter another account...")) {
             if(binding.firstAccount.getSelectedItem().equals(getFreeEnterAccount())) {
                 Toast.makeText(mainActivity, "Invalid transaction parameters!", Toast.LENGTH_SHORT).show();
@@ -295,18 +307,5 @@ public class MoneyTransferFragment extends Fragment {
                 .append(binding.recipientAccount3.getText().toString());
 
         return sb.toString();
-    }
-
-    private Number fetchNumber(TextInputLayout textInputLayout) {
-        Number result = 0;
-        try {
-            result = NumberFormat.getInstance().parse(textInputLayout.getEditText().getText().toString());
-        }
-        catch (ParseException e) {
-            Toast.makeText(mainActivity, "Wrong value!", Toast.LENGTH_SHORT).show();
-            textInputLayout.getEditText().requestFocus();
-        }
-
-        return result;
     }
 }
