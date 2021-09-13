@@ -38,6 +38,7 @@ import rs.ac.bg.etf.diplomski.authenticationapp.app_main.MainActivity;
 import rs.ac.bg.etf.diplomski.authenticationapp.app_main.accounts_info.AccountViewModel;
 import rs.ac.bg.etf.diplomski.authenticationapp.app_main.exchange_office.ExchangeOfficeFragment;
 import rs.ac.bg.etf.diplomski.authenticationapp.app_main.money_transfer.MoneyTransferFragment;
+import rs.ac.bg.etf.diplomski.authenticationapp.app_main.payments.PaymentsFragment;
 import rs.ac.bg.etf.diplomski.authenticationapp.app_main.user_management.UserViewModel;
 import rs.ac.bg.etf.diplomski.authenticationapp.app_second_factor_register.PinRegisterActivity;
 import rs.ac.bg.etf.diplomski.authenticationapp.app_second_factor_register.PinRegisterFragment;
@@ -48,6 +49,7 @@ import rs.ac.bg.etf.diplomski.authenticationapp.models.OPERATION;
 import static rs.ac.bg.etf.diplomski.authenticationapp.app_main.exchange_office.ExchangeOfficeFragment.PURCHASING_RATE;
 import static rs.ac.bg.etf.diplomski.authenticationapp.app_main.exchange_office.ExchangeOfficeFragment.SELLING_RATE;
 import static rs.ac.bg.etf.diplomski.authenticationapp.models.OPERATION.*;
+import static rs.ac.bg.etf.diplomski.authenticationapp.modules.NumberOperations.fetchNumber;
 
 public class KeyboardFragment extends Fragment {
 
@@ -322,9 +324,15 @@ public class KeyboardFragment extends Fragment {
 
             case EXCHANGE_OFFICE:
                 exchangeOffice();
+                break;
 
             case INTERNAL_TRANSFER:
                 internalTransfer();
+                break;
+
+            case EXTERNAL_PAYMENT:
+                externalPayment();
+                break;
 
             default:
                 break;
@@ -408,7 +416,17 @@ public class KeyboardFragment extends Fragment {
                 Toast.makeText(activity, "There is not enough funds on the payer account!", Toast.LENGTH_SHORT).show();
                 return;
             }
-            accountViewModel.executeInternalTransaction(payer, receiver, transfer_amount, amount);
+
+            accountViewModel.executeTransaction(
+                    payer,
+                    "",
+                    receiver,
+                    "",
+                    "EUR buy to account " + receiver,
+                    "EUR buy from account " + payer,
+                    transfer_amount,
+                    amount
+            );
         }
         else {
             transfer_amount = amount * PURCHASING_RATE;
@@ -416,7 +434,17 @@ public class KeyboardFragment extends Fragment {
                 Toast.makeText(activity, "There is not enough funds on the payer account!", Toast.LENGTH_SHORT).show();
                 return;
             }
-            accountViewModel.executeInternalTransaction(payer, receiver, amount, transfer_amount);
+
+            accountViewModel.executeTransaction(
+                    payer,
+                    "",
+                    receiver,
+                    "",
+                    "EUR sell to account " + receiver,
+                    "EUR sell from account " + payer,
+                    amount,
+                    transfer_amount
+            );
         }
 
         sp.edit().clear().apply();
@@ -430,7 +458,7 @@ public class KeyboardFragment extends Fragment {
         double amount = sp.getFloat(MoneyTransferFragment.TRANSFER_AMOUNT, 0);
 
         if(!accountViewModel.hasEnoughFunds(payer, amount)) {
-            Toast.makeText(activity, "There is not enough funds on the payer account!", Toast.LENGTH_SHORT).show();
+//            Toast.makeText(activity, "There is not enough funds on the payer account!", Toast.LENGTH_SHORT).show();
             return;
         }
 
@@ -439,6 +467,47 @@ public class KeyboardFragment extends Fragment {
             return;
         }
 
-        accountViewModel.executeInternalTransaction(payer, receiver, amount, amount);
+        accountViewModel.executeTransaction(
+                payer,
+                "",
+                receiver,
+                "",
+                "Internal transfer: " + receiver,
+                "Internal transfer: " + payer,
+                amount,
+                amount
+        );
+    }
+
+    private void externalPayment() {
+        SharedPreferences sp = activity.getSharedPreferences(PaymentsFragment.SHARED_PREFERENCES_PAYMENT, Context.MODE_PRIVATE);
+
+        String payerAccount = sp.getString(PaymentsFragment.PAYER_ACCOUNT, "");
+        String payerInfo = sp.getString(PaymentsFragment.PAYER_INFO, "");
+        String recipientInfo = sp.getString(PaymentsFragment.RECEIVER_INFO, "");
+        String purpose = sp.getString(PaymentsFragment.PURPOSE, "");
+        String recipientAccount = sp.getString(PaymentsFragment.PAYER_ACCOUNT, "");
+        double amount = sp.getFloat(PaymentsFragment.AMOUNT, 0);
+
+        if(!accountViewModel.hasEnoughFunds(payerAccount, amount)) {
+            Toast.makeText(activity, "There is not enough funds on the payer account!", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        if(!payerAccount.substring(17, 19).equals(recipientAccount.substring(17, 19))) {
+            Toast.makeText(activity, "Chosen account are not of same type! Enter valid accounts.", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        accountViewModel.executeTransaction(
+                payerAccount,
+                payerInfo,
+                recipientAccount,
+                recipientInfo,
+                purpose,
+                purpose,
+                amount,
+                amount
+        );
     }
 }

@@ -153,10 +153,11 @@ public class MoneyTransferFragment extends Fragment {
     }
 
     private void startTransaction() {
-        if(binding.recipientAccount1.getText().toString().equals("")
-                || binding.recipientAccount2.getText().toString().equals("")
-                || binding.recipientAccount3.getText().toString().equals("")
-        ) {
+        if(binding.secondAccount.getSelectedItem().toString().equals("Enter another account...") &&
+                (binding.recipientAccount1.getText().toString().length() != 3
+                        || binding.recipientAccount2.getText().toString().length() != 13
+                        || binding.recipientAccount3.getText().toString().length() != 2
+                )) {
             Toast.makeText(mainActivity, "Account number format is wrong!", Toast.LENGTH_SHORT).show();
             return;
         }
@@ -215,7 +216,7 @@ public class MoneyTransferFragment extends Fragment {
                         dialog.dismiss();
                         navController.navigate(MoneyTransferFragmentDirections.actionGlobalKeyboardFragmentMain(OPERATION.INTERNAL_TRANSFER, ""));
 
-                        setupInitialState();
+//                        setupInitialState();
                     }
 
                     @RequiresApi(api = Build.VERSION_CODES.N)
@@ -224,7 +225,7 @@ public class MoneyTransferFragment extends Fragment {
                         dialog.dismiss();
                         executeTransaction();
 
-                        setupInitialState();
+//                        setupInitialState();
                     }
                 }).authenticate();
             });
@@ -245,14 +246,6 @@ public class MoneyTransferFragment extends Fragment {
         }
         double amount = fetchNumber(binding.amountLabel).doubleValue();
 
-        if(binding.recipientAccount1.getText().toString().length() != 3
-                || binding.recipientAccount2.getText().toString().length() != 12
-                || binding.recipientAccount3.getText().toString().length() != 2
-        ) {
-            Toast.makeText(mainActivity, "Account number format is wrong!", Toast.LENGTH_SHORT).show();
-            return;
-        }
-
         if(!accountViewModel.hasEnoughFunds(payer, amount)) {
             Toast.makeText(mainActivity, "There is not enough funds on the payer account!", Toast.LENGTH_SHORT).show();
             return;
@@ -263,7 +256,16 @@ public class MoneyTransferFragment extends Fragment {
             return;
         }
 
-        accountViewModel.executeInternalTransaction(payer, receiver, amount, amount);
+        accountViewModel.executeTransaction(
+                payer,
+                "",
+                receiver,
+                "",
+                "Internal transfer: " + receiver,
+                "Internal transfer: " + payer,
+                amount,
+                amount
+        );
     }
 
     @Override

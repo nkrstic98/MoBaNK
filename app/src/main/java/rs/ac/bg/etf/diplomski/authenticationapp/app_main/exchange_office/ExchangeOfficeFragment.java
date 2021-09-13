@@ -203,13 +203,23 @@ public class ExchangeOfficeFragment extends Fragment {
         double amount = NumberOperations.fetchNumber(binding.amountLabel).doubleValue();
 
         double transfer_amount = 0;
+
         if(operation == EXCHANGE_OPERATION.BUY) {
             transfer_amount = amount * SELLING_RATE;
             if(!accountViewModel.hasEnoughFunds(payer, transfer_amount)) {
                 Toast.makeText(mainActivity, "There is not enough funds on the payer account!", Toast.LENGTH_SHORT).show();
                 return;
             }
-            accountViewModel.executeInternalTransaction(payer, receiver, transfer_amount, amount);
+            accountViewModel.executeTransaction(
+                    payer,
+                    "",
+                    receiver,
+                    "",
+                    "EUR buy to account " + receiver,
+                    "EUR buy from account " + payer,
+                    transfer_amount,
+                    amount
+            );
         }
         else {
             transfer_amount = amount * PURCHASING_RATE;
@@ -217,7 +227,16 @@ public class ExchangeOfficeFragment extends Fragment {
                 Toast.makeText(mainActivity, "There is not enough funds on the payer account!", Toast.LENGTH_SHORT).show();
                 return;
             }
-            accountViewModel.executeInternalTransaction(payer, receiver, amount, transfer_amount);
+            accountViewModel.executeTransaction(
+                    payer,
+                    "",
+                    receiver,
+                    "",
+                    "EUR sell to account " + receiver,
+                    "EUR sell from account " + payer,
+                    amount,
+                    transfer_amount
+            );
         }
     }
 
