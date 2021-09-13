@@ -123,6 +123,16 @@ public class AccountViewModel extends ViewModel {
         return null;
     }
 
+    public Account getAccountFromId(String id) {
+        for(int i = 0; i < accountIds.size(); i++) {
+            if(accountIds.get(i).equals(id)) {
+                return accounts.get(i);
+            }
+        }
+
+        return null;
+    }
+
     public String getAccountId(int index) {
         return accountIds.get(index);
     }

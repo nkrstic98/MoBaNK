@@ -38,13 +38,12 @@ public class AccountDetailsFragment extends Fragment {
         binding = FragmentAccountDetailsBinding.inflate(inflater, container, false);
 
         String accId = AccountDetailsFragmentArgs.fromBundle(getArguments()).getAccountId();
-        Account account = accountViewModel.getAccount(accId);
+        Account account = accountViewModel.getAccountFromId(accId);
 
         binding.number.setText(account.getNumber());
         binding.type.setText(account.getCurrency().equals("RSD") ? "Basic" : "Foreign Exchange");
-        binding.balance.setText(account.getBalance() + "  " + account.getCurrency());
+        binding.balance.setText((account.getBalance() % 1 == 0) ? ((int)account.getBalance() + ".00") : (String.format("%.2f", account.getBalance())) + "  " + account.getCurrency());
         binding.status.setText(account.getStatus() ? "ACTIVE" : "NOT ACTIVE");
-
 
         return binding.getRoot();
     }
