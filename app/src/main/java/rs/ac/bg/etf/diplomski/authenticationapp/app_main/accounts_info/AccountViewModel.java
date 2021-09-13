@@ -148,11 +148,6 @@ public class AccountViewModel extends ViewModel {
     }
 
     public void executeInternalTransaction(String payer, String receiver, double payer_amount, double receiver_amount) {
-        if(!payer.substring(17, 19).equals(receiver.substring(17, 19))) {
-            Toast.makeText(mainActivity, "Chosen account are not of same type! Enter valid accounts.", Toast.LENGTH_SHORT).show();
-            return;
-        }
-
         Date transactionTime = new Date();
 
         Account payerA = getAccount(payer);

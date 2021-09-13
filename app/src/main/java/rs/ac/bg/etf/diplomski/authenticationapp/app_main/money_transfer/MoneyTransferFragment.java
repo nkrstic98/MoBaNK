@@ -15,8 +15,6 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -50,7 +48,7 @@ public class MoneyTransferFragment extends Fragment {
 
     private FragmentMoneyTransferBinding binding;
 
-    private boolean first_dash = false, second_dash = false;
+//    private boolean first_dash = false, second_dash = false;
 
     public MoneyTransferFragment() {
         // Required empty public constructor
@@ -97,10 +95,10 @@ public class MoneyTransferFragment extends Fragment {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 if(position == binding.secondAccount.getAdapter().getCount() - 1) {
-                    binding.freeEnterAccountLabel.setVisibility(View.VISIBLE);
+                    binding.freeAccountLayout.setVisibility(View.VISIBLE);
                 }
                 else {
-                    binding.freeEnterAccountLabel.setVisibility(View.GONE);
+                    binding.freeAccountLayout.setVisibility(View.GONE);
                 }
             }
 
@@ -110,9 +108,20 @@ public class MoneyTransferFragment extends Fragment {
             }
         });
 
-        binding.freeEnterAccount.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+//        binding.freeEnterAccount.addTextChangedListener(new TextWatcher() {
+//            @Override
+//            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+////                if(s.length() < 3) {
+////                    first_dash = false;
+////                }
+////
+////                if(s.length() < 16) {
+////                    second_dash = false;
+////                }
+//            }
+//
+//            @Override
+//            public void onTextChanged(CharSequence s, int start, int before, int count) {
 //                if(s.length() < 3) {
 //                    first_dash = false;
 //                }
@@ -120,34 +129,23 @@ public class MoneyTransferFragment extends Fragment {
 //                if(s.length() < 16) {
 //                    second_dash = false;
 //                }
-            }
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-                if(s.length() < 3) {
-                    first_dash = false;
-                }
-
-                if(s.length() < 16) {
-                    second_dash = false;
-                }
-            }
-
-            @Override
-            public void afterTextChanged(Editable s) {
-                if(s.toString().length() == 3 && !first_dash) {
-                    binding.freeEnterAccount.setText(s.toString() + "-");
-                    binding.freeEnterAccount.setSelection(s.length() + 1);
-                    first_dash = true;
-                }
-
-                if(s.toString().length() == 16 && !second_dash) {
-                    binding.freeEnterAccount.setText(s.toString() + "-");
-                    binding.freeEnterAccount.setSelection(s.length() + 1);
-                    second_dash = true;
-                }
-            }
-        });
+//            }
+//
+//            @Override
+//            public void afterTextChanged(Editable s) {
+//                if(s.toString().length() == 3 && !first_dash) {
+//                    binding.freeEnterAccount.setText(s.toString() + "-");
+//                    binding.freeEnterAccount.setSelection(s.length() + 1);
+//                    first_dash = true;
+//                }
+//
+//                if(s.toString().length() == 16 && !second_dash) {
+//                    binding.freeEnterAccount.setText(s.toString() + "-");
+//                    binding.freeEnterAccount.setSelection(s.length() + 1);
+//                    second_dash = true;
+//                }
+//            }
+//        });
 
         binding.buttonTransfer.setOnClickListener(v -> {
             startTransaction();
@@ -158,7 +156,7 @@ public class MoneyTransferFragment extends Fragment {
 
     private void startTransaction() {
         if(binding.secondAccount.getSelectedItem().equals("Enter another account...")) {
-            if(binding.firstAccount.getSelectedItem().equals(binding.freeEnterAccount.getText().toString())) {
+            if(binding.firstAccount.getSelectedItem().equals(getFreeEnterAccount())) {
                 Toast.makeText(mainActivity, "Invalid transaction parameters!", Toast.LENGTH_SHORT).show();
             }
         }
@@ -193,9 +191,11 @@ public class MoneyTransferFragment extends Fragment {
                                         TRANSFER_RECEIVER,
                                         binding.secondAccount.getSelectedItem().equals("Enter another account...")
                                                 ?
-                                                binding.secondAccount.getSelectedItem().toString()
+                                                getFreeEnterAccount()
                                                 :
-                                                binding.freeEnterAccount.getText().toString()
+//                                                binding.freeEnterAccount.getText().toString()
+                                                binding.secondAccount.getSelectedItem().toString()
+
                                 )
                                 .putFloat(TRANSFER_AMOUNT, fetchNumber(binding.amountLabel).floatValue())
                                 .apply();
@@ -228,12 +228,26 @@ public class MoneyTransferFragment extends Fragment {
             receiver = binding.secondAccount.getSelectedItem().toString();
         }
         else {
-            receiver = binding.freeEnterAccount.getText().toString();
+//            receiver = binding.freeEnterAccount.getText().toString();
+            receiver = getFreeEnterAccount();
         }
         double amount = fetchNumber(binding.amountLabel).doubleValue();
 
+        if(binding.recipientAccount1.getText().toString().length() != 3
+                || binding.recipientAccount2.getText().toString().length() != 12
+                || binding.recipientAccount3.getText().toString().length() != 2
+        ) {
+            Toast.makeText(mainActivity, "Account number format is wrong!", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
         if(!accountViewModel.hasEnoughFunds(payer, amount)) {
             Toast.makeText(mainActivity, "There is not enough funds on the payer account!", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        if(!payer.substring(17, 19).equals(receiver.substring(17, 19))) {
+            Toast.makeText(mainActivity, "Chosen account are not of same type! Enter valid accounts.", Toast.LENGTH_SHORT).show();
             return;
         }
 
@@ -251,7 +265,8 @@ public class MoneyTransferFragment extends Fragment {
         binding.amount.setText("");
         binding.amountLabel.clearFocus();
 
-        binding.freeEnterAccountLabel.setVisibility(View.GONE);
+//        binding.freeEnterAccountLabel.setVisibility(View.GONE);
+        binding.freeAccountLayout.setVisibility(View.GONE);
 
         ArrayAdapter<String> from = new ArrayAdapter<>(
                 mainActivity,
@@ -268,6 +283,18 @@ public class MoneyTransferFragment extends Fragment {
                 list
         );
         binding.secondAccount.setAdapter(to);
+    }
+
+    private String getFreeEnterAccount() {
+        StringBuilder sb = new StringBuilder();
+        sb
+                .append(binding.recipientAccount1.getText().toString())
+                .append("-")
+                .append(binding.recipientAccount2.getText().toString())
+                .append("-")
+                .append(binding.recipientAccount3.getText().toString());
+
+        return sb.toString();
     }
 
     private Number fetchNumber(TextInputLayout textInputLayout) {

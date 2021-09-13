@@ -434,6 +434,11 @@ public class KeyboardFragment extends Fragment {
             return;
         }
 
+        if(!payer.substring(17, 19).equals(receiver.substring(17, 19))) {
+            Toast.makeText(activity, "Chosen account are not of same type! Enter valid accounts.", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
         accountViewModel.executeInternalTransaction(payer, receiver, amount, amount);
     }
 }
