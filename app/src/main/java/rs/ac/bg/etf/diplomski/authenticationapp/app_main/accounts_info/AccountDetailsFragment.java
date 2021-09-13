@@ -9,10 +9,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import rs.ac.bg.etf.diplomski.authenticationapp.R;
 import rs.ac.bg.etf.diplomski.authenticationapp.app_main.MainActivity;
 import rs.ac.bg.etf.diplomski.authenticationapp.databinding.FragmentAccountDetailsBinding;
 import rs.ac.bg.etf.diplomski.authenticationapp.models.Account;
+import rs.ac.bg.etf.diplomski.authenticationapp.view_models.AccountViewModel;
 
 public class AccountDetailsFragment extends Fragment {
 

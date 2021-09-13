@@ -25,7 +25,7 @@ import java.util.concurrent.ExecutorService;
 
 import rs.ac.bg.etf.diplomski.authenticationapp.R;
 import rs.ac.bg.etf.diplomski.authenticationapp.app_main.MainActivity;
-import rs.ac.bg.etf.diplomski.authenticationapp.app_main.accounts_info.AccountViewModel;
+import rs.ac.bg.etf.diplomski.authenticationapp.view_models.AccountViewModel;
 import rs.ac.bg.etf.diplomski.authenticationapp.databinding.FragmentPaymentsBinding;
 import rs.ac.bg.etf.diplomski.authenticationapp.di.ExecutorServiceModule;
 import rs.ac.bg.etf.diplomski.authenticationapp.models.OPERATION;

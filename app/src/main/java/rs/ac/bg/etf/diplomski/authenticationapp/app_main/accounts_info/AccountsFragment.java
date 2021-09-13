@@ -19,6 +19,7 @@ import android.view.ViewGroup;
 import rs.ac.bg.etf.diplomski.authenticationapp.app_main.MainActivity;
 import rs.ac.bg.etf.diplomski.authenticationapp.databinding.FragmentAccountsBinding;
 import rs.ac.bg.etf.diplomski.authenticationapp.modules.BiometricAuthenticator;
+import rs.ac.bg.etf.diplomski.authenticationapp.view_models.AccountViewModel;
 
 public class AccountsFragment extends Fragment {
 

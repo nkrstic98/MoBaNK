@@ -1,4 +1,4 @@
-package rs.ac.bg.etf.diplomski.authenticationapp.app_main.accounts_info;
+package rs.ac.bg.etf.diplomski.authenticationapp.view_models;
 
 import android.app.AlertDialog;
 import android.os.Build;
@@ -26,6 +26,7 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import rs.ac.bg.etf.diplomski.authenticationapp.R;
 import rs.ac.bg.etf.diplomski.authenticationapp.app_main.MainActivity;
+import rs.ac.bg.etf.diplomski.authenticationapp.app_main.accounts_info.AccountAdapter;
 import rs.ac.bg.etf.diplomski.authenticationapp.app_main.transactions.TransactionAdapter;
 import rs.ac.bg.etf.diplomski.authenticationapp.di.ExecutorServiceModule;
 import rs.ac.bg.etf.diplomski.authenticationapp.models.Account;

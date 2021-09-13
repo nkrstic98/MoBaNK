@@ -35,6 +35,7 @@ import rs.ac.bg.etf.diplomski.authenticationapp.databinding.FragmentUserSettings
 import rs.ac.bg.etf.diplomski.authenticationapp.models.OPERATION;
 import rs.ac.bg.etf.diplomski.authenticationapp.modules.BiometricAuthenticator;
 import rs.ac.bg.etf.diplomski.authenticationapp.modules.KeyboardFragmentDirections;
+import rs.ac.bg.etf.diplomski.authenticationapp.view_models.UserViewModel;
 
 @ViewModelScoped
 public class UserSettingsFragment extends Fragment {

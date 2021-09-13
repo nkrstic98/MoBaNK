@@ -23,14 +23,9 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Toast;
 
-import com.google.android.material.textfield.TextInputLayout;
-
-import java.text.NumberFormat;
-import java.text.ParseException;
-
 import rs.ac.bg.etf.diplomski.authenticationapp.R;
 import rs.ac.bg.etf.diplomski.authenticationapp.app_main.MainActivity;
-import rs.ac.bg.etf.diplomski.authenticationapp.app_main.accounts_info.AccountViewModel;
+import rs.ac.bg.etf.diplomski.authenticationapp.view_models.AccountViewModel;
 import rs.ac.bg.etf.diplomski.authenticationapp.databinding.FragmentExchangeOfficeBinding;
 import rs.ac.bg.etf.diplomski.authenticationapp.models.OPERATION;
 import rs.ac.bg.etf.diplomski.authenticationapp.modules.BiometricAuthenticator;

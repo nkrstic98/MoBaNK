@@ -10,7 +10,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import rs.ac.bg.etf.diplomski.authenticationapp.app_main.MainActivity;
-import rs.ac.bg.etf.diplomski.authenticationapp.app_main.accounts_info.AccountViewModel;
+import rs.ac.bg.etf.diplomski.authenticationapp.view_models.AccountViewModel;
 import rs.ac.bg.etf.diplomski.authenticationapp.databinding.FragmentTransactionsBinding;
 
 public class TransactionsFragment extends Fragment {

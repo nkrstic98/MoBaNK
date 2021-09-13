@@ -1,4 +1,4 @@
-package rs.ac.bg.etf.diplomski.authenticationapp.app_main.user_management;
+package rs.ac.bg.etf.diplomski.authenticationapp.view_models;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -17,6 +17,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import java.util.List;
 
 import rs.ac.bg.etf.diplomski.authenticationapp.app_main.MainActivity;
+import rs.ac.bg.etf.diplomski.authenticationapp.app_main.user_management.UserSettingsFragment;
 import rs.ac.bg.etf.diplomski.authenticationapp.models.OPERATION;
 import rs.ac.bg.etf.diplomski.authenticationapp.models.User;
 import rs.ac.bg.etf.diplomski.authenticationapp.modules.BiometricAuthenticator;
