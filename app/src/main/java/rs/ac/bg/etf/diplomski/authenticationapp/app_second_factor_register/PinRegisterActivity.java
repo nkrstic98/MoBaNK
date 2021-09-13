@@ -4,6 +4,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.WindowManager;
 
 import com.google.firebase.auth.FirebaseAuth;
 
@@ -22,6 +23,7 @@ public class PinRegisterActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
 
         binding = ActivityPinRegisterBinding.inflate(getLayoutInflater());
+        getWindow().setFlags(WindowManager.LayoutParams.FLAG_SECURE, WindowManager.LayoutParams.FLAG_SECURE);
         should_logout = getIntent().getBooleanExtra(REGISTRATION_INVOKED, true);
 
         setContentView(binding.getRoot());

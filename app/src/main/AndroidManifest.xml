@@ -13,9 +13,9 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.AuthenticationApp">
-        <activity android:name=".app_second_factor_register.PinRegisterActivity" android:theme="@style/Theme.AuthenticationApp.Option2"></activity>
-        <activity android:name=".app_login.LoginActivity"  android:theme="@style/Theme.AuthenticationApp.Option2"/>
-        <activity android:name=".app_user_register.RegisterActivity" android:theme="@style/Theme.AuthenticationApp.Option2">
+        <activity android:name=".app_second_factor_register.PinRegisterActivity" android:theme="@style/Theme.AuthenticationApp.Option2" android:screenOrientation="portrait"></activity>
+        <activity android:name=".app_login.LoginActivity" android:theme="@style/Theme.AuthenticationApp.Option2" android:screenOrientation="portrait"/>
+        <activity android:name=".app_user_register.RegisterActivity" android:theme="@style/Theme.AuthenticationApp.Option2" android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
