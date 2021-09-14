@@ -107,7 +107,7 @@ public class AccountViewModel extends ViewModel {
                         for(DocumentSnapshot documentSnapshot : value) {
                             Account account = documentSnapshot.toObject(Account.class);
                             if(documentSnapshot.getId().equals(accountId)) {
-                                transactionAdapter.setTransactions(account.getTransactions());
+                                transactionAdapter.setTransactions(account.getTransactions() != null ? account.getTransactions() : new ArrayList<>());
                             }
                         }
                     }
