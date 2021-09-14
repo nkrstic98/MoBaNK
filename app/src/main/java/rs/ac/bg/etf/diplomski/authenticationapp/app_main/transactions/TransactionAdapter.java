@@ -68,6 +68,7 @@ public class TransactionAdapter extends RecyclerView.Adapter<TransactionAdapter.
             if(t.getType() == TRANSACTION_TYPE.INFLOW) {
                 binding.amount.setText("+ " + ((t.getAmount() % 1 == 0) ? ((int)t.getAmount() + ".00") : t.getAmount()));
                 binding.executor.setText("Payer: " + t.getPayer());
+                binding.purpose.setText(t.getPurpose());
                 binding.card.setCardBackgroundColor(resources.getColor(R.color.color_inflow));
             }
             else {
