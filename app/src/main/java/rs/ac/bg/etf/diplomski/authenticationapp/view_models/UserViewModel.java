@@ -2,6 +2,7 @@ package rs.ac.bg.etf.diplomski.authenticationapp.view_models;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.net.Uri;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -10,6 +11,7 @@ import androidx.lifecycle.ViewModel;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.auth.UserProfileChangeRequest;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -74,6 +76,21 @@ public class UserViewModel extends ViewModel {
 
     public String getPhone() {
         return user.getValue().getPhone();
+    }
+
+    public void updateProfile(Uri uri) {
+        UserProfileChangeRequest request = new UserProfileChangeRequest.Builder()
+                .setDisplayName(firebaseUser.getDisplayName())
+                .setPhotoUri(uri)
+                .build();
+
+        firebaseUser.updateProfile(request)
+                .addOnSuccessListener(mainActivity, aVoid -> {
+//                    binding.imageProfile.setImageURI(uri);
+                })
+                .addOnFailureListener(mainActivity, e -> {
+                    Toast.makeText(mainActivity, e.getMessage(), Toast.LENGTH_SHORT).show();
+                });
     }
 
     public void updateEmail(String data, UserSettingsFragment.OperationCallback callback) {

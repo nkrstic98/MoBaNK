@@ -1,14 +1,22 @@
 package rs.ac.bg.etf.diplomski.authenticationapp.app_main.user_management;
 
+import android.Manifest;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
+import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
+import android.net.Uri;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
+import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.MutableLiveData;
@@ -16,14 +24,20 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 
+import android.provider.MediaStore;
 import android.transition.AutoTransition;
 import android.transition.TransitionManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
+import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.auth.UserProfileChangeRequest;
+
+import java.io.ByteArrayOutputStream;
 
 import dagger.hilt.android.scopes.ViewModelScoped;
 import rs.ac.bg.etf.diplomski.authenticationapp.R;
@@ -37,8 +51,15 @@ import rs.ac.bg.etf.diplomski.authenticationapp.modules.BiometricAuthenticator;
 import rs.ac.bg.etf.diplomski.authenticationapp.modules.KeyboardFragmentDirections;
 import rs.ac.bg.etf.diplomski.authenticationapp.view_models.UserViewModel;
 
+import static android.app.Activity.RESULT_CANCELED;
+import static android.app.Activity.RESULT_OK;
+
 @ViewModelScoped
 public class UserSettingsFragment extends Fragment {
+
+    private static final int REQUEST_CODE_PERMISSIONS = 10;
+    public static final int CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE = 1034;
+    private static final String[] REQUIRED_PERMISSIONS = { Manifest.permission.CAMERA, Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE };
 
     private MainActivity mainActivity;
     private UserViewModel userViewModel;
@@ -73,6 +94,9 @@ public class UserSettingsFragment extends Fragment {
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         binding.user.setText(user.getDisplayName());
         binding.email.setText(user.getEmail());
+        if(user.getPhotoUrl() != null) {
+            binding.imageProfile.setImageURI(user.getPhotoUrl());
+        }
 
         userViewModel.setData(mainActivity, (op, data, dialog) -> {
             binding.phone.setText(userViewModel.getPhone());
@@ -146,6 +170,20 @@ public class UserSettingsFragment extends Fragment {
             });
 
             dialog.show();
+        });
+
+        binding.imageProfile.setOnClickListener(v -> {
+            if(!allPermissionsGranted()) {
+                ActivityCompat.requestPermissions(
+                        mainActivity, REQUIRED_PERMISSIONS, REQUEST_CODE_PERMISSIONS
+                );
+                if(allPermissionsGranted()) {
+                    selectImage(mainActivity);
+                }
+            }
+            else {
+                selectImage(mainActivity);
+            }
         });
 
         return binding.getRoot();
@@ -247,4 +285,81 @@ public class UserSettingsFragment extends Fragment {
             mainActivity.finish();
         });
     }
+
+    private void selectImage(Context context) {
+        final CharSequence[] options = {"Take Photo", "Choose from Gallery", "Cancel"};
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+        builder.setTitle("Choose your profile picture");
+
+        builder.setItems(options, new DialogInterface.OnClickListener() {
+
+            @Override
+            public void onClick(DialogInterface dialog, int item) {
+
+                if (options[item].equals("Take Photo")) {
+                    SharedPreferences sp = mainActivity.getSharedPreferences(MainActivity.SP_PROFILE_IMAGE, Context.MODE_PRIVATE);
+                    sp.edit().putBoolean(MainActivity.IMAGE_DATA, true).apply();
+                    Intent takePicture = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
+                    startActivityForResult(takePicture, 0);
+
+                } else if (options[item].equals("Choose from Gallery")) {
+                    SharedPreferences sp = mainActivity.getSharedPreferences(MainActivity.SP_PROFILE_IMAGE, Context.MODE_PRIVATE);
+                    sp.edit().putBoolean(MainActivity.IMAGE_DATA, true).apply();
+                    Intent pickPhoto = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+                    startActivityForResult(pickPhoto, 1);//one can be replaced with any action code
+
+                } else if (options[item].equals("Cancel")) {
+                    dialog.dismiss();
+                }
+            }
+        });
+        builder.show();
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        if (resultCode != RESULT_CANCELED) {
+            Uri imageUri = null;
+            switch (requestCode) {
+                case 0:
+                    if (resultCode == RESULT_OK && data != null) {
+                        Bitmap selectedImage = (Bitmap) data.getExtras().get("data");
+                        imageUri = getImageUri(mainActivity, selectedImage);
+                    }
+
+                    break;
+                case 1:
+                    if (resultCode == RESULT_OK && data != null) {
+                        imageUri = data.getData();
+                    }
+                    break;
+            }
+
+            if(imageUri != null) {
+                binding.imageProfile.setImageURI(imageUri);
+                userViewModel.updateProfile(imageUri);
+                ImageView imageView = (ImageView) mainActivity.findViewById(R.id.imageProfile_header);
+                imageView.setImageURI(imageUri);
+            }
+        }
+    }
+
+    private boolean allPermissionsGranted() {
+        for(int i = 0; i < REQUIRED_PERMISSIONS.length; i++) {
+            if(ContextCompat.checkSelfPermission(mainActivity, REQUIRED_PERMISSIONS[i]) != PackageManager.PERMISSION_GRANTED) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    private Uri getImageUri(Context inContext, Bitmap inImage) {
+        ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+        inImage.compress(Bitmap.CompressFormat.JPEG, 100, bytes);
+        String path = MediaStore.Images.Media.insertImage(inContext.getContentResolver(), inImage, "Title", null);
+        return Uri.parse(path);
+    }
+
 }

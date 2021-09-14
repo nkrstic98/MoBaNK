@@ -8,6 +8,7 @@ import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.View;
 import android.view.WindowManager;
@@ -27,6 +28,9 @@ import rs.ac.bg.etf.diplomski.authenticationapp.databinding.ActivityMainBinding;
 public class MainActivity extends AppCompatActivity {
 
     public static final String REGISTRATION_COMPLETED = "registration-completed";
+
+    public static final String SP_PROFILE_IMAGE = "sp-profile-image";
+    public static final String IMAGE_DATA = "image-data";
 
     private ActivityMainBinding binding;
     private AppBarConfiguration appBarConfiguration;
@@ -110,6 +114,12 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void logout() {
+        SharedPreferences sp = getSharedPreferences(SP_PROFILE_IMAGE, MODE_PRIVATE);
+        if(sp.getBoolean(IMAGE_DATA, false)) {
+            sp.edit().clear().apply();
+            return;
+        }
+
         if(!finish_registration) {
             FirebaseAuth.getInstance().signOut();
         }
@@ -124,6 +134,8 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void setUserData() {
+        SharedPreferences sharedPreferences = getSharedPreferences(BiometricAuthenticator.SHARED_PREFERENCES_ACCOUNT, MODE_PRIVATE);
+
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
 
         View headerView = binding.navView.getHeaderView(0);
@@ -132,7 +144,8 @@ public class MainActivity extends AppCompatActivity {
         name.setText(user.getDisplayName());
         TextView email = (TextView) headerView.findViewById(R.id.user_email);
         email.setText(user.getEmail());
-        ImageView profile = (ImageView) headerView.findViewById(R.id.imageProfile);
+        ImageView profile = (ImageView) headerView.findViewById(R.id.imageProfile_header);
+
         if(user.getPhotoUrl() != null) {
             profile.setImageURI(user.getPhotoUrl());
         }
