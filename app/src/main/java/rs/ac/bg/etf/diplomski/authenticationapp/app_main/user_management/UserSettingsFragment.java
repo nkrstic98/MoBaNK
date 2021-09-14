@@ -341,6 +341,8 @@ public class UserSettingsFragment extends Fragment {
                 userViewModel.updateProfile(imageUri);
                 ImageView imageView = (ImageView) mainActivity.findViewById(R.id.imageProfile_header);
                 imageView.setImageURI(imageUri);
+
+                sharedPreferences.edit().putString(BiometricAuthenticator.SHARED_PREFERENCES_USER_PHOTO, imageUri.toString()).apply();
             }
         }
     }
@@ -361,5 +363,4 @@ public class UserSettingsFragment extends Fragment {
         String path = MediaStore.Images.Media.insertImage(inContext.getContentResolver(), inImage, "Title", null);
         return Uri.parse(path);
     }
-
 }

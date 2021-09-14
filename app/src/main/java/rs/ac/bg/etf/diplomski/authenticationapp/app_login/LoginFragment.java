@@ -3,6 +3,7 @@ package rs.ac.bg.etf.diplomski.authenticationapp.app_login;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.Uri;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -52,6 +53,18 @@ public class LoginFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         binding = FragmentLoginBinding.inflate(inflater, container, false);
+
+        Uri uri = null;
+        if(sharedPreferences.getString(BiometricAuthenticator.SHARED_PREFERENCES_USER_PHOTO, "").equals("")) {
+            uri = null;
+        }
+        else {
+            uri = Uri.parse(sharedPreferences.getString(BiometricAuthenticator.SHARED_PREFERENCES_USER_PHOTO, ""));
+
+        }
+        if(uri != null) {
+            binding.imageProfileLogin.setImageURI(uri);
+        }
 
         binding.welcomeMessage.setText("Welcome, " + sharedPreferences.getString(BiometricAuthenticator.SHARED_PREFERENCES_USER_INFO, ""));
 
