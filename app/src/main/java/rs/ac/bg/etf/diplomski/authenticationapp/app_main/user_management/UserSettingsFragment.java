@@ -111,6 +111,11 @@ public class UserSettingsFragment extends Fragment {
                         ContextCompat.getDrawable(mainActivity, R.drawable.outline_keyboard_arrow_down_24)
         );
 
+        if(sharedPreferences.getBoolean(BiometricAuthenticator.TAKE_PHOTO_APPROVED, false)) {
+            selectImage();
+            sharedPreferences.edit().remove(BiometricAuthenticator.TAKE_PHOTO_APPROVED).apply();
+        }
+
         binding.buttonMoreOptions.setOnClickListener(v -> {
             moreOptions.setValue(!moreOptions.getValue());
 
@@ -178,11 +183,11 @@ public class UserSettingsFragment extends Fragment {
                         mainActivity, REQUIRED_PERMISSIONS, REQUEST_CODE_PERMISSIONS
                 );
                 if(allPermissionsGranted()) {
-                    selectImage(mainActivity);
+                    uploadPhoto();
                 }
             }
             else {
-                selectImage(mainActivity);
+                uploadPhoto();
             }
         });
 
@@ -286,32 +291,49 @@ public class UserSettingsFragment extends Fragment {
         });
     }
 
-    private void selectImage(Context context) {
+    //------------------------------------------
+    //USER PROFILE PICTURE UPLOAD
+    //------------------------------------------
+    private void uploadPhoto() {
+        if(use_biometry.getValue()) {
+            new BiometricAuthenticator(mainActivity, new BiometricAuthenticator.Callback() {
+                @Override
+                public void failure() {
+                    navController.navigate(KeyboardFragmentDirections.actionGlobalKeyboardFragmentMain(OPERATION.SET_PROFILE_PICTURE, ""));
+                }
+
+                @Override
+                public void success() {
+                    selectImage();
+                }
+            }).authenticate();
+        }
+        else {
+            navController.navigate(KeyboardFragmentDirections.actionGlobalKeyboardFragmentMain(OPERATION.SET_PROFILE_PICTURE, ""));
+        }
+    }
+
+    private void selectImage() {
         final CharSequence[] options = {"Take Photo", "Choose from Gallery", "Cancel"};
 
-        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+        AlertDialog.Builder builder = new AlertDialog.Builder(mainActivity);
         builder.setTitle("Choose your profile picture");
 
-        builder.setItems(options, new DialogInterface.OnClickListener() {
+        builder.setItems(options, (dialog, item) -> {
+            if (options[item].equals("Take Photo")) {
+                SharedPreferences sp = mainActivity.getSharedPreferences(MainActivity.SP_PROFILE_IMAGE, Context.MODE_PRIVATE);
+                sp.edit().putBoolean(MainActivity.IMAGE_DATA, true).apply();
+                Intent takePicture = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                startActivityForResult(takePicture, 0);
 
-            @Override
-            public void onClick(DialogInterface dialog, int item) {
+            } else if (options[item].equals("Choose from Gallery")) {
+                SharedPreferences sp = mainActivity.getSharedPreferences(MainActivity.SP_PROFILE_IMAGE, Context.MODE_PRIVATE);
+                sp.edit().putBoolean(MainActivity.IMAGE_DATA, true).apply();
+                Intent pickPhoto = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+                startActivityForResult(pickPhoto, 1);//one can be replaced with any action code
 
-                if (options[item].equals("Take Photo")) {
-                    SharedPreferences sp = mainActivity.getSharedPreferences(MainActivity.SP_PROFILE_IMAGE, Context.MODE_PRIVATE);
-                    sp.edit().putBoolean(MainActivity.IMAGE_DATA, true).apply();
-                    Intent takePicture = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
-                    startActivityForResult(takePicture, 0);
-
-                } else if (options[item].equals("Choose from Gallery")) {
-                    SharedPreferences sp = mainActivity.getSharedPreferences(MainActivity.SP_PROFILE_IMAGE, Context.MODE_PRIVATE);
-                    sp.edit().putBoolean(MainActivity.IMAGE_DATA, true).apply();
-                    Intent pickPhoto = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-                    startActivityForResult(pickPhoto, 1);//one can be replaced with any action code
-
-                } else if (options[item].equals("Cancel")) {
-                    dialog.dismiss();
-                }
+            } else if (options[item].equals("Cancel")) {
+                dialog.dismiss();
             }
         });
         builder.show();

@@ -3,13 +3,18 @@ package rs.ac.bg.etf.diplomski.authenticationapp.modules;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
 import androidx.lifecycle.MutableLiveData;
@@ -19,15 +24,18 @@ import androidx.navigation.Navigation;
 
 import android.os.Handler;
 import android.os.Looper;
+import android.provider.MediaStore;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.davidmiguel.numberkeyboard.NumberKeyboardListener;
 import com.google.firebase.auth.FirebaseAuth;
 
+import java.io.ByteArrayOutputStream;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -45,6 +53,8 @@ import rs.ac.bg.etf.diplomski.authenticationapp.app_user_register.RegisterActivi
 import rs.ac.bg.etf.diplomski.authenticationapp.databinding.FragmentKeyboardBinding;
 import rs.ac.bg.etf.diplomski.authenticationapp.models.OPERATION;
 
+import static android.app.Activity.RESULT_CANCELED;
+import static android.app.Activity.RESULT_OK;
 import static rs.ac.bg.etf.diplomski.authenticationapp.app_main.exchange_office.ExchangeOfficeFragment.PURCHASING_RATE;
 import static rs.ac.bg.etf.diplomski.authenticationapp.app_main.exchange_office.ExchangeOfficeFragment.SELLING_RATE;
 import static rs.ac.bg.etf.diplomski.authenticationapp.models.OPERATION.*;
@@ -332,6 +342,10 @@ public class KeyboardFragment extends Fragment {
                 externalPayment();
                 break;
 
+            case SET_PROFILE_PICTURE:
+                selectImage();
+                break;
+
             default:
                 break;
         }
@@ -507,5 +521,12 @@ public class KeyboardFragment extends Fragment {
                 amount,
                 amount
         );
+    }
+
+    private void selectImage() {
+        sharedPreferences
+                .edit()
+                .putBoolean(BiometricAuthenticator.TAKE_PHOTO_APPROVED, true)
+                .apply();
     }
 }

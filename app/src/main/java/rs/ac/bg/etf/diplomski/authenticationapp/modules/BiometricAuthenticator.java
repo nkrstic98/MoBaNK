@@ -28,6 +28,7 @@ public class BiometricAuthenticator {
     public static final String SHARED_PREFERENCES_USER_INFO = "shared-preferences-user-info";
     public static final String SHARED_PREFERENCES_USER_ID = "shared-preferences-user-id";
     public static final String SHARED_PREFERENCES_USER_PHOTO = "shared-preferences-user-photo";
+    public static final String TAKE_PHOTO_APPROVED = "shared-preferences-take-photo-approved";
 
     private Executor executor;
     private BiometricPrompt biometricPrompt;
